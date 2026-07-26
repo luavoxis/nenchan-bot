@@ -404,18 +404,18 @@ function html() {
 body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
 .sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:2px;min-height:100vh}
 .sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
-.sidebar button{background:none;border:none;color:#888;font:11px monospace;padding:6px 8px;text-align:left;cursor:pointer;border-radius:0}
+.sidebar button{background:none;border:none;color:#888;font:11px monospace;padding:6px 8px;text-align:left;cursor:pointer}
 .sidebar button:hover{color:#fff;background:#111}
 .sidebar button.active{color:#fff;background:#222}
 #logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important}
 .main{flex:1;padding:16px;max-width:800px}
-.tab{display:none}
-.tab.active{display:block}
+.panel{display:none}
+.panel.show{display:block}
 h2{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
 label{display:block;color:#666;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px}
 input,textarea,select{width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;margin-bottom:6px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#fff}
-button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer;display:inline-block;width:auto}
+button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer}
 button:hover{background:#888}
 .flex{display:flex;gap:4px;margin-bottom:4px}
 .flex button{flex:1}
@@ -423,7 +423,6 @@ button:hover{background:#888}
 .success{color:#4f4;font-size:11px;margin-bottom:4px}
 textarea{resize:vertical;min-height:50px;font:12px monospace}
 select option{background:#000;color:#ccc}
-.hidden{display:none!important}
 .stat{background:#0a0a0a;border:1px solid #222;padding:10px;margin-bottom:6px}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
@@ -433,20 +432,14 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .member-row{cursor:pointer}
 .member-row:hover{background:#111}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:100}
-.modal.open{display:flex}
+.modal.show{display:flex}
 .modal-box{background:#111;border:1px solid #333;padding:16px;width:90%;max-width:400px}
 .modal-box h3{font-size:12px;color:#fff;margin-bottom:8px}
 .modal-box p{font-size:11px;color:#888;margin-bottom:6px}
-.login-tab{display:flex!important;flex-direction:column;justify-content:center;align-items:center;height:100vh}
-.login-tab:not(.active){display:none!important}
-.login-box{background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center}
-.login-title{margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400}
-.login-input{text-align:center;margin-bottom:8px}
-.login-btn{width:100%}
 </style>
 </head>
 <body>
-<div id="sidebar" class="sidebar hidden">
+<div id="sidebar" class="sidebar" style="display:none">
 <h1>bot panel</h1>
 <button class="active" onclick="switchTab('dashboard')">[ dashboard ]</button>
 <button onclick="switchTab('messages')">[ messages ]</button>
@@ -455,19 +448,19 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" class="tab active login-tab">
-<div class="login-box">
-<h2 class="login-title">bot panel</h2>
-<div id="loginError" class="error"></div>
-<input type="password" id="password" placeholder="password" class="login-input" onkeydown="if(event.key==='Enter')login()"/>
-<button onclick="login()" class="login-btn">login</button>
+<div id="loginScreen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
+<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
+<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
+<div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
+<input type="password" id="password" placeholder="password" style="text-align:center;margin-bottom:8px;width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;outline:none" onkeydown="if(event.key==='Enter')login()"/>
+<button onclick="login()" style="width:100%;padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer">login</button>
 </div>
 </div>
-<div id="tab-dashboard" class="tab">
+<div id="panel-dashboard" class="panel">
 <h2>dashboard</h2>
 <div id="dashContent"><p style="color:#666">select a server from the sidebar</p></div>
 </div>
-<div id="tab-messages" class="tab">
+<div id="panel-messages" class="panel">
 <h2>messages</h2>
 <label>channel</label>
 <select id="msgChannel"><option value="">select server first</option></select>
@@ -475,157 +468,186 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <textarea id="msgInput" placeholder="message"></textarea>
 <div class="flex">
 <button onclick="sendMsg()">send</button>
-<button onclick="document.getElementById('msgInput').value=''" style="background:#555">clear</button>
+<button onclick="g('msgInput').value=''" style="background:#555">clear</button>
 </div>
-<div id="msgStatus"></div>
+<div id="msgStatus" style="color:#4f4;font-size:11px;margin-top:4px"></div>
 </div>
-<div id="tab-members" class="tab">
+<div id="panel-members" class="panel">
 <h2>members</h2>
 <div id="memberList"><p style="color:#666">select a server from the sidebar</p></div>
 </div>
 </div>
-<div id="userModal" class="modal"><div class="modal-box"><h3 id="modalName"></h3><p id="modalId"></p><p id="modalJoined"></p><p id="modalRoles"></p><div class="flex" style="margin-top:8px"><button onclick="closeModal()">close</button></div></div></div>
+<div id="userModal" class="modal"><div class="modal-box"><h3 id="modalName"></h3><p id="modalId"></p><p id="modalJoined"></p><p id="modalRoles"></p><div class="flex" style="margin-top:8px"><button onclick="c()">close</button></div></div></div>
 <script>
-let token=getCookie("token"),guildId="",allMembers=[],allRoles=[];
-function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?m[2]:null}
-function qs(s){return document.querySelector(s)}
-function show(e){e?.classList.add("active")}
-function hide(e){e?.classList.remove("active")}
+function g(i){return document.getElementById(i)}
+function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
+var token=getCookie("token"),guildId="",allMembers=[],allRoles=[];
+
+function login(){
+  var pwd=g("password").value,err=g("loginError");
+  err.textContent="";
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      if(d.token){
+        document.cookie="token="+encodeURIComponent(d.token)+";path=/;max-age=86400;SameSite=Lax";
+        token=d.token;
+        initPanel();
+      }else{err.textContent=d.error||"wrong password"}
+    }catch(e){err.textContent="invalid response"}
+  };
+  x.onerror=function(){err.textContent="connection error"};
+  x.send(JSON.stringify({action:"login",password:pwd}));
+}
+
+function initPanel(){
+  g("sidebar").style.display="flex";
+  g("loginScreen").style.display="none";
+  loadGuilds();
+}
 
 function switchTab(name){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  const t=document.getElementById(name==="login"?"loginScreen":"tab-"+name);
-  if(t)t.classList.add("active");
-  document.querySelectorAll(".sidebar button").forEach(b=>b.classList.remove("active"));
-  const btn=Array.from(document.querySelectorAll(".sidebar button")).find(b=>b.textContent.includes(name));
-  if(btn)btn.classList.add("active");
+  document.querySelectorAll(".panel").forEach(function(e){e.classList.remove("show")});
+  var el=g("panel-"+name);
+  if(el)el.classList.add("show");
+  document.querySelectorAll(".sidebar button").forEach(function(b){b.classList.remove("active")});
+  var btns=document.querySelectorAll(".sidebar button");
+  for(var i=0;i<btns.length;i++){if(btns[i].textContent.includes(name)){btns[i].classList.add("active");break}}
   if(name==="messages"&&guildId)loadMsgChannels();
   if(name==="members"&&guildId)loadMembers();
   if(name==="dashboard"&&guildId)loadDashboard();
 }
 
-// login
-async function login(){
-  const pwd=document.getElementById("password").value;
-  const errEl=document.getElementById("loginError");errEl.textContent="";
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:pwd})});
-    const d=await r.json();
-    if(d.token){document.cookie="token="+d.token+";path=/;max-age=86400;SameSite=Lax";token=d.token;initPanel()}
-    else errEl.textContent=d.error||"wrong password"
-  }catch(ex){errEl.textContent="connection error"}
+function loadGuilds(){
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.setRequestHeader("Authorization","Bearer "+token);
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      if(d.error)return;
+      var sel=g("guildSel");
+      sel.innerHTML="<label style='margin-top:8px;color:#666;font-size:10px;text-transform:uppercase'>server</label>";
+      for(var i=0;i<d.guilds.length;i++){
+        (function(gid,gname){
+          var b=document.createElement("button");
+          b.textContent=gname;b.style.fontSize="10px";b.style.padding="4px 8px";
+          b.onclick=function(){selectGuild(gid,gname)};
+          sel.appendChild(b);
+        })(d.guilds[i].id,d.guilds[i].name);
+      }
+      if(d.guilds.length)selectGuild(d.guilds[0].id,d.guilds[0].name);
+    }catch(e){}
+  };
+  x.send(JSON.stringify({action:"guilds"}));
 }
 
-// init
-async function initPanel(){
-  document.getElementById("sidebar").classList.remove("hidden");
-  hide(document.getElementById("loginScreen"));
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"guilds"})});
-    const d=await r.json();
-    if(d.error)return;
-    const sel=document.getElementById("guildSel");
-    sel.innerHTML="<label style='margin-top:8px;color:#666;font-size:10px;text-transform:uppercase'>server</label>";
-    d.guilds.forEach(g=>{
-      const b=document.createElement("button");
-      b.textContent=g.name;b.style.fontSize="10px";b.style.padding="4px 8px";
-      b.onclick=()=>selectGuild(g.id,g.name);
-      sel.appendChild(b);
-    });
-    if(d.guilds.length)selectGuild(d.guilds[0].id,d.guilds[0].name);
-  }catch(e){}
-}
-
-async function selectGuild(id,name){
+function selectGuild(id,name){
   guildId=id;
-  document.querySelectorAll("#guildSel button").forEach(b=>b.classList.remove("active"));
-  const btns=document.querySelectorAll("#guildSel button");
-  for(const b of btns)if(b.textContent===name)b.classList.add("active");
+  var btns=g("guildSel").querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){btns[i].classList.remove("active");if(btns[i].textContent===name)btns[i].classList.add("active")}
   loadDashboard();loadMsgChannels();loadMembers();
   switchTab("dashboard");
 }
 
-// dashboard
-async function loadDashboard(){
+function loadDashboard(){
   if(!guildId)return;
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"guildinfo",guildId})});
-    const d=await r.json();
-    if(d.error)return;
-    const c=document.getElementById("dashContent");
-    c.innerHTML="<div class='stat'><span>server</span><p>"+d.name+"</p></div>"+
-      "<div class='stat'><span>owner</span><p>"+d.owner+"</p></div>"+
-      "<div class='stat'><span>members</span><p>"+d.memberCount+"</p></div>"+
-      "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
-      "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
-      "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
-      "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
-  }catch(e){}
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.setRequestHeader("Authorization","Bearer "+token);
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      if(d.error)return;
+      g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
+        "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
+        "<div class='stat'><span>members</span><p>"+d.memberCount+"</p></div>"+
+        "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
+        "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
+        "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
+        "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
+    }catch(e){}
+  };
+  x.send(JSON.stringify({action:"guildinfo",guildId:guildId}));
 }
 
-// messages
-async function loadMsgChannels(){
+function loadMsgChannels(){
   if(!guildId)return;
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"channels",guildId})});
-    const d=await r.json();
-    if(d.error)return;
-    const s=document.getElementById("msgChannel");
-    s.innerHTML="<option value=''>select channel</option>"+d.channels.filter(c=>c.type===0).map(c=>"<option value='"+c.id+"'>#"+c.name+"</option>").join("");
-  }catch(e){}
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.setRequestHeader("Authorization","Bearer "+token);
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      if(d.error)return;
+      var s=g("msgChannel");
+      s.innerHTML="<option value=''>select channel</option>";
+      for(var i=0;i<d.channels.length;i++){if(d.channels[i].type===0){var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o)}}
+    }catch(e){}
+  };
+  x.send(JSON.stringify({action:"channels",guildId:guildId}));
 }
 
-async function sendMsg(){
-  const c=document.getElementById("msgChannel").value,m=document.getElementById("msgInput").value;
-  if(!c||!m){document.getElementById("msgStatus").textContent="fill all fields";return}
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"send",channelId:c,content:m})});
-    const d=await r.json();
-    document.getElementById("msgStatus").textContent=d.success?"sent!":(d.error||"failed");
-    if(d.success)document.getElementById("msgInput").value="";
-  }catch(e){document.getElementById("msgStatus").textContent="error"}
+function sendMsg(){
+  var c=g("msgChannel").value,m=g("msgInput").value;
+  if(!c||!m){g("msgStatus").textContent="fill all fields";return}
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.setRequestHeader("Authorization","Bearer "+token);
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      g("msgStatus").textContent=d.success?"sent!":(d.error||"failed");
+      if(d.success)g("msgInput").value="";
+    }catch(e){g("msgStatus").textContent="error"}
+  };
+  x.send(JSON.stringify({action:"send",channelId:c,content:m}));
 }
 
-// members
-async function loadMembers(){
+function loadMembers(){
   if(!guildId)return;
-  try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"members",guildId})});
-    const d=await r.json();
-    if(d.error)return;
-    allMembers=d.members;allRoles=d.roles;
-    const c=document.getElementById("memberList");
-    if(!d.members.length){c.innerHTML="<p style='color:#666'>no members</p>";return}
-    let html="<table><tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
-    d.members.forEach(m=>{
-      const name=m.nick||m.user.global_name||m.user.username;
-      const joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-      const roleCount=m.roles.length;
-      html+="<tr class='member-row' onclick='showMember(""+m.user.id+"")'><td>"+escape(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+roleCount+"</td></tr>";
-    });
-    html+="</table>";
-    c.innerHTML=html;
-  }catch(e){}
+  var x=new XMLHttpRequest();
+  x.open("POST","/api",true);
+  x.setRequestHeader("Content-Type","application/json");
+  x.setRequestHeader("Authorization","Bearer "+token);
+  x.onload=function(){
+    try{
+      var d=JSON.parse(x.responseText);
+      if(d.error)return;
+      allMembers=d.members;allRoles=d.roles;
+      var html="<table><tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
+      for(var i=0;i<d.members.length;i++){
+        var m=d.members[i],name=m.nick||(m.user.global_name||m.user.username);
+        var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+        html+="<tr class='member-row' onclick='showMember(""+m.user.id+"")'><td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td></tr>";
+      }
+      html+="</table>";
+      g("memberList").innerHTML=html;
+    }catch(e){}
+  };
+  x.send(JSON.stringify({action:"members",guildId:guildId}));
 }
 
 function showMember(id){
-  const m=allMembers.find(x=>x.user.id===id);if(!m)return;
-  const name=m.nick||m.user.global_name||m.user.username;
-  const joined=new Date(m.joined_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
-  const roles=m.roles.map(r=>{const role=allRoles.find(x=>x.id===r);return role?role.name:r}).join(", ")||"none";
-  document.getElementById("modalName").textContent=name;
-  document.getElementById("modalId").textContent="id: "+m.user.id;
-  document.getElementById("modalJoined").textContent="joined: "+joined;
-  document.getElementById("modalRoles").textContent="roles: "+roles;
-  document.getElementById("userModal").classList.add("open");
+  var m=allMembers.find(function(x){return x.user.id===id});if(!m)return;
+  var name=m.nick||(m.user.global_name||m.user.username);
+  g("modalName").textContent=name;
+  g("modalId").textContent="id: "+m.user.id;
+  g("modalJoined").textContent="joined: "+new Date(m.joined_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  var roles=m.roles.map(function(r){var role=allRoles.find(function(x){return x.id===r});return role?role.name:r}).join(", ")||"none";
+  g("modalRoles").textContent="roles: "+roles;
+  g("userModal").classList.add("show");
 }
-
-function closeModal(){document.getElementById("userModal").classList.remove("open")}
-
-function escape(s){const d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
-
-function logout(){document.cookie="token=;path=/;max-age=0";token=null;location.reload()}
-
+function c(){g("userModal").classList.remove("show")}
+function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
+function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
 if(token)initPanel();
 </script>
 </body>
@@ -748,10 +770,9 @@ async function handlePanel(req, res) {
       return res.json({ guilds: r.data });
     }
     if (action === "guildinfo") {
-      const [guildRes, chanRes, memberRes, rolesRes] = await Promise.all([
+      const [guildRes, chanRes, rolesRes] = await Promise.all([
         axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}`, { headers }),
         axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/channels`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/members?limit=1`, { headers }),
         axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/roles`, { headers })
       ]);
       const guild = guildRes.data;
@@ -762,7 +783,7 @@ async function handlePanel(req, res) {
         memberCount: guild.approximate_member_count || guild.member_count || "?",
         channelCount: chanRes.data.length,
         roleCount: rolesRes.data.length,
-        created: new Date(guild.id ? Number(BigInt(guild.id) >> 22n) + 14200704e5 : 0).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+        created: new Date(Number(BigInt(guild.id) >> 22n) + 14200704e5).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0
       });
