@@ -645,7 +645,7 @@ function renderDmList(channels){
     if(!recipient)continue;
     var name=recipient.global_name||recipient.username;
     var avatar=recipient.avatar?"https://cdn.discordapp.com/avatars/"+recipient.id+"/"+recipient.avatar+(recipient.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(recipient.discriminator||"0")%5)+".png";
-    h+="<div class='dm-channel' onclick='openDm(\""+ch.id+"\",\""+esc(name)+"\")'>";
+    h+="<div class='dm-channel' data-cid='"+ch.id+"' data-name='"+esc(name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
     h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
     h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(name)+"</div>";
     h+="<div class='dm-channel-preview'>"+esc(recipient.username)+"</div></div>";
