@@ -1,6 +1,6 @@
 // index.ts
-import axios from "axios";
-import { InteractionResponseType, MessageFlags as MessageFlags3 } from "discord-api-types/v10";
+import axios2 from "axios";
+import { InteractionResponseType, MessageFlags as MessageFlags4 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 
@@ -166,11 +166,70 @@ var chat_default = {
   }
 };
 
+// commands/banner.ts
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType3,
+  MessageFlags as MessageFlags3
+} from "discord-api-types/v10";
+import axios from "axios";
+var banner_default = {
+  data: {
+    name: "banner",
+    description: "Shows a user's banner",
+    options: [
+      {
+        name: "user",
+        description: "The user you want to see the banner of",
+        type: ApplicationCommandOptionType3.User,
+        required: true
+      }
+    ]
+  },
+  async execute(data) {
+    const userId = data.interaction.data.options?.find(
+      (o) => o.name === "user"
+    )?.value;
+    if (!userId) {
+      return {
+        content: "You must specify a user.",
+        flags: MessageFlags3.Ephemeral
+      };
+    }
+    const res = await axios.get(
+      `https://discord.com/api/v10/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bot ${process.env.DISCORD_TOKEN}`
+        }
+      }
+    );
+    const user = res.data;
+    if (!user.banner) {
+      return {
+        content: "This user doesn't have a banner.",
+        flags: MessageFlags3.Ephemeral
+      };
+    }
+    const isAnimated = user.banner.startsWith("a_");
+    const ext = isAnimated ? "gif" : "png";
+    const bannerUrl = `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${ext}?size=1024`;
+    return {
+      embeds: [
+        {
+          color: 5793266,
+          image: { url: bannerUrl }
+        }
+      ]
+    };
+  }
+};
+
 // .discraft/commands/index.ts
 var commands_default = {
   profile: profile_default,
   ping: ping_default,
-  chat: chat_default
+  chat: chat_default,
+  banner: banner_default
 };
 
 // utils/logger.ts
@@ -233,12 +292,12 @@ async function handler(req, res) {
       const command = commands_default[commandName];
       if (command) {
         try {
-          await axios.post(
+          await axios2.post(
             `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
             {
               type: InteractionResponseType.DeferredChannelMessageWithSource,
               data: {
-                flags: command.data.initialEphemeral ? MessageFlags3.Ephemeral : 0
+                flags: command.data.initialEphemeral ? MessageFlags4.Ephemeral : 0
               }
             },
             {
@@ -260,11 +319,11 @@ async function handler(req, res) {
           });
           commandResult = {
             content: "An error occurred while processing your request.",
-            flags: MessageFlags3.Ephemeral
+            flags: MessageFlags4.Ephemeral
           };
         }
         try {
-          await axios.patch(
+          await axios2.patch(
             `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
             {
               content: commandResult.content ?? "",
