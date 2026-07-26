@@ -154,6 +154,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .member-stat span{display:block;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px}
 .member-stat p{font-size:14px;color:#fff;margin-top:2px}
 .modal-box{background:#111;border:1px solid #333;padding:0;width:90%;max-width:360px;overflow:hidden}
+.modal-banner{height:80px;background-size:cover;background-position:center}
+.modal-banner-color{height:8px}
 .modal-header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #222;background:#0d0d0d}
 .modal-header img{width:48px;height:48px;border-radius:50%}
 .modal-header-info h3{font-size:13px;color:#fff;margin:0}
@@ -552,7 +554,15 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
-  g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
+  var bannerHtml="";
+  if(m.user.banner){
+    var ext=m.user.banner.startsWith("a_")?".gif":".png";
+    bannerHtml="<div class='modal-banner' style='background-image:url(https://cdn.discordapp.com/banners/"+m.user.id+"/"+m.user.banner+ext+"?size=480)'></div>";
+  }else if(m.user.accent_color!=null){
+    var ac="#"+m.user.accent_color.toString(16).padStart(6,"0");
+    bannerHtml="<div class='modal-banner-color' style='background:"+ac+"'></div>";
+  }
+  g("modalBox").innerHTML=bannerHtml+"<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
     "<div class='modal-section'><div class='modal-section-label'>id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
     "<div class='modal-section'><div class='modal-section-label'>joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
