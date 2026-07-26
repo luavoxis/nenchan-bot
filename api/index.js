@@ -401,24 +401,23 @@ function html() {
 <title>Bot Panel</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:14px/1.5 system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center}
-.card{background:#16213e;padding:2rem;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);width:100%;max-width:500px}
-h1{text-align:center;margin-bottom:1.5rem;color:#c9a0dc;font-size:1.5rem}
-label{display:block;margin-bottom:.25rem;color:#aaa;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
-input,textarea,select{width:100%;padding:.6rem .8rem;border:1px solid #2a2a4a;border-radius:6px;background:#0f3460;color:#e0e0e0;font:inherit;margin-bottom:1rem}
-input:focus,textarea:focus,select:focus{outline:2px solid #c9a0dc;border-color:transparent}
-button{width:100%;padding:.7rem;background:#c9a0dc;color:#1a1a2e;border:none;border-radius:6px;font:600 1rem system-ui,sans-serif;cursor:pointer;transition:opacity .2s}
-button:hover{opacity:.85}
-.error{color:#e74c3c;margin-bottom:.5rem;font-size:.85rem}
-.success{color:#2ecc71;margin-bottom:.5rem;font-size:.85rem}
+body{font:14px/1.5 system-ui,sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.card{background:#111;padding:2rem;border-radius:8px;border:1px solid #222;width:100%;max-width:500px}
+h1{text-align:center;margin-bottom:1.5rem;color:#fff;font-size:1.5rem}
+label{display:block;margin-bottom:.25rem;color:#888;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+input,textarea,select{width:100%;padding:.6rem .8rem;border:1px solid #333;border-radius:4px;background:#000;color:#fff;font:inherit;margin-bottom:1rem}
+input:focus,textarea:focus,select:focus{outline:1px solid #fff;border-color:#fff}
+button{width:100%;padding:.7rem;background:#fff;color:#000;border:none;border-radius:4px;font:600 1rem system-ui,sans-serif;cursor:pointer}
+button:hover{opacity:.8}
+.error{color:#ff4444;margin-bottom:.5rem;font-size:.85rem}
+.success{color:#44ff44;margin-bottom:.5rem;font-size:.85rem}
 .hidden{display:none}
 .flex{display:flex;gap:.5rem}
 .flex button{flex:1}
-#logout{background:transparent;color:#e74c3c;border:1px solid #e74c3c;margin-top:1rem;padding:.4rem}
-#logout:hover{background:#e74c3c20}
+#logout{background:transparent;color:#ff4444;border:1px solid #ff4444;margin-top:1rem;padding:.4rem}
 textarea{resize:vertical;min-height:80px}
-small{color:#888;font-size:.8rem}
-select option{background:#0f3460;color:#e0e0e0}
+small{color:#666;font-size:.8rem}
+select option{background:#000;color:#fff}
 </style>
 </head>
 <body>
