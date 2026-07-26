@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
-import getRawBody from "raw-body";
 import commands from "./.discraft/commands/index";
 import {
   type Command,
@@ -992,23 +991,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    let rawBody: Buffer;
+    let rawBody: string;
     try {
-      rawBody = await getRawBody(req);
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      rawBody = Buffer.concat(chunks).toString();
     } catch (e: any) {
       return res.status(400).json({ error: "Failed to read body: " + (e.message || "unknown") });
     }
     if (!rawBody || !rawBody.length) return res.status(400).json({ error: "Missing body" });
-    const bodyStr = rawBody.toString();
 
     const signature = req.headers["x-signature-ed25519"];
     const timestamp = req.headers["x-signature-timestamp"];
 
     if (typeof signature === "string" && typeof timestamp === "string") {
-      return await handleDiscord(req, res, bodyStr, signature, timestamp);
+      return await handleDiscord(req, res, rawBody, signature, timestamp);
     }
 
-    return await handlePanel(res, bodyStr);
+    return await handlePanel(res, rawBody);
   } catch (error) {
     console.error("Handler error", error);
     return res.status(500).json({ error: "Internal error" });
