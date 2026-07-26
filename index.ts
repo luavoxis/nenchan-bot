@@ -67,6 +67,7 @@ button:hover{background:#888}
 .success{color:#4f4;font-size:11px;margin-bottom:4px}
 textarea{resize:vertical;min-height:50px;font:12px monospace}
 select option{background:#000;color:#ccc}
+.hidden{display:none!important}
 .stat{background:#0a0a0a;border:1px solid #222;padding:10px;margin-bottom:6px}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
@@ -83,7 +84,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </style>
 </head>
 <body>
-<div class="sidebar">
+<div id="sidebar" class="sidebar hidden">
 <h1>bot panel</h1>
 <button class="active" onclick="switchTab('dashboard')">[ dashboard ]</button>
 <button onclick="switchTab('messages')">[ messages ]</button>
@@ -154,6 +155,7 @@ async function login(){
 
 // init
 async function initPanel(){
+  document.getElementById("sidebar").classList.remove("hidden");
   hide(document.getElementById("loginScreen"));
   try{
     const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"guilds"})});
