@@ -114,13 +114,6 @@ select option{background:#000;color:#ccc}
 .dash-card-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:9px;margin-top:1px}
-.dash-boost{display:flex;align-items:center;gap:10px;padding:10px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px}
-.dash-boost-icon{font-size:20px;flex-shrink:0}
-.dash-boost-bar{flex:1}
-.dash-boost-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.dash-boost-track{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden}
-.dash-boost-fill{height:100%;background:#ff73fa;border-radius:3px;transition:width .3s}
-.dash-boost-text{color:#fff;font-size:11px;margin-top:3px}
 .dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0}
 .dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
 .dash-roles-header .role-arrow{color:#555;font-size:9px;transition:transform .15s}
@@ -400,9 +393,6 @@ function loadDashboard(){
       var c=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#666";
       return "<div class='role-item'><span class='role-dot' style='background:"+c+"'></span>"+esc(r.name)+"</div>";
     }).join("");
-    var boostPct=Math.min((d.boostCount/14)*100,100);
-    var boostColors=["#57f287","#eb459e","#ff73fa","#ff73fa","#ff73fa","#f47fff"];
-    var boostBarColor=boostColors[d.boostLevel]||"#57f287";
     var h="<div class='dash-header'>";
     h+=iconHtml;
     h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.created.split(", ").pop()+"</div></div>";
@@ -411,9 +401,8 @@ function loadDashboard(){
     h+="<div class='dash-card'><div class='dash-card-icon'>&#128101;</div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
     h+="<div class='dash-card'><div class='dash-card-icon'>&#128172;</div><div><div class='dash-card-label'>channels</div><div class='dash-card-val'>"+d.channelCount+"</div><div class='dash-card-sub'>"+d.textChannels+" text &middot; "+d.voiceChannels+" voice &middot; "+d.categories+" categories</div></div></div>";
     h+="<div class='dash-card'><div class='dash-card-icon'>&#128081;</div><div><div class='dash-card-label'>owner</div><div class='dash-card-val'>"+esc(d.owner)+"</div><div class='dash-card-sub'>"+d.ownerId+"</div></div></div>";
-    h+="<div class='dash-card'><div class='dash-card-icon'>&#11088;</div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+"</div><div class='dash-card-sub'>tier "+d.boostLevel+"</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'>&#11088;</div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+" boosts</div><div class='dash-card-sub'>tier "+d.boostLevel+" &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
     h+="</div>";
-    h+="<div class='dash-boost'><div class='dash-boost-icon'>&#127775;</div><div class='dash-boost-bar'><div class='dash-boost-label'>boost progress (tier "+d.boostLevel+")</div><div class='dash-boost-track'><div class='dash-boost-fill' style='width:"+boostPct+"%;background:"+boostBarColor+"'></div></div><div class='dash-boost-text'>"+d.boostCount+" boosts &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
     h+="<div class='dash-roles-header' onclick='toggleDashRoles()'><span>roles ("+d.roleCount+")</span><span class='role-arrow' id='dashRoleArrow'>&#9660;</span></div>";
     h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
     g("dashContent").innerHTML=h;
