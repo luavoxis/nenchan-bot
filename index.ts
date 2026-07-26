@@ -288,7 +288,8 @@ function loadMsgHistory(cid){
         var name=u.global_name||u.username;
         var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
         var color=u.bot?"#4af":"#888";
-        h+="<div style='margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
+        h+="<div style='display:flex;gap:8px;margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
+        h+="<div style='flex:1;min-width:0'>";
         h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
         if(msg.edited_timestamp) h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
         h+="<br>";
@@ -357,7 +358,8 @@ function loadMsgHistory(cid){
           }
           h+="</div>";
         }
-        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="float:right;color:#555;cursor:pointer" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this)" title="delete">&#10005;</span>';
+        h+='</div>';
+        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this.parentElement)" title="delete">&#10005;</span>';
         h+="</div>";
       }
     }catch(e){
