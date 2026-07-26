@@ -235,14 +235,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="memberList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
 </div>
 <div id="panel-dms" class="panel">
-<div style="display:flex;gap:4px;margin-bottom:8px">
-<input type="text" id="dmUserId" placeholder="user id" style="flex:1;padding:4px 6px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace"/>
-<button onclick="startDmById()" style="padding:4px 10px;font-size:11px;background:#333;color:#eee;border:1px solid #555;cursor:pointer;font-family:monospace">open</button>
+<div id="dmStart">
+<label>user id</label>
+<div style="display:flex;gap:4px">
+<input type="text" id="dmUserId" placeholder="user id" style="flex:1"/>
+<button onclick="startDmById()">open</button>
 </div>
-<div id="dmList"></div>
+</div>
 <div id="dmChat" style="display:none">
-<div id="dmChatHeader" style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #222;margin-bottom:8px">
-<button onclick="dmBack()" style="background:none;border:1px solid #333;color:#888;padding:2px 8px;font:11px monospace;cursor:pointer">back</button>
+<div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #222;margin-bottom:8px">
+<button onclick="dmClose()" style="background:none;border:1px solid #333;color:#888;padding:2px 8px;font:11px monospace;cursor:pointer">close</button>
 <span id="dmChatName" style="color:#fff;font-size:12px"></span>
 </div>
 <div id="dmHistory" style="max-height:360px;overflow-y:auto;margin-bottom:8px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
@@ -251,8 +253,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <label>message</label>
 <textarea id="dmInput" placeholder="message" style="min-height:50px"></textarea>
 <div class="flex" style="gap:4px">
-<button onclick="sendDm()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">send</button>
-<button onclick="g('dmInput').value=''" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
+<button onclick="sendDm()">send</button>
+<button onclick="g('dmInput').value=''">clear</button>
 </div>
 <div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
@@ -288,7 +290,7 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
-  if(name==="dms"){loadDms();g("dmList").style.display="block";g("dmChat").style.display="none"}
+  if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none"}
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
 }
 
@@ -629,13 +631,11 @@ function updateFileLabel(el){
   else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
-var allDmChannels=[],currentDmChannel=null;
+var currentDmChannel=null;
 function startDmById(){
   var uid=g("dmUserId").value.trim();
   if(!uid)return;
-  g("dmUserId").value="";
-  currentDmChannel=null;
-  g("dmList").style.display="none";
+  g("dmStart").style.display="none";
   g("dmChat").style.display="block";
   g("dmChatName").textContent=uid;
   g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>opening dm...</p>";
@@ -648,46 +648,12 @@ function startDmById(){
       if(u&&!u.error)g("dmChatName").textContent=u.global_name||u.username||uid;
     });
     loadDmHistory(d.channelId);
-    loadDms();
   });
 }
-function loadDms(){
-  api({action:"dm_channels"},function(d){
-    if(d.error){g("dmList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    var channels=(d.channels||[]).filter(function(ch){return ch.type===1});
-    channels.sort(function(a,b){var al=a.last_message_id||a.id;var bl=b.last_message_id||b.id;return bl>al?1:bl<al?-1:0});
-    allDmChannels=channels;
-    renderDmList(channels);
-  });
-}
-function renderDmList(channels){
-  if(!channels.length){g("dmList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no conversations</p>";return}
-  var h="";
-  for(var i=0;i<channels.length;i++){
-    var ch=channels[i],r=ch.recipients&&ch.recipients[0];
-    if(!r)continue;
-    var name=r.global_name||r.username;
-    var avatar=r.avatar?"https://cdn.discordapp.com/avatars/"+r.id+"/"+r.avatar+(r.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(r.discriminator||"0")%5)+".png";
-    h+="<div class='dm-channel' data-cid='"+ch.id+"' data-name='"+esc(name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
-    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(name)+"</div>";
-    h+="<div class='dm-channel-preview'>@"+esc(r.username)+"</div></div>";
-    h+="</div>";
-  }
-  g("dmList").innerHTML=h;
-}
-function openDm(cid,name){
-  currentDmChannel=cid;
-  g("dmList").style.display="none";
-  g("dmChat").style.display="block";
-  g("dmChatName").textContent=name;
-  loadDmHistory(cid);
-}
-function dmBack(){
+function dmClose(){
   currentDmChannel=null;
-  g("dmList").style.display="block";
   g("dmChat").style.display="none";
-  loadDms();
+  g("dmStart").style.display="block";
 }
 function loadDmHistory(cid){
   g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
