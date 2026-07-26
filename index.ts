@@ -210,7 +210,6 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="msgStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
 <div id="panel-members" class="panel">
-<h2>members</h2>
 <input type="text" class="member-search" id="memberSearch" placeholder="search members..." oninput="filterMembers(this.value)"/>
 <div id="memberStats" class="member-stats"></div>
 <div id="memberList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
