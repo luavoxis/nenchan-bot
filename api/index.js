@@ -46,15 +46,12 @@ var profile_default = {
     return {
       embeds: [
         {
-          title: user.global_name ?? user.username,
           color: 5793266,
-          thumbnail: { url: avatarUrl },
           fields: [
             { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true }
           ],
-          image: { url: avatarUrl },
-          footer: { text: "Discord Profile" }
+          image: { url: avatarUrl }
         }
       ]
     };
