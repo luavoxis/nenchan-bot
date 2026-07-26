@@ -1,11 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import axios from "axios";
 import FormData from "form-data";
 import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 import commands from "./.discraft/commands/index";
-import { logger } from "./utils/logger";
 import {
   type Command,
   type CommandExecuteUnpromised,
@@ -13,6 +11,17 @@ import {
 } from "./utils/types";
 
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
+
+async function discordFetch(url: string, opts: any = {}): Promise<any> {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try { const d = await res.json(); msg = d.message || msg; } catch {}
+    throw new Error(msg);
+  }
+  if (res.headers.get("content-type")?.includes("application/json")) return res.json();
+  return res.text();
+}
 
 function authToken(): string {
   return Buffer.from(PANEL_PASSWORD).toString("base64");
@@ -444,7 +453,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return await handlePanel(res, bodyStr);
   } catch (error) {
-    logger.error("Handler error", { error });
+    console.error("Handler error", error);
     return res.status(500).json({ error: "Internal error" });
   }
 }
@@ -474,13 +483,16 @@ async function handleDiscord(req: VercelRequest, res: VercelResponse, rawBody: s
 
     if (command) {
       try {
-        await axios.post(
+        await discordFetch(
           `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
           {
-            type: InteractionResponseType.DeferredChannelMessageWithSource,
-            data: { flags: command.data.initialEphemeral ? MessageFlags.Ephemeral : 0 },
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: InteractionResponseType.DeferredChannelMessageWithSource,
+              data: { flags: command.data.initialEphemeral ? MessageFlags.Ephemeral : 0 },
+            }),
           },
-          { headers: { "Content-Type": "application/json" } },
         );
       } catch {
         return res.status(500).json({ error: "Failed to defer" });
@@ -505,14 +517,17 @@ async function handleDiscord(req: VercelRequest, res: VercelResponse, rawBody: s
       }
 
       try {
-        await axios.patch(
+        await discordFetch(
           `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
           {
-            content: commandResult.content ?? "",
-            flags: commandResult.flags,
-            embeds: commandResult.embeds,
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content: commandResult.content ?? "",
+              flags: commandResult.flags,
+              embeds: commandResult.embeds,
+            }),
           },
-          { headers: { "Content-Type": "application/json" } },
         );
         return res.status(200).end();
       } catch {
@@ -556,29 +571,28 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
   try {
     if (body.action === "guildinfo") {
       const [guildRes, chanRes, rolesRes] = await Promise.all([
-        axios.get(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
-        axios.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
-        axios.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
+        discordFetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
+        discordFetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
+        discordFetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
       ]);
-      const guild = guildRes.data;
-      const ownerRes = await axios.get(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
+      const guild = guildRes;
+      const ownerRes = await discordFetch(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
       let bots = 0, humans = 0, totalMembers = guild.approximate_member_count || guild.member_count || "?";
       try {
-        const memberRes = await axios.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
-        const members = memberRes.data;
+        const members = await discordFetch(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
         bots = members.filter((m: any) => m.user?.bot).length;
         humans = members.length - bots;
         totalMembers = guild.approximate_member_count || guild.member_count || members.length;
       } catch {}
       return res.json({
         name: guild.name,
-        owner: ownerRes.data.global_name || ownerRes.data.username,
+        owner: ownerRes.global_name || ownerRes.username,
         totalMembers,
         bots,
         humans,
-        channelCount: chanRes.data.length,
-        roleCount: rolesRes.data.length,
-        roles: rolesRes.data.map((r: any) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
+        channelCount: chanRes.length,
+        roleCount: rolesRes.length,
+        roles: rolesRes.map((r: any) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
         created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0,
@@ -586,8 +600,8 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
     }
 
     if (body.action === "channels") {
-      const r = await axios.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
-      return res.json({ channels: r.data });
+      const channels = await discordFetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
+      return res.json({ channels });
     }
 
     if (body.action === "send") {
@@ -597,42 +611,41 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         const buf = Buffer.from(body.fileData, "base64");
         form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
       }
-      await axios.post(
+      await discordFetch(
         `https://discord.com/api/v10/channels/${body.channelId}/messages`,
-        form,
-        { headers: { ...headers, ...form.getHeaders() } },
+        { method: "POST", headers: { ...headers, ...form.getHeaders() }, body: form as any },
       );
       return res.json({ success: true });
     }
 
     if (body.action === "messages") {
-      const r = await axios.get(
+      const messages = await discordFetch(
         `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
         { headers },
       );
-      return res.json({ messages: r.data });
+      return res.json({ messages });
     }
 
     if (body.action === "delete") {
-      await axios.delete(
+      await discordFetch(
         `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
-        { headers },
+        { method: "DELETE", headers },
       );
       return res.json({ success: true });
     }
 
     if (body.action === "members") {
       const [memberRes, rolesRes] = await Promise.all([
-        axios.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
-        axios.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
+        discordFetch(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
+        discordFetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
       ]);
-      return res.json({ members: memberRes.data, roles: rolesRes.data });
+      return res.json({ members: memberRes, roles: rolesRes });
     }
 
     return res.status(400).json({ error: "Unknown action" });
   } catch (err: any) {
     return res.status(500).json({
-      error: err.response?.data?.message || err.message || "Request failed",
+      error: err.message || "Request failed",
     });
   }
 }

@@ -2,12 +2,21 @@ import {
   ApplicationCommandOptionType,
   MessageFlags,
 } from "discord-api-types/v10";
-import axios from "axios";
 import type {
   CommandData,
   CommandExecuteResult,
   SimplifiedInteraction,
 } from "../utils/types";
+
+async function discordFetch(url: string, opts: any = {}): Promise<any> {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try { const d = await res.json(); msg = d.message || msg; } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
 
 function snowflakeToDate(id: string): string {
   const timestamp = Number(BigInt(id) >> 22n) + 1420070400000;
@@ -43,11 +52,10 @@ export default {
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
     };
 
-    const userRes = await axios.get(
+    const user = await discordFetch(
       `https://discord.com/api/v10/users/${targetId}`,
       { headers },
     );
-    const user = userRes.data;
 
     const isAnimated = user.avatar?.startsWith("a_");
     const ext = isAnimated ? "gif" : "png";
@@ -92,11 +100,10 @@ export default {
     }
 
     try {
-      const memberRes = await axios.get(
+      const member = await discordFetch(
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
         { headers },
       );
-      const member = memberRes.data;
 
       fields.splice(2, 0, {
         name: "Nickname",
@@ -113,11 +120,10 @@ export default {
       fields.push({ name: "Joined Server", value: joinedAt, inline: true });
 
       try {
-        const rolesRes = await axios.get(
+        const allRoles = await discordFetch(
           `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
           { headers },
         );
-        const allRoles = rolesRes.data;
         const memberRoleIds = member.roles as string[];
         const memberRoles = allRoles
           .filter((r: { id: string }) => memberRoleIds.includes(r.id))
@@ -148,8 +154,8 @@ export default {
           inline: false,
         });
       }
-    } catch (err) {
-      const status = axios.isAxiosError(err) ? err.response?.status : "?";
+    } catch (err: any) {
+      const status = err.message?.match(/HTTP (\d+)/)?.[1] || "?";
       fields.push({ name: "Note", value: `*Could not fetch member data (HTTP ${status}) - make sure the bot has Server Members Intent enabled and try re-inviting with \`guilds.members.read\` scope*`, inline: false });
     }
 

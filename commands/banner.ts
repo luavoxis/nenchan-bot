@@ -2,12 +2,21 @@ import {
   ApplicationCommandOptionType,
   MessageFlags,
 } from "discord-api-types/v10";
-import axios from "axios";
 import type {
   CommandData,
   CommandExecuteResult,
   SimplifiedInteraction,
 } from "../utils/types";
+
+async function discordFetch(url: string, opts: any = {}): Promise<any> {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try { const d = await res.json(); msg = d.message || msg; } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
 
 export default {
   data: {
@@ -36,7 +45,7 @@ export default {
       };
     }
 
-    const res = await axios.get(
+    const user = await discordFetch(
       `https://discord.com/api/v10/users/${userId}`,
       {
         headers: {
@@ -44,8 +53,6 @@ export default {
         },
       },
     );
-
-    const user = res.data;
 
     if (!user.banner) {
       return {

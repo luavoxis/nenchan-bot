@@ -10304,7 +10304,6 @@ var require_form_data = __commonJS({
 
 // index.ts
 var import_form_data = __toESM(require_form_data(), 1);
-import axios3 from "axios";
 import { InteractionResponseType, MessageFlags as MessageFlags5 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
@@ -10313,7 +10312,19 @@ import getRawBody from "raw-body";
 import {
   ApplicationCommandOptionType
 } from "discord-api-types/v10";
-import axios from "axios";
+async function discordFetch(url, opts = {}) {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try {
+      const d = await res.json();
+      msg = d.message || msg;
+    } catch {
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
 function snowflakeToDate(id) {
   const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
   return new Date(timestamp).toLocaleDateString("en-US", {
@@ -10341,11 +10352,10 @@ var userinfo_default = {
     const headers = {
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`
     };
-    const userRes = await axios.get(
+    const user = await discordFetch(
       `https://discord.com/api/v10/users/${targetId}`,
       { headers }
     );
-    const user = userRes.data;
     const isAnimated = user.avatar?.startsWith("a_");
     const ext = isAnimated ? "gif" : "png";
     const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator) % 5}.png`;
@@ -10383,11 +10393,10 @@ var userinfo_default = {
       fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
     try {
-      const memberRes = await axios.get(
+      const member = await discordFetch(
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
         { headers }
       );
-      const member = memberRes.data;
       fields.splice(2, 0, {
         name: "Nickname",
         value: member.nick || "None",
@@ -10400,11 +10409,10 @@ var userinfo_default = {
       });
       fields.push({ name: "Joined Server", value: joinedAt, inline: true });
       try {
-        const rolesRes = await axios.get(
+        const allRoles = await discordFetch(
           `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
           { headers }
         );
-        const allRoles = rolesRes.data;
         const memberRoleIds = member.roles;
         const memberRoles = allRoles.filter((r) => memberRoleIds.includes(r.id)).sort(
           (a, b) => b.position - a.position
@@ -10425,7 +10433,7 @@ var userinfo_default = {
         });
       }
     } catch (err) {
-      const status = axios.isAxiosError(err) ? err.response?.status : "?";
+      const status = err.message?.match(/HTTP (\d+)/)?.[1] || "?";
       fields.push({ name: "Note", value: `*Could not fetch member data (HTTP ${status}) - make sure the bot has Server Members Intent enabled and try re-inviting with \`guilds.members.read\` scope*`, inline: false });
     }
     return {
@@ -10607,7 +10615,19 @@ import {
   ApplicationCommandOptionType as ApplicationCommandOptionType4,
   MessageFlags as MessageFlags4
 } from "discord-api-types/v10";
-import axios2 from "axios";
+async function discordFetch2(url, opts = {}) {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try {
+      const d = await res.json();
+      msg = d.message || msg;
+    } catch {
+    }
+    throw new Error(msg);
+  }
+  return res.json();
+}
 var banner_default = {
   data: {
     name: "banner",
@@ -10631,7 +10651,7 @@ var banner_default = {
         flags: MessageFlags4.Ephemeral
       };
     }
-    const res = await axios2.get(
+    const user = await discordFetch2(
       `https://discord.com/api/v10/users/${userId}`,
       {
         headers: {
@@ -10639,7 +10659,6 @@ var banner_default = {
         }
       }
     );
-    const user = res.data;
     if (!user.banner) {
       return {
         content: "This user doesn't have a banner.",
@@ -10669,14 +10688,25 @@ var commands_default = {
   banner: banner_default
 };
 
-// utils/logger.ts
-import consola from "consola";
-
 // utils/types.ts
 import "discord-interactions";
 
 // index.ts
 var PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
+async function discordFetch3(url, opts = {}) {
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    let msg = `HTTP ${res.status}`;
+    try {
+      const d = await res.json();
+      msg = d.message || msg;
+    } catch {
+    }
+    throw new Error(msg);
+  }
+  if (res.headers.get("content-type")?.includes("application/json")) return res.json();
+  return res.text();
+}
 function authToken() {
   return Buffer.from(PANEL_PASSWORD).toString("base64");
 }
@@ -11088,7 +11118,7 @@ async function handler(req, res) {
     }
     return await handlePanel(res, bodyStr);
   } catch (error) {
-    consola.error("Handler error", { error });
+    console.error("Handler error", error);
     return res.status(500).json({ error: "Internal error" });
   }
 }
@@ -11112,13 +11142,16 @@ async function handleDiscord(req, res, rawBody, signature, timestamp) {
     const command = commands_default[commandName];
     if (command) {
       try {
-        await axios3.post(
+        await discordFetch3(
           `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
           {
-            type: InteractionResponseType.DeferredChannelMessageWithSource,
-            data: { flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0 }
-          },
-          { headers: { "Content-Type": "application/json" } }
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: InteractionResponseType.DeferredChannelMessageWithSource,
+              data: { flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0 }
+            })
+          }
         );
       } catch {
         return res.status(500).json({ error: "Failed to defer" });
@@ -11143,14 +11176,17 @@ ${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
         };
       }
       try {
-        await axios3.patch(
+        await discordFetch3(
           `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
           {
-            content: commandResult.content ?? "",
-            flags: commandResult.flags,
-            embeds: commandResult.embeds
-          },
-          { headers: { "Content-Type": "application/json" } }
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              content: commandResult.content ?? "",
+              flags: commandResult.flags,
+              embeds: commandResult.embeds
+            })
+          }
         );
         return res.status(200).end();
       } catch {
@@ -11183,16 +11219,15 @@ async function handlePanel(res, bodyStr) {
   try {
     if (body.action === "guildinfo") {
       const [guildRes, chanRes, rolesRes] = await Promise.all([
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
+        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
+        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
+        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
-      const guild = guildRes.data;
-      const ownerRes = await axios3.get(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
+      const guild = guildRes;
+      const ownerRes = await discordFetch3(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
       let bots = 0, humans = 0, totalMembers = guild.approximate_member_count || guild.member_count || "?";
       try {
-        const memberRes = await axios3.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
-        const members = memberRes.data;
+        const members = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
         bots = members.filter((m) => m.user?.bot).length;
         humans = members.length - bots;
         totalMembers = guild.approximate_member_count || guild.member_count || members.length;
@@ -11200,21 +11235,21 @@ async function handlePanel(res, bodyStr) {
       }
       return res.json({
         name: guild.name,
-        owner: ownerRes.data.global_name || ownerRes.data.username,
+        owner: ownerRes.global_name || ownerRes.username,
         totalMembers,
         bots,
         humans,
-        channelCount: chanRes.data.length,
-        roleCount: rolesRes.data.length,
-        roles: rolesRes.data.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
+        channelCount: chanRes.length,
+        roleCount: rolesRes.length,
+        roles: rolesRes.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
         created: new Date(Number(BigInt(guild.id) >> 22n) + 14200704e5).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0
       });
     }
     if (body.action === "channels") {
-      const r = await axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
-      return res.json({ channels: r.data });
+      const channels = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
+      return res.json({ channels });
     }
     if (body.action === "send") {
       const form = new import_form_data.default();
@@ -11223,38 +11258,37 @@ async function handlePanel(res, bodyStr) {
         const buf = Buffer.from(body.fileData, "base64");
         form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
       }
-      await axios3.post(
+      await discordFetch3(
         `https://discord.com/api/v10/channels/${body.channelId}/messages`,
-        form,
-        { headers: { ...headers, ...form.getHeaders() } }
+        { method: "POST", headers: { ...headers, ...form.getHeaders() }, body: form }
       );
       return res.json({ success: true });
     }
     if (body.action === "messages") {
-      const r = await axios3.get(
+      const messages = await discordFetch3(
         `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
         { headers }
       );
-      return res.json({ messages: r.data });
+      return res.json({ messages });
     }
     if (body.action === "delete") {
-      await axios3.delete(
+      await discordFetch3(
         `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
-        { headers }
+        { method: "DELETE", headers }
       );
       return res.json({ success: true });
     }
     if (body.action === "members") {
       const [memberRes, rolesRes] = await Promise.all([
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
+        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
+        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
-      return res.json({ members: memberRes.data, roles: rolesRes.data });
+      return res.json({ members: memberRes, roles: rolesRes });
     }
     return res.status(400).json({ error: "Unknown action" });
   } catch (err) {
     return res.status(500).json({
-      error: err.response?.data?.message || err.message || "Request failed"
+      error: err.message || "Request failed"
     });
   }
 }
