@@ -11,11 +11,11 @@ import type {
 export default {
   data: {
     name: "profile",
-    description: "Bir kullanıcının profil fotoğrafını gösterir",
+    description: "Shows a user's profile picture",
     options: [
       {
-        name: "kullanici",
-        description: "Profilini görmek istediğin kullanıcı",
+        name: "user",
+        description: "The user you want to see the profile of",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
@@ -26,7 +26,7 @@ export default {
   }): CommandExecuteResult {
     const interaction = data.interaction;
     const userId = interaction.data.options?.find(
-      (o) => o.name === "kullanici",
+      (o) => o.name === "user",
     )?.value;
 
     if (!userId) {
@@ -55,7 +55,7 @@ export default {
           color: 0x5865F2,
           thumbnail: { url: avatarUrl },
           fields: [
-            { name: "Kullanıcı Adı", value: `@${user.username}`, inline: true },
+            { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true },
           ],
           image: { url: avatarUrl },

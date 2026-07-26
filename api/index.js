@@ -12,11 +12,11 @@ import {
 var profile_default = {
   data: {
     name: "profile",
-    description: "Bir kullan\u0131c\u0131n\u0131n profil foto\u011Fraf\u0131n\u0131 g\xF6sterir",
+    description: "Shows a user's profile picture",
     options: [
       {
-        name: "kullanici",
-        description: "Profilini g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        name: "user",
+        description: "The user you want to see the profile of",
         type: ApplicationCommandOptionType.User,
         required: true
       }
@@ -25,7 +25,7 @@ var profile_default = {
   async execute(data) {
     const interaction = data.interaction;
     const userId = interaction.data.options?.find(
-      (o) => o.name === "kullanici"
+      (o) => o.name === "user"
     )?.value;
     if (!userId) {
       return {
@@ -50,7 +50,7 @@ var profile_default = {
           color: 5793266,
           thumbnail: { url: avatarUrl },
           fields: [
-            { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
+            { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true }
           ],
           image: { url: avatarUrl },
