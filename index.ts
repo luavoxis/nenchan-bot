@@ -236,10 +236,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-dms" class="panel">
 <div id="dmStart">
-<label>user id</label>
 <div style="display:flex;gap:4px">
 <input type="text" id="dmUserId" placeholder="user id" style="flex:1"/>
-<button onclick="startDmById()">open</button>
+<button onclick="startDmById()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">open</button>
 </div>
 </div>
 <div id="dmChat" style="display:none">
