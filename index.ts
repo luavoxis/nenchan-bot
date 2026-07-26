@@ -1348,21 +1348,29 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
     }
 
     if (body.action === "bans") {
-      const bans = await discordFetch(
-        `https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`,
-        { headers },
-      );
-      return res.json({ bans });
+      try {
+        const bans = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`,
+          { headers },
+        );
+        return res.json({ bans: Array.isArray(bans) ? bans : [] });
+      } catch (e: any) {
+        return res.json({ bans: [], error: e.message || "Failed to fetch bans" });
+      }
     }
 
     if (body.action === "unban") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
-      await discordFetch(
-        `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
-        { method: "DELETE", headers },
-      );
-      return res.json({ success: true });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
+          { method: "DELETE", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to unban" });
+      }
     }
 
     return res.status(400).json({ error: "Unknown action" });
