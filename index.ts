@@ -110,7 +110,8 @@ select option{background:#000;color:#ccc}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 @media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
 .dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px}
-.dash-card-icon{width:32px;height:32px;background:#111;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.dash-card-icon{width:32px;height:32px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:4px}
+.dash-card-icon img{width:18px;height:18px}
 .dash-card-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:9px;margin-top:1px}
@@ -398,10 +399,10 @@ function loadDashboard(){
     h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.created.split(", ").pop()+"</div></div>";
     h+="</div>";
     h+="<div class='dash-grid'>";
-    h+="<div class='dash-card'><div class='dash-card-icon'>&#128101;</div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
-    h+="<div class='dash-card'><div class='dash-card-icon'>&#128172;</div><div><div class='dash-card-label'>channels</div><div class='dash-card-val'>"+d.channelCount+"</div><div class='dash-card-sub'>"+d.textChannels+" text &middot; "+d.voiceChannels+" voice &middot; "+d.categories+" categories</div></div></div>";
-    h+="<div class='dash-card'><div class='dash-card-icon'>&#128081;</div><div><div class='dash-card-label'>owner</div><div class='dash-card-val'>"+esc(d.owner)+"</div><div class='dash-card-sub'>"+d.ownerId+"</div></div></div>";
-    h+="<div class='dash-card'><div class='dash-card-icon'>&#11088;</div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+" boosts</div><div class='dash-card-sub'>tier "+d.boostLevel+" &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/users.png' alt=''/></div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/channels.png' alt=''/></div><div><div class='dash-card-label'>channels</div><div class='dash-card-val'>"+d.channelCount+"</div><div class='dash-card-sub'>"+d.textChannels+" text &middot; "+d.voiceChannels+" voice &middot; "+d.categories+" categories</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/owner.png' alt=''/></div><div><div class='dash-card-label'>owner</div><div class='dash-card-val'>"+esc(d.owner)+"</div><div class='dash-card-sub'>"+d.ownerId+"</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/boost.png' alt=''/></div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+" boosts</div><div class='dash-card-sub'>tier "+d.boostLevel+" &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
     h+="</div>";
     h+="<div class='dash-roles-header' onclick='toggleDashRoles()'><span>roles ("+d.roleCount+")</span><span class='role-arrow' id='dashRoleArrow'>&#9660;</span></div>";
     h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
