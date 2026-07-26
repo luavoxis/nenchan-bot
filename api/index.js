@@ -505,7 +505,7 @@ body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display
 .panel{display:none}
 .panel.show{display:block}
 h2{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
-label{display:block;color:#666;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px}
+label{display:block;color:#666;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px;font-weight:600}
 input,textarea,select{width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;margin-bottom:6px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#fff}
 button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer}
@@ -517,7 +517,7 @@ button:hover{background:#888}
 textarea{resize:vertical;min-height:50px;font:12px monospace}
 select option{background:#000;color:#ccc}
 .stat{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;margin-bottom:4px}
-.stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
 .dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px}
 .dash-icon{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:#111}
@@ -531,16 +531,16 @@ select option{background:#000;color:#ccc}
 .dash-card-icon img{width:18px;height:18px}
 .dash-card-label{color:#666;font-size:9px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
-.dash-card-sub{color:#555;font-size:9px;margin-top:1px}
+.dash-card-sub{color:#555;font-size:9px;margin-top:1px;font-weight:600}
 .dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0}
-.dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-roles-header .role-arrow{color:#555;font-size:9px;transition:transform .15s}
 .dash-roles-list{display:none;background:#0a0a0a;border:1px solid #1a1a1a;border-top:none;padding:4px 6px;max-height:200px;overflow-y:auto;scrollbar-width:none;margin-bottom:6px}
 .dash-roles-list.show{display:block}
 .dash-roles-list::-webkit-scrollbar{display:none}
 table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
 td,th{padding:4px 6px;text-align:left;border-bottom:1px solid #222;color:#aaa}
-th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
+th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .member-row{cursor:pointer}
 .member-row:hover{background:#111}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:100}
@@ -567,12 +567,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .msg-author{font-size:11px;font-weight:600;color:#4af}
 .msg-author .msg-time{font-weight:400;color:#444;font-size:9px;margin-left:6px}
 .msg-content{color:#ccc;font-size:11px;line-height:1.5;margin-top:1px;word-wrap:break-word}
-.msg-ref{margin:3px 0;padding:2px 8px;border-left:2px solid #444;color:#666;font-size:9px}
+.msg-ref{margin:3px 0;padding:2px 8px;border-left:2px solid #444;color:#666;font-size:9px;font-weight:600}
 .msg-embed{margin:4px 0;padding:6px 8px;border-left:3px solid #444;background:#0d0d0d;border-radius:2px}
 .msg-embed-title{color:#59f;font-weight:bold;font-size:11px}
 .msg-embed-desc{color:#bbb;font-size:10px;margin-top:2px}
-.msg-embed-author{color:#888;font-size:9px}
-.msg-embed-field-name{color:#888;font-size:9px;margin-top:3px}
+.msg-embed-author{color:#888;font-size:9px;font-weight:600}
+.msg-embed-field-name{color:#888;font-size:9px;margin-top:3px;font-weight:600}
 .msg-embed-field-val{color:#bbb;font-size:9px}
 .msg-reactions{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
 .msg-reaction{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;background:#111;border-radius:3px;font-size:11px;cursor:default}
@@ -614,16 +614,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .member-name span{color:#555;font-size:10px;font-weight:400}
 .member-username{color:#555;font-size:10px}
 .member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
-.role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap}
+.role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap;font-weight:600}
 .role-group-header{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:12px 4px 4px;border-bottom:1px solid #1a1a1a;margin-top:4px;font-weight:600}
 .role-group-header:first-child{margin-top:0}
 .role-group-count{color:#333;font-weight:400}
-.member-joined{color:#444;font-size:9px;flex-shrink:0}
+.member-joined{color:#444;font-size:9px;flex-shrink:0;font-weight:600}
 .member-search{width:100%;padding:6px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;margin-bottom:8px;outline:none}
 .member-search:focus{border-color:#555}
 .member-stats{display:flex;gap:6px;margin-bottom:8px}
 .member-stat{flex:1;text-align:center;padding:6px;background:#0a0a0a;border:1px solid #1a1a1a}
-.member-stat span{display:block;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+.member-stat span{display:block;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .member-stat p{font-size:14px;color:#fff;margin-top:2px}
 .modal-box{background:#111;border:1px solid #333;padding:0;width:90%;max-width:360px;overflow:hidden}
 .modal-banner{height:80px;background-size:cover;background-position:center}
@@ -634,7 +634,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-header-info p{font-size:10px;color:#555;margin:2px 0 0}
 .modal-body{padding:12px 16px}
 .modal-section{margin-bottom:10px}
-.modal-section-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.modal-section-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;font-weight:600}
 .modal-roles{display:flex;flex-wrap:wrap;gap:4px}
 .modal-role{display:flex;align-items:center;gap:4px;font-size:10px;color:#aaa;padding:3px 6px;background:#0d0d0d;border:1px solid #222}
 .modal-role-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -660,7 +660,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .confirm-box{background:#111;border:1px solid #333;padding:0;width:90%;max-width:320px;overflow:hidden}
 .confirm-title{padding:12px 16px;font-size:12px;color:#fff;border-bottom:1px solid #222}
 .confirm-body{padding:12px 16px}
-.confirm-body label{display:block;color:#666;font-size:9px;text-transform:uppercase;margin-bottom:2px;margin-top:8px}
+.confirm-body label{display:block;color:#666;font-size:9px;text-transform:uppercase;margin-bottom:2px;margin-top:8px;font-weight:600}
 .confirm-body label:first-child{margin-top:0}
 .confirm-body input,.confirm-body select,.confirm-body textarea{width:100%;padding:5px 8px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace;outline:none;margin:0}
 .confirm-body input:focus,.confirm-body textarea:focus{border-color:#fff}
@@ -674,7 +674,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .dm-channel img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
 .dm-channel-name{color:#ddd;font-size:11px}
 .dm-channel-preview{color:#555;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dm-channel-time{color:#555;font-size:9px;flex-shrink:0;margin-left:auto}
+.dm-channel-time{color:#555;font-size:9px;flex-shrink:0;margin-left:auto;font-weight:600}
 </style>
 </head>
 <body>
