@@ -106,13 +106,13 @@ select option{background:#000;color:#ccc}
 .dash-icon{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:#111}
 .dash-info{flex:1;min-width:0}
 .dash-name{color:#fff;font-size:16px;font-weight:600;margin:0}
-.dash-id{color:#555;font-size:10px;margin-top:2px}
+.dash-id{color:#555;font-size:10px;margin-top:2px;font-weight:600}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 @media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
 .dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px}
 .dash-card-icon{width:32px;height:32px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:4px}
 .dash-card-icon img{width:18px;height:18px}
-.dash-card-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.dash-card-label{color:#666;font-size:9px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:9px;margin-top:1px}
 .dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0}
@@ -396,7 +396,7 @@ function loadDashboard(){
     }).join("");
     var h="<div class='dash-header'>";
     h+=iconHtml;
-    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.created.split(", ").pop()+"</div></div>";
+    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+esc(d.created)+"</div></div>";
     h+="</div>";
     h+="<div class='dash-grid'>";
     h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/users.png' alt=''/></div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
@@ -1095,7 +1095,7 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         categories: categoryCh,
         roleCount: rolesRes.length,
         roles: rolesRes.map((r: any) => ({ id: r.id, name: r.name, color: r.color, position: r.position, hoist: r.hoist })),
-        created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+        created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) + " · " + new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
         createdTs: Number(BigInt(guild.id) >> 22n) + 1420070400000,
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0,
