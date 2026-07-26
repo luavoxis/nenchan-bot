@@ -278,7 +278,7 @@ function loadMsgHistory(cid){
   g("msgHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
   api({action:"messages",channelId:cid,limit:30},function(d){
     if(d.error){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";return}
+    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>/ᐠ - ˕ -マ ᶻ 𝗓 𐰁<br><span style='font-size:9px;color:#444'>no message found.</span></p>";return}
     if(!Array.isArray(d.messages)){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>invalid response: messages is not an array</p>";return}
     var h="";
     try{
