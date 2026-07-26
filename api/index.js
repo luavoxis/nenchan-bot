@@ -431,9 +431,25 @@ async function handler(req, res) {
             commandName,
             error
           });
+          const errMsg = error instanceof Error ? error.message : "Unknown error";
           commandResult = {
-            content: "An error occurred while processing your request.",
-            flags: MessageFlags5.Ephemeral
+            flags: MessageFlags5.Ephemeral,
+            embeds: [
+              {
+                color: 15548997,
+                title: "Command Error",
+                fields: [
+                  { name: "Command", value: `/${commandName}`, inline: true },
+                  {
+                    name: "Error",
+                    value: `\`\`\`
+${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
+\`\`\``,
+                    inline: false
+                  }
+                ]
+              }
+            ]
           };
         }
         try {

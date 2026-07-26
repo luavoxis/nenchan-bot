@@ -114,9 +114,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             commandName,
             error,
           });
+          const errMsg =
+            error instanceof Error ? error.message : "Unknown error";
           commandResult = {
-            content: "An error occurred while processing your request.",
             flags: MessageFlags.Ephemeral,
+            embeds: [
+              {
+                color: 0xED4245,
+                title: "Command Error",
+                fields: [
+                  { name: "Command", value: `/${commandName}`, inline: true },
+                  {
+                    name: "Error",
+                    value: `\`\`\`\n${errMsg.length > 1000 ? errMsg.slice(0, 1000) + "..." : errMsg}\n\`\`\``,
+                    inline: false,
+                  },
+                ],
+              },
+            ],
           };
         }
 
