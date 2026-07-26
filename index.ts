@@ -80,6 +80,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-box{background:#111;border:1px solid #333;padding:16px;width:90%;max-width:400px}
 .modal-box h3{font-size:12px;color:#fff;margin-bottom:8px}
 .modal-box p{font-size:11px;color:#888;margin-bottom:6px}
+.stat[onclick]{cursor:pointer}
+.stat[onclick]:hover{background:#0e0e0e}
 .role-toggle{cursor:pointer;user-select:none}
 .role-toggle:hover{color:#fff}
 .role-list{display:none;max-height:200px;overflow-y:auto;margin-top:4px;padding:4px 0;border-top:1px solid #222}
@@ -192,14 +194,14 @@ function loadDashboard(){
       "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
       "<div class='stat'><span>members</span><p>"+d.totalMembers+" total &middot; "+d.humans+" humans &middot; "+d.bots+" bots</p></div>"+
       "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
-      "<div class='stat' onclick='toggleRoles()'><span>roles</span><p class='role-toggle'>"+d.roleCount+" <span style='color:#666;font-size:10px'>click to expand</span></p>"+
+      "<div class='stat' onclick='toggleRoles()'><span>roles</span><p class='role-toggle'>"+d.roleCount+" <span id='roleArrow' style='color:#666;font-size:10px'>&#9660;</span></p>"+
       "<div id='roleList' class='role-list'>"+roleItems+"</div></div>"+
       "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
       "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
   });
 }
 
-function toggleRoles(){g("roleList").classList.toggle("show")}
+function toggleRoles(){g("roleList").classList.toggle("show");g("roleArrow").innerHTML=g("roleList").classList.contains("show")?"&#9650;":"&#9660;"}
 
 function loadMsgChannels(){
   api({action:"channels"},function(d){
