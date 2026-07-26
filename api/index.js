@@ -1406,8 +1406,13 @@ async function handler(req, res) {
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
-    const rawBody = await getRawBody(req);
-    if (!rawBody) return res.status(400).json({ error: "Missing body" });
+    let rawBody;
+    try {
+      rawBody = await getRawBody(req);
+    } catch (e) {
+      return res.status(400).json({ error: "Failed to read body: " + (e.message || "unknown") });
+    }
+    if (!rawBody || !rawBody.length) return res.status(400).json({ error: "Missing body" });
     const bodyStr = rawBody.toString();
     const signature = req.headers["x-signature-ed25519"];
     const timestamp = req.headers["x-signature-timestamp"];
