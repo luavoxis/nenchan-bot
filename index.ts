@@ -175,6 +175,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-footer{padding:10px 16px;border-top:1px solid #222;text-align:right}
 .modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px monospace;cursor:pointer}
 .modal-footer button:hover{background:#333;color:#fff}
+.dm-channel{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;cursor:pointer;transition:border-color .15s;margin-bottom:4px}
+.dm-channel:hover{border-color:#444}
+.dm-channel img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.dm-channel-name{color:#ddd;font-size:11px}
+.dm-channel-preview{color:#555;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-channel-time{color:#555;font-size:9px;flex-shrink:0;margin-left:auto}
 </style>
 </head>
 <body>
@@ -185,6 +191,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button class="active" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;dms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
@@ -227,6 +234,25 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="memberStats" class="member-stats"></div>
 <div id="memberList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
 </div>
+<div id="panel-dms" class="panel">
+<div id="dmList"></div>
+<div id="dmChat" style="display:none">
+<div id="dmChatHeader" style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #222;margin-bottom:8px">
+<button onclick="dmBack()" style="background:none;border:1px solid #333;color:#888;padding:2px 8px;font:11px monospace;cursor:pointer">back</button>
+<span id="dmChatName" style="color:#fff;font-size:12px"></span>
+</div>
+<div id="dmHistory" style="max-height:360px;overflow-y:auto;margin-bottom:8px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
+<p style="color:#555;text-align:center;padding:20px 0">loading...</p>
+</div>
+<label>message</label>
+<textarea id="dmInput" placeholder="message" style="min-height:50px"></textarea>
+<div class="flex" style="gap:4px">
+<button onclick="sendDm()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">send</button>
+<button onclick="g('dmInput').value=''" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
+</div>
+<div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
+</div>
+</div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <script>
@@ -258,6 +284,7 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
+  if(name==="dms"){loadDms();g("dmList").style.display="block";g("dmChat").style.display="none"}
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
 }
 
@@ -598,6 +625,115 @@ function updateFileLabel(el){
   else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
+var allDmChannels=[],currentDmChannel=null;
+function loadDms(){
+  api({action:"dm_channels"},function(d){
+    if(d.error){g("dmList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    var channels=d.channels||[];
+    channels.sort(function(a,b){return new Date(b.last_message_id?b.id:0)-new Date(a.last_message_id?a.id:0)});
+    allDmChannels=channels;
+    renderDmList(channels);
+  });
+}
+function renderDmList(channels){
+  if(!channels.length){g("dmList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no dm channels</p>";return}
+  var h="";
+  for(var i=0;i<channels.length;i++){
+    var ch=channels[i];
+    if(ch.type!==1)continue;
+    var recipient=ch.recipients&&ch.recipients[0];
+    if(!recipient)continue;
+    var name=recipient.global_name||recipient.username;
+    var avatar=recipient.avatar?"https://cdn.discordapp.com/avatars/"+recipient.id+"/"+recipient.avatar+(recipient.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(recipient.discriminator||"0")%5)+".png";
+    h+="<div class='dm-channel' onclick='openDm(\""+ch.id+"\",\""+esc(name)+"\")'>";
+    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+    h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(name)+"</div>";
+    h+="<div class='dm-channel-preview'>"+esc(recipient.username)+"</div></div>";
+    h+="</div>";
+  }
+  g("dmList").innerHTML=h;
+}
+function openDm(cid,name){
+  currentDmChannel=cid;
+  g("dmList").style.display="none";
+  g("dmChat").style.display="block";
+  g("dmChatName").textContent=name;
+  loadDmHistory(cid);
+}
+function dmBack(){
+  currentDmChannel=null;
+  g("dmList").style.display="block";
+  g("dmChat").style.display="none";
+}
+function loadDmHistory(cid){
+  g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
+  api({action:"dm_messages",channelId:cid,limit:50},function(d){
+    if(d.error){g("dmHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    if(!d.messages||!d.messages.length){g("dmHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";return}
+    var h="";
+    for(var i=d.messages.length-1;i>=0;i--){
+      var msg=d.messages[i],u=msg.author;
+      if(!u)continue;
+      var name=u.global_name||u.username;
+      var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+      var isBot=u.bot;
+      var color=isBot?"#4af":"#888";
+      h+="<div style='display:flex;gap:8px;margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
+      h+="<div style='flex:1;min-width:0'>";
+      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
+      if(msg.edited_timestamp)h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
+      h+="<br>";
+      if(msg.referenced_message&&msg.referenced_message.author){
+        var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
+        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
+      }
+      h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
+      if(msg.sticker_items&&msg.sticker_items.length){
+        for(var j=0;j<msg.sticker_items.length;j++){
+          var s=msg.sticker_items[j];
+          h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='' loading='lazy'/>";
+        }
+      }
+      if(msg.attachments&&msg.attachments.length){
+        for(var j=0;j<msg.attachments.length;j++){
+          var a=msg.attachments[j];
+          if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
+            h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+          }else if(a.content_type&&a.content_type.startsWith("video/")){
+            h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
+          }else{
+            h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>";
+          }
+        }
+      }
+      h+="</div>";
+      h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteDmMsg(this.dataset.cid,this.dataset.mid)" title="delete">&#10005;</span>';
+      h+="</div>";
+    }
+    g("dmHistory").innerHTML=h;
+  });
+}
+function sendDm(){
+  var c=currentDmChannel,m=g("dmInput").value;
+  if(!m){g("dmStatus").textContent="enter a message";g("dmStatus").style.color="#f44";return}
+  g("dmStatus").style.color="#aaa";g("dmStatus").textContent="sending...";
+  api({action:"dm_send",channelId:c,content:m},function(d){
+    if(d.success){
+      g("dmStatus").style.color="#4f4";g("dmStatus").textContent="sent!";
+      g("dmInput").value="";
+      loadDmHistory(c);
+    }else{
+      g("dmStatus").style.color="#f44";g("dmStatus").textContent=d.error||"failed";
+    }
+  });
+}
+function deleteDmMsg(cid,mid){
+  if(!confirm("delete this message?"))return;
+  api({action:"delete",channelId:cid,messageId:mid},function(d){
+    if(d.success){loadDmHistory(cid)}
+    else{alert(d.error||"failed to delete")}
+  });
+}
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
 </body>
@@ -871,6 +1007,50 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
     if (body.action === "userinfo") {
       const userRes = await discordFetch(`https://discord.com/api/v10/users/${body.userId}`, { headers });
       return res.json(userRes);
+    }
+
+    if (body.action === "dm_channels") {
+      const channels = await discordFetch(`https://discord.com/api/v10/users/@me/channels`, { headers });
+      return res.json({ channels });
+    }
+
+    if (body.action === "dm_messages") {
+      const messages = await discordFetch(
+        `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 50}`,
+        { headers },
+      );
+      return res.json({ messages });
+    }
+
+    if (body.action === "dm_send") {
+      let channelId = body.channelId;
+      if (!channelId && body.userId) {
+        const ch = await discordFetch(`https://discord.com/api/v10/users/@me/channels`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ recipient_id: body.userId }),
+        });
+        channelId = ch.id;
+      }
+      if (!channelId) return res.status(400).json({ error: "No channel or user specified" });
+      const form = new FormData();
+      form.append("content", body.content || "");
+      if (body.fileData && body.fileName) {
+        const buf = Buffer.from(body.fileData, "base64");
+        const blob = new Blob([buf], { type: body.fileType || "application/octet-stream" });
+        form.append("file", blob, body.fileName);
+      }
+      const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+        method: "POST",
+        headers: { ...headers },
+        body: form,
+      });
+      if (!response.ok) {
+        let msg = `HTTP ${response.status}`;
+        try { const d = await response.json(); msg = d.message || msg; } catch {}
+        throw new Error(msg);
+      }
+      return res.json({ success: true, channelId });
     }
 
     return res.status(400).json({ error: "Unknown action" });
