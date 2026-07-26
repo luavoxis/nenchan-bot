@@ -94,10 +94,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <body>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>bot panel</h1>
-<button class="active" onclick="switchTab('dashboard')">[ dashboard ]</button>
-<button onclick="switchTab('messages')">[ messages ]</button>
-<button onclick="switchTab('members')">[ members ]</button>
-<button id="logoutBtn" onclick="logout()">[ logout ]</button>
+<button class="active" onclick="switchTab('dashboard')">dashboard</button>
+<button onclick="switchTab('messages')">messages</button>
+<button onclick="switchTab('members')">members</button>
+<button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;justify-content:center;align-items:center">
