@@ -10972,7 +10972,7 @@ function loadMsgHistory(cid){
         }
         h+="</div>";
       }
-      h+="<span style='float:right;color:#555;cursor:pointer' onclick='deleteMsg(\\"+cid+\\",\\"+msg.id+\\",this)' title='delete'>&#10005;</span>";
+      h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="float:right;color:#555;cursor:pointer" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this)" title="delete">&#10005;</span>';
       h+="</div>";
     }
     g("msgHistory").innerHTML=h||"<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";
