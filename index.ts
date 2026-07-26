@@ -48,9 +48,11 @@ function html(): string {
 body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
 .sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:2px;min-height:100vh}
 .sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
-.sidebar button{background:none;border:none;color:#888;font:11px monospace;padding:6px 8px;text-align:left;cursor:pointer}
+.sidebar button{background:none;border:none;color:#888;font:11px monospace;padding:6px 8px;text-align:left;cursor:pointer;min-width:140px}
 .sidebar button:hover{color:#fff;background:#111}
 .sidebar button.active{color:#fff;background:#222}
+.sidebar button .l{color:#555}
+.sidebar button .r{color:#555}
 #logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important}
 .main{flex:1;padding:16px;max-width:800px}
 .panel{display:none}
@@ -94,9 +96,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <body>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>bot panel</h1>
-<button class="active" onclick="switchTab('dashboard')">dashboard</button>
-<button onclick="switchTab('messages')">messages</button>
-<button onclick="switchTab('members')">members</button>
+<button class="active" onclick="switchTab('dashboard')"><span class=l>[</span> dashboard <span class=r>]</span></button>
+<button onclick="switchTab('messages')"><span class=l>[</span> messages <span class=r>]</span></button>
+<button onclick="switchTab('members')"><span class=l>[</span> members <span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
