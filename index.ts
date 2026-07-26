@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import axios from "axios";
+import FormData from "form-data";
 import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
@@ -117,14 +118,24 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="panel-messages" class="panel">
 <h2>messages</h2>
 <label>channel</label>
-<select id="msgChannel"><option value="">loading...</option></select>
+<select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">loading...</option></select>
+<div id="msgHistory" style="max-height:280px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
+<p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
+</div>
+<div style="display:flex;gap:4px;margin-bottom:4px">
+<input type="file" id="msgFile" style="flex:1;color:#888;font:11px monospace;padding:3px;background:#000;border:1px solid #333" />
+<button onclick="g('msgFile').value=''" style="background:#555;padding:3px 8px;font-size:10px">clear</button>
+</div>
+<div style="display:flex;gap:4px;margin-bottom:4px">
+<select id="msgMention" style="flex:1" onchange="insertMention()"><option value="">@mention</option></select>
+</div>
 <label>message</label>
-<textarea id="msgInput" placeholder="message"></textarea>
+<textarea id="msgInput" placeholder="message" style="min-height:60px"></textarea>
 <div class="flex">
 <button onclick="sendMsg()">send</button>
-<button onclick="g('msgInput').value=''" style="background:#555">clear</button>
+<button onclick="g('msgInput').value='';g('msgFile').value=''" style="background:#555">clear</button>
 </div>
-<div id="msgStatus" style="color:#4f4;font-size:11px;margin-top:4px"></div>
+<div id="msgStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
 <div id="panel-members" class="panel">
 <h2>members</h2>
@@ -211,16 +222,81 @@ function loadMsgChannels(){
     if(d.error)return;
     var s=g("msgChannel");
     s.innerHTML="<option value=''>select channel</option>";
-    for(var i=0;i<d.channels.length;i++){if(d.channels[i].type===0){var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o)}}
+    for(var i=0;i<d.channels.length;i++){
+      if(d.channels[i].type===0){
+        var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o);
+      }
+    }
+    api({action:"members"},function(md){
+      if(md.error)return;
+      var sel=g("msgMention");
+      for(var i=0;i<md.members.length;i++){
+        var m=md.members[i],name=m.nick||(m.user.global_name||m.user.username);
+        var o=document.createElement("option");o.value="<@"+m.user.id+">";o.textContent="@"+name;sel.appendChild(o);
+      }
+    });
+  });
+}
+
+function insertMention(){
+  var sel=g("msgMention");
+  if(sel.value){g("msgInput").value+=sel.value+" ";sel.value=""}
+}
+
+function loadMsgHistory(cid){
+  if(!cid){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>select a channel</p>";return}
+  api({action:"messages",channelId:cid,limit:30},function(d){
+    if(d.error){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    var h="";
+    for(var i=0;i<d.messages.length;i++){
+      var msg=d.messages[i],u=msg.author;
+      var name=u.global_name||u.username;
+      var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+      var color=u.bot?"#4af":"#888";
+      h+="<div style='margin-bottom:4px;border-bottom:1px solid #111;padding-bottom:4px'>";
+      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span><br>";
+      h+="<span style='color:#ccc'>"+esc(msg.content||"")+"</span>";
+      if(msg.attachments&&msg.attachments.length){
+        for(var j=0;j<msg.attachments.length;j++){
+          var a=msg.attachments[j];
+          if(a.content_type&&a.content_type.startsWith("image/")){
+            h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+          }else{h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"}
+        }
+      }
+      h+="</div>";
+    }
+    g("msgHistory").innerHTML=h||"<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";
   });
 }
 
 function sendMsg(){
-  var c=g("msgChannel").value,m=g("msgInput").value;
-  if(!c||!m){g("msgStatus").textContent="fill all fields";return}
-  api({action:"send",channelId:c,content:m},function(d){
-    g("msgStatus").textContent=d.success?"sent!":(d.error||"failed");
-    if(d.success)g("msgInput").value="";
+  var c=g("msgChannel").value,m=g("msgInput").value,file=g("msgFile").files[0];
+  if(!c){g("msgStatus").textContent="select a channel";g("msgStatus").style.color="#f44";return}
+  if(!m&&!file){g("msgStatus").textContent="enter a message or pick a file";g("msgStatus").style.color="#f44";return}
+  g("msgStatus").style.color="#aaa";g("msgStatus").textContent="sending...";
+  var body={action:"send",channelId:c,content:m};
+  if(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      body.fileData=e.target.result.split(",")[1];
+      body.fileName=file.name;
+      body.fileType=file.type;
+      doSend(body,c);
+    };
+    reader.readAsDataURL(file);
+  }else{doSend(body,c)}
+}
+
+function doSend(body,cid){
+  api(body,function(d){
+    if(d.success){
+      g("msgStatus").style.color="#4f4";g("msgStatus").textContent="sent!";
+      g("msgInput").value="";g("msgFile").value="";
+      loadMsgHistory(cid);
+    }else{
+      g("msgStatus").style.color="#f44";g("msgStatus").textContent=d.error||"failed";
+    }
   });
 }
 
@@ -433,12 +509,26 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
     }
 
     if (body.action === "send") {
+      const form = new FormData();
+      form.append("content", body.content || "");
+      if (body.fileData && body.fileName) {
+        const buf = Buffer.from(body.fileData, "base64");
+        form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
+      }
       await axios.post(
         `https://discord.com/api/v10/channels/${body.channelId}/messages`,
-        { content: body.content },
-        { headers },
+        form,
+        { headers: { ...headers, ...form.getHeaders() } },
       );
       return res.json({ success: true });
+    }
+
+    if (body.action === "messages") {
+      const r = await axios.get(
+        `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
+        { headers },
+      );
+      return res.json({ messages: r.data });
     }
 
     if (body.action === "members") {
