@@ -511,8 +511,8 @@ function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
 function fmt(s){
   return esc(s)
-    .replace(/&lt;:([^:]+):(\\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>")
-    .replace(/&lt;a:([^:]+):(\\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
+    .replace(/&lt;:([^:]+):(\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>")
+    .replace(/&lt;a:([^:]+):(\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
 }
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
