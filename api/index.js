@@ -1039,11 +1039,18 @@ async function handlePanel(res, bodyStr) {
       return res.json({ success: true });
     }
     if (body.action === "messages") {
-      const messages = await discordFetch3(
-        `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
-        { headers }
-      );
-      return res.json({ messages });
+      console.log("Fetching messages for channel:", body.channelId, "limit:", body.limit || 30);
+      try {
+        const messages = await discordFetch3(
+          `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
+          { headers }
+        );
+        console.log("Messages result type:", typeof messages, "isArray:", Array.isArray(messages), "length:", Array.isArray(messages) ? messages.length : "N/A");
+        return res.json({ messages });
+      } catch (e) {
+        console.error("Messages fetch error:", e.message);
+        throw e;
+      }
     }
     if (body.action === "delete") {
       await discordFetch3(
