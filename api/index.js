@@ -433,7 +433,10 @@ var commands_default = {
 import "discord-interactions";
 
 // index.ts
-var PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
+var DISCORD_OWNER_ID = process.env.DISCORD_OWNER_ID || "";
+var DISCORD_APP_ID = process.env.DISCORD_APP_ID || "";
+var DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
+var OAUTH_REDIRECT = "https://nenchan.vercel.app/api";
 async function discordFetch3(url, opts = {}) {
   const u = new URL(url);
   const mod = u.protocol === "https:" ? await import("https") : await import("http");
@@ -471,11 +474,11 @@ async function discordFetch3(url, opts = {}) {
   });
 }
 function authToken() {
-  return Buffer.from(PANEL_PASSWORD).toString("base64");
+  return Buffer.from(DISCORD_OWNER_ID).toString("base64");
 }
 function verifyToken(token) {
   try {
-    return Buffer.from(token, "base64").toString() === PANEL_PASSWORD;
+    return Buffer.from(token, "base64").toString() === DISCORD_OWNER_ID;
   } catch {
     return false;
   }
@@ -552,8 +555,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
 <h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
 <div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
-<input type="password" id="password" placeholder="password" style="text-align:center;margin-bottom:8px;width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;outline:none" onkeydown="if(event.key==='Enter')login()"/>
-<button onclick="login()" style="width:100%;padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer">login</button>
+<button onclick="loginDiscord()" style="width:100%;padding:8px 10px;background:#5865F2;color:#fff;border:none;border-radius:0;font:12px monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="14" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.9048 3.0581 26.1885 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.4218 0.384528C20.3584 1.2916 15.5057 2.8214 10.9776 4.8978C10.9384 4.9147 10.9048 4.9429 10.8825 4.9795C1.57795 18.7309 -0.143566 32.1443 0.0634574 45.3916C0.0665884 45.4562 0.112098 45.5182 0.178348 45.5477C6.45866 50.1432 12.3413 52.9005 18.1105 54.6698C18.1853 54.7047 18.2723 54.6929 18.3373 54.6448C19.7468 52.7248 20.9917 50.72 22.0603 48.6493C22.1217 48.5282 22.076 48.3822 21.9537 48.3014C18.488 47.0774 15.1632 45.2637 11.9822 42.9226C11.7211 42.7424 11.6658 42.3689 11.8429 42.1275C12.3622 41.4599 12.8867 40.7605 13.3636 40.0481C13.4187 39.9667 13.5316 39.9389 13.6177 39.9713C26.135 45.707 39.6821 45.707 52.1169 39.7713C52.203 39.7389 52.3159 39.7667 52.371 39.8481C52.8479 40.5605 53.3724 41.2599 53.8917 41.9275C54.0688 42.1689 54.0263 42.5424 53.7652 42.7224C50.5842 45.2637 47.2594 47.0774 43.7937 48.3014C43.6714 48.3822 43.628 48.5282 43.6893 48.6493C44.758 50.72 46.0029 52.7248 47.4124 54.6448C47.4774 54.6929 47.5644 54.7047 47.6392 54.6698C53.4121 52.9005 59.2949 50.1432 65.5752 45.5551C65.6428 45.5256 65.6897 45.4616 65.6911 45.3968C65.9378 30.0424 62.7177 16.6909 53.4859 4.9829C53.4627 4.9442 53.4283 4.9167 53.3898 4.8998L60.1045 4.8978Z" fill="white"/></svg> Login with Discord</button>
 </div>
 </div>
 <div id="panel-dashboard" class="panel">
@@ -593,24 +595,11 @@ function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
 var token=getCookie("token"),allMembers=[],allRoles=[];
 
-function login(){
-  var pwd=g("password").value,err=g("loginError");
-  err.textContent="";
-  var x=new XMLHttpRequest();
-  x.open("POST","/api",true);
-  x.setRequestHeader("Content-Type","application/json");
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      if(d.token){
-        document.cookie="token="+encodeURIComponent(d.token)+";path=/;max-age=86400;SameSite=Lax";
-        token=d.token;
-        initPanel();
-      }else{err.textContent=d.error||"wrong password"}
-    }catch(e){err.textContent="invalid response"}
-  };
-  x.onerror=function(){err.textContent="connection error"};
-  x.send(JSON.stringify({action:"login",password:pwd}));
+function loginDiscord(){
+  api({action:"oauth_url"},function(d){
+    if(d.url){window.location.href=d.url}
+    else{g("loginError").textContent=d.error||"failed to start login"}
+  });
 }
 
 function initPanel(){
@@ -869,6 +858,10 @@ if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard"
 async function handler(req, res) {
   try {
     if (req.method === "GET") {
+      const code = req.query.code;
+      if (code) {
+        return await handleOAuthCallback(req, res, code);
+      }
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(200).send(html());
     }
@@ -964,6 +957,36 @@ ${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
   }
   return res.status(400).json({ error: "Unknown Interaction Type" });
 }
+async function handleOAuthCallback(req, res, code) {
+  try {
+    const params = new URLSearchParams({
+      client_id: DISCORD_APP_ID,
+      client_secret: DISCORD_CLIENT_SECRET,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: OAUTH_REDIRECT
+    });
+    const tokenRes = await discordFetch3("https://discord.com/api/v10/oauth2/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString()
+    });
+    const userRes = await discordFetch3("https://discord.com/api/v10/users/@me", {
+      headers: { Authorization: `Bearer ${tokenRes.access_token}` }
+    });
+    if (userRes.id !== DISCORD_OWNER_ID) {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>This account is not authorized.</p><a href='/api' style='color:#59f'>\u2190 back</a></div></body></html>");
+    }
+    res.setHeader("Set-Cookie", `token=${authToken()}; Path=/; Max-Age=86400; SameSite=Lax`);
+    res.setHeader("Location", "/api");
+    return res.status(302).end();
+  } catch (err) {
+    console.error("OAuth callback error:", err.message);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.status(500).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>OAuth Error</h1><p style='color:#888'>" + (err.message || "Unknown error") + "</p><a href='/api' style='color:#59f'>\u2190 back</a></div></body></html>");
+  }
+}
 async function handlePanel(res, bodyStr) {
   let body;
   try {
@@ -971,11 +994,9 @@ async function handlePanel(res, bodyStr) {
   } catch {
     return res.status(400).json({ error: "Invalid JSON" });
   }
-  if (body.action === "login") {
-    if (body.password === PANEL_PASSWORD) {
-      return res.json({ token: authToken() });
-    }
-    return res.status(401).json({ error: "Wrong password" });
+  if (body.action === "oauth_url") {
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify`;
+    return res.json({ url });
   }
   const reqToken = body.token || "";
   if (!verifyToken(reqToken)) {
