@@ -1047,6 +1047,8 @@ function updateFileLabel(el){
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
 var allDmChannels=[],currentDmChannel=null;
+function getSavedDms(){try{return JSON.parse(localStorage.getItem("dm_channels")||"[]")}catch(e){return[]}}
+function saveDm(ch){var list=getSavedDms();for(var i=0;i<list.length;i++){if(list[i].id===ch.id)return}list.unshift(ch);localStorage.setItem("dm_channels",JSON.stringify(list))}
 function startDmById(){
   var uid=g("dmUserId").value.trim();
   if(!uid)return;
@@ -1062,35 +1064,43 @@ function startDmById(){
     if(d.error){g("dmHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     currentDmChannel=d.channelId;
     api({action:"userinfo",userId:uid},function(u){
-      if(u&&!u.error)g("dmChatName").textContent=u.global_name||u.username||uid;
+      if(u&&!u.error){
+        var name=u.global_name||u.username||uid;
+        g("dmChatName").textContent=name;
+        saveDm({id:d.channelId,userId:uid,name:name,avatar:u.avatar});
+        loadDms();
+      }
     });
     loadDmHistory(d.channelId);
   });
 }
 function loadDms(){
+  var saved=getSavedDms();
   api({action:"dm_channels"},function(d){
-    if(d.error){g("dmList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    var channels=d.channels||[];
-    channels=channels.filter(function(ch){return ch.type===1});
-    channels.sort(function(a,b){var al=a.last_message_id||a.id||"0";var bl=b.last_message_id||b.id||"0";return bl>al?1:bl<al?-1:0});
-    allDmChannels=channels;
-    renderDmList(channels);
+    if(!d.error&&d.channels){
+      var channels=d.channels.filter(function(ch){return ch.type===1});
+      for(var i=0;i<channels.length;i++){
+        var ch=channels[i];
+        var r=ch.recipients&&ch.recipients[0];
+        if(r){
+          var name=r.global_name||r.username;
+          saveDm({id:ch.id,userId:r.id,name:name,avatar:r.avatar});
+        }
+      }
+    }
+    renderDmList(getSavedDms());
   });
 }
 function renderDmList(channels){
-  if(!channels.length){g("dmList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no dm channels</p>";return}
+  if(!channels.length){g("dmList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no conversations yet</p>";return}
   var h="";
   for(var i=0;i<channels.length;i++){
     var ch=channels[i];
-    if(ch.type!==1)continue;
-    var recipient=ch.recipients&&ch.recipients[0];
-    if(!recipient)continue;
-    var name=recipient.global_name||recipient.username;
-    var avatar=recipient.avatar?"https://cdn.discordapp.com/avatars/"+recipient.id+"/"+recipient.avatar+(recipient.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(recipient.discriminator||"0")%5)+".png";
-    h+="<div class='dm-channel' data-cid='"+ch.id+"' data-name='"+esc(name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
+    var avatar=ch.avatar?"https://cdn.discordapp.com/avatars/"+ch.userId+"/"+ch.avatar+(ch.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(ch.userId)%5)+".png";
+    h+="<div class='dm-channel' data-cid='"+ch.id+"' data-name='"+esc(ch.name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
     h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(name)+"</div>";
-    h+="<div class='dm-channel-preview'>"+esc(recipient.username)+"</div></div>";
+    h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(ch.name)+"</div>";
+    h+="<div class='dm-channel-preview'>@"+esc(ch.name)+"</div></div>";
     h+="</div>";
   }
   g("dmList").innerHTML=h;
@@ -1167,7 +1177,11 @@ function sendDm(){
     if(d.success){
       g("dmStatus").style.color="#4f4";g("dmStatus").textContent="sent!";
       g("dmInput").value="";
-      if(d.channelId&&!currentDmChannel)currentDmChannel=d.channelId;
+      if(d.channelId){
+        if(!currentDmChannel)currentDmChannel=d.channelId;
+        var name=g("dmChatName").textContent;
+        if(name&&name.length<50)saveDm({id:d.channelId,userId:"",name:name,avatar:null});
+      }
       if(currentDmChannel)loadDmHistory(currentDmChannel);
     }else{
       g("dmStatus").style.color="#f44";g("dmStatus").textContent=d.error||"failed";
