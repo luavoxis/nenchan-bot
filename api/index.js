@@ -535,6 +535,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .role-item{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:10px;color:#aaa}
 .role-item:hover{background:#111}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+#msgHistory{scrollbar-width:none;-ms-overflow-style:none}
+#msgHistory::-webkit-scrollbar{display:none}
 </style>
 </head>
 <body>
