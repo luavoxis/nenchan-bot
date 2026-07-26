@@ -123,6 +123,37 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
+.member-grid{display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 180px);overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.member-grid::-webkit-scrollbar{display:none}
+.member-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;cursor:pointer;transition:border-color .15s}
+.member-card:hover{border-color:#444}
+.member-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-name{color:#ddd;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-name span{color:#555;font-size:10px;font-weight:400}
+.member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap}
+.member-joined{color:#444;font-size:9px;flex-shrink:0}
+.member-search{width:100%;padding:6px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;margin-bottom:8px;outline:none}
+.member-search:focus{border-color:#555}
+.member-stats{display:flex;gap:6px;margin-bottom:8px}
+.member-stat{flex:1;text-align:center;padding:6px;background:#0a0a0a;border:1px solid #1a1a1a}
+.member-stat span{display:block;font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+.member-stat p{font-size:14px;color:#fff;margin-top:2px}
+.modal-box{background:#111;border:1px solid #333;padding:0;width:90%;max-width:360px;overflow:hidden}
+.modal-header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #222;background:#0d0d0d}
+.modal-header img{width:48px;height:48px;border-radius:50%}
+.modal-header-info h3{font-size:13px;color:#fff;margin:0}
+.modal-header-info p{font-size:10px;color:#555;margin:2px 0 0}
+.modal-body{padding:12px 16px}
+.modal-section{margin-bottom:10px}
+.modal-section-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.modal-roles{display:flex;flex-wrap:wrap;gap:4px}
+.modal-role{display:flex;align-items:center;gap:4px;font-size:10px;color:#aaa;padding:3px 6px;background:#0d0d0d;border:1px solid #222}
+.modal-role-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.modal-footer{padding:10px 16px;border-top:1px solid #222;text-align:right}
+.modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px monospace;cursor:pointer}
+.modal-footer button:hover{background:#333;color:#fff}
 </style>
 </head>
 <body>
@@ -169,10 +200,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-members" class="panel">
 <h2>members</h2>
-<div id="memberList"><p style="color:#666">loading...</p></div>
+<input type="text" class="member-search" id="memberSearch" placeholder="search members..." oninput="filterMembers(this.value)"/>
+<div id="memberStats" class="member-stats"></div>
+<div id="memberList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
 </div>
 </div>
-<div id="userModal" class="modal"><div class="modal-box"><h3 id="modalName"></h3><p id="modalId"></p><p id="modalJoined"></p><p id="modalRoles"></p><div class="flex" style="margin-top:8px"><button onclick="c()">close</button></div></div></div>
+<div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <script>
 function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
@@ -400,29 +433,78 @@ function loadMembers(){
   api({action:"members"},function(d){
     if(d.error)return;
     allMembers=d.members;allRoles=d.roles;
-    var tbl=document.createElement("table");
-    tbl.innerHTML="<tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
-    for(var i=0;i<d.members.length;i++){
-      var m=d.members[i],name=m.nick||(m.user.global_name||m.user.username);
-      var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-      var tr=document.createElement("tr");tr.className="member-row";
-      tr.onclick=function(id){return function(){showMember(id)}}(m.user.id);
-      tr.innerHTML="<td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td>";
-      tbl.appendChild(tr);
-    }
-    g("memberList").innerHTML="";
-    g("memberList").appendChild(tbl);
+    var humans=0,bots=0;
+    for(var i=0;i<d.members.length;i++){if(d.members[i].user.bot)bots++;else humans++}
+    g("memberStats").innerHTML="<div class='member-stat'><span>total</span><p>"+d.members.length+"</p></div>"+
+      "<div class='member-stat'><span>humans</span><p>"+humans+"</p></div>"+
+      "<div class='member-stat'><span>bots</span><p>"+bots+"</p></div>";
+    renderMembers(d.members);
   });
+}
+
+function renderMembers(members){
+  var sorted=members.slice().sort(function(a,b){
+    var an=a.nick||(a.user.global_name||a.user.username).toLowerCase();
+    var bn=b.nick||(b.user.global_name||b.user.username).toLowerCase();
+    return an.localeCompare(bn);
+  });
+  var h="";
+  for(var i=0;i<sorted.length;i++){
+    var m=sorted[i],name=m.nick||(m.user.global_name||m.user.username);
+    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+    var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+    var roleBadges="";
+    for(var j=0;j<m.roles.length&&j<3;j++){
+      var role=allRoles.find(function(x){return x.id===m.roles[j]});
+      if(role){
+        var rc=role.color?"#"+role.color.toString(16).padStart(6,"0"):"#555";
+        roleBadges+="<span class='role-badge' style='border-color:"+rc+"44;color:"+rc+"'>"+esc(role.name)+"</span>";
+      }
+    }
+    if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
+    h+="<div class='member-card' onclick=\"showMember('"+m.user.id+"')\">";
+    h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+    h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
+    h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
+    h+="<span class='member-joined'>"+joined+"</span>";
+    h+="</div>";
+  }
+  if(!sorted.length)h="<p style='color:#555;text-align:center;padding:20px 0'>no members found</p>";
+  g("memberList").innerHTML=h;
+}
+
+function filterMembers(q){
+  if(!allMembers.length)return;
+  q=q.toLowerCase();
+  var filtered=allMembers.filter(function(m){
+    var name=(m.nick||(m.user.global_name||m.user.username)).toLowerCase();
+    var id=m.user.id;
+    return name.indexOf(q)!==-1||id.indexOf(q)!==-1;
+  });
+  renderMembers(filtered);
 }
 
 function showMember(id){
   var m=allMembers.find(function(x){return x.user.id===id});if(!m)return;
   var name=m.nick||(m.user.global_name||m.user.username);
-  g("modalName").textContent=name;
-  g("modalId").textContent="id: "+m.user.id;
-  g("modalJoined").textContent="joined: "+new Date(m.joined_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
-  var roles=m.roles.map(function(r){var role=allRoles.find(function(x){return x.id===r});return role?role.name:r}).join(", ")||"none";
-  g("modalRoles").textContent="roles: "+roles;
+  var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+  var joined=new Date(m.joined_at).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  var rolesHtml="";
+  for(var i=0;i<m.roles.length;i++){
+    var role=allRoles.find(function(x){return x.id===m.roles[i]});
+    if(role){
+      var rc=role.color?"#"+role.color.toString(16).padStart(6,"0"):"#555";
+      rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
+    }
+  }
+  g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
+    "<div class='modal-body'>"+
+    "<div class='modal-section'><div class='modal-section-label">id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
+    "<div class='modal-section'><div class='modal-section-label">joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
+    (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#aaa;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
+    "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#555;font-size:10px'>no roles</span>")+"</div></div>"+
+    "</div>"+
+    "<div class='modal-footer'><button onclick=\"c()\">close</button></div>";
   g("userModal").classList.add("show");
 }
 function c(){g("userModal").classList.remove("show")}
