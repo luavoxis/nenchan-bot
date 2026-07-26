@@ -449,12 +449,13 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" class="tab active">
-<h2>login</h2>
+<div id="loginScreen" class="tab active" style="display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:80vh">
+<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:300px;text-align:center">
+<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px">bot panel</h2>
 <div id="loginError" class="error"></div>
-<label>password</label>
-<input type="password" id="password" placeholder="password" onkeydown="if(event.key==='Enter')login()"/>
-<button onclick="login()">login</button>
+<input type="password" id="password" placeholder="password" style="text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')login()"/>
+<button onclick="login()" style="width:100%">login</button>
+</div>
 </div>
 <div id="tab-dashboard" class="tab">
 <h2>dashboard</h2>
@@ -499,14 +500,14 @@ function switchTab(name){
 
 // login
 async function login(){
-  const p=document.getElementById("password").value;
-  const e=document.getElementById("loginError");e.textContent="";
+  const pwd=document.getElementById("password").value;
+  const errEl=document.getElementById("loginError");errEl.textContent="";
   try{
-    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:p})});
+    const r=await fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:pwd})});
     const d=await r.json();
     if(d.token){document.cookie="token="+d.token+";path=/;max-age=86400;SameSite=Lax";token=d.token;initPanel()}
-    else e.textContent=d.error||"wrong password"
-  }catch{a=>e.textContent="error"}
+    else errEl.textContent=d.error||"wrong password"
+  }catch(ex){errEl.textContent="connection error"}
 }
 
 // init
