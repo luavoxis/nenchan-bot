@@ -1014,7 +1014,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return await handlePanel(res, body);
   } catch (error) {
     console.error("Handler error", error);
-    return res.status(500).json({ error: "Internal error" });
+    return res.status(500).json({ error: "Internal error", message: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
   }
 }
 

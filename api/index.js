@@ -1426,7 +1426,7 @@ async function handler(req, res) {
     return await handlePanel(res, body);
   } catch (error) {
     console.error("Handler error", error);
-    return res.status(500).json({ error: "Internal error" });
+    return res.status(500).json({ error: "Internal error", message: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : void 0 });
   }
 }
 async function handleDiscord(req, res, rawBody, signature, timestamp) {
