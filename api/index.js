@@ -446,7 +446,22 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
+<div id="welcomeScreen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;cursor:pointer" onclick="showLogin()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;text-align:center;user-select:none">
+<div style="font-size:32px;color:#fff;letter-spacing:4px;font-weight:300;margin-bottom:8px">Welcome</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;max-width:320px;font-size:12px;color:#555;line-height:1.8">
+<span>Willkommen</span> <span>Bienvenue</span> <span>Bienvenido</span>
+<span>Benvenuto</span> <span>Bem-vindo</span> <span>Vitejte</span>
+<span>V\xE4lkommen</span> <span>Welkom</span> <span>Witamy</span>
+<span>Ho\u015F geldin</span> <span>Hu\u0101n y\xEDng</span> <span>\u3088\u3046\u3053\u305D</span>
+<span>\u0414\u043E\u0431\u0440\u043E \u043F\u043E\u0436\u0430\u043B\u043E\u0432\u0430\u0442\u044C</span> <span>\u0623\u0647\u0644\u0627\u064B \u0648\u0633\u0647\u0644\u0627\u064B</span> <span>Swagata</span>
+<span>Karibu</span> <span>\u0412\u0456\u0442\u0430\u0454\u043C\u043E</span> <span>\u062E\u0648\u0634 \u0622\u0645\u062F\u06CC\u062F</span>
+<span>\u05D1\u05E8\u05D5\u05DA \u05D4\u05D1\u05D0</span> <span>\u09B8\u09CD\u09AC\u09BE\u0997\u09A4\u09AE</span>
+</div>
+<div style="margin-top:24px;font-size:10px;color:#333;letter-spacing:1px">tap to continue</div>
+</div>
+</div>
+<div id="loginScreen" style="display:none;flex-direction:column;justify-content:center;align-items:center;height:100vh">
 <div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
 <h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
 <div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
@@ -480,6 +495,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
 var token=getCookie("token"),allMembers=[],allRoles=[];
+function showLogin(){g("welcomeScreen").style.display="none";g("loginScreen").style.display="flex"}
 
 function login(){
   var pwd=g("password").value,err=g("loginError");
@@ -599,7 +615,7 @@ function showMember(id){
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
-if(token)initPanel();
+if(token){g("welcomeScreen").style.display="none";initPanel()}
 </script>
 </body>
 </html>`;

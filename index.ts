@@ -100,7 +100,22 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
+<div id="welcomeScreen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;cursor:pointer" onclick="showLogin()">
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;text-align:center;user-select:none">
+<div style="font-size:32px;color:#fff;letter-spacing:4px;font-weight:300;margin-bottom:8px">Welcome</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;max-width:320px;font-size:12px;color:#555;line-height:1.8">
+<span>Willkommen</span> <span>Bienvenue</span> <span>Bienvenido</span>
+<span>Benvenuto</span> <span>Bem-vindo</span> <span>Vitejte</span>
+<span>Välkommen</span> <span>Welkom</span> <span>Witamy</span>
+<span>Hoş geldin</span> <span>Huān yíng</span> <span>ようこそ</span>
+<span>Добро пожаловать</span> <span>أهلاً وسهلاً</span> <span>Swagata</span>
+<span>Karibu</span> <span>Вітаємо</span> <span>خوش آمدید</span>
+<span>ברוך הבא</span> <span>স্বাগতম</span>
+</div>
+<div style="margin-top:24px;font-size:10px;color:#333;letter-spacing:1px">tap to continue</div>
+</div>
+</div>
+<div id="loginScreen" style="display:none;flex-direction:column;justify-content:center;align-items:center;height:100vh">
 <div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
 <h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
 <div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
@@ -134,6 +149,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
 var token=getCookie("token"),allMembers=[],allRoles=[];
+function showLogin(){g("welcomeScreen").style.display="none";g("loginScreen").style.display="flex"}
 
 function login(){
   var pwd=g("password").value,err=g("loginError");
@@ -253,7 +269,7 @@ function showMember(id){
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
-if(token)initPanel();
+if(token){g("welcomeScreen").style.display="none";initPanel()}
 </script>
 </body>
 </html>`;
