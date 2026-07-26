@@ -181,11 +181,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 </div>
 <div id="panel-dashboard" class="panel">
-<h2>dashboard</h2>
 <div id="dashContent"><p style="color:#666">loading...</p></div>
 </div>
 <div id="panel-messages" class="panel">
-<h2>messages</h2>
 <label>channel</label>
 <select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">loading...</option></select>
 <div id="msgHistory" style="max-height:360px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
