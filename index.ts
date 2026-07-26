@@ -991,24 +991,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    let rawBody: string;
-    try {
-      const chunks: Buffer[] = [];
-      for await (const chunk of req) chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-      rawBody = Buffer.concat(chunks).toString();
-    } catch (e: any) {
-      return res.status(400).json({ error: "Failed to read body: " + (e.message || "unknown") });
-    }
-    if (!rawBody || !rawBody.length) return res.status(400).json({ error: "Missing body" });
-
     const signature = req.headers["x-signature-ed25519"];
     const timestamp = req.headers["x-signature-timestamp"];
 
     if (typeof signature === "string" && typeof timestamp === "string") {
+      const rawBody = JSON.stringify(req.body);
       return await handleDiscord(req, res, rawBody, signature, timestamp);
     }
 
-    return await handlePanel(res, rawBody);
+    const body = req.body;
+    if (!body || typeof body !== "object") {
+      return res.status(400).json({ error: "Invalid body" });
+    }
+
+    return await handlePanel(res, body);
   } catch (error) {
     console.error("Handler error", error);
     return res.status(500).json({ error: "Internal error" });
@@ -1133,14 +1129,7 @@ async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, code
   }
 }
 
-async function handlePanel(res: VercelResponse, bodyStr: string) {
-  let body: any;
-  try {
-    body = JSON.parse(bodyStr);
-  } catch {
-    return res.status(400).json({ error: "Invalid JSON" });
-  }
-
+async function handlePanel(res: VercelResponse, body: any) {
   if (body.action === "oauth_url") {
     const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify`;
     return res.json({ url });
