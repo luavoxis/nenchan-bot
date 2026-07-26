@@ -156,7 +156,7 @@ export default {
     return {
       embeds: [
         {
-          color: user.accent_color || 0x5865F2,
+          color: user.accent_color || 0xC9A0DC,
           thumbnail: { url: avatarUrl },
           fields,
         },

@@ -51,7 +51,7 @@ export default {
     return {
       embeds: [
         {
-          color: 0x5865F2,
+          color: 0xC9A0DC,
           fields: [
             { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true },

@@ -61,7 +61,7 @@ export default {
     return {
       embeds: [
         {
-          color: 0x5865F2,
+          color: 0xC9A0DC,
           image: { url: bannerUrl },
         },
       ],

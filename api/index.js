@@ -126,7 +126,7 @@ var userinfo_default = {
     return {
       embeds: [
         {
-          color: user.accent_color || 5793266,
+          color: user.accent_color || 13213916,
           thumbnail: { url: avatarUrl },
           fields
         }
@@ -177,7 +177,7 @@ var profile_default = {
     return {
       embeds: [
         {
-          color: 5793266,
+          color: 13213916,
           fields: [
             { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true }
@@ -347,7 +347,7 @@ var banner_default = {
     return {
       embeds: [
         {
-          color: 5793266,
+          color: 13213916,
           image: { url: bannerUrl }
         }
       ]
