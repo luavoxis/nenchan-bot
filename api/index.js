@@ -42,12 +42,21 @@ var profile_default = {
     }
     const isAnimated = user.avatar.startsWith("a_");
     const ext = isAnimated ? "gif" : "png";
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}`;
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
     return {
-      content: `## ${user.username}
-**ID:** \`${user.id}\`
-**Avatar:**
-${avatarUrl}`
+      embeds: [
+        {
+          title: user.global_name ?? user.username,
+          color: 5793266,
+          thumbnail: { url: avatarUrl },
+          fields: [
+            { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
+            { name: "ID", value: `\`${user.id}\``, inline: true }
+          ],
+          image: { url: avatarUrl },
+          footer: { text: "Discord Profile" }
+        }
+      ]
     };
   }
 };
@@ -262,7 +271,8 @@ async function handler(req, res) {
             `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
             {
               content: commandResult.content ?? "",
-              flags: commandResult.flags
+              flags: commandResult.flags,
+              embeds: commandResult.embeds
             },
             {
               headers: {

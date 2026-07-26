@@ -127,6 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             {
               content: commandResult.content ?? "",
               flags: commandResult.flags,
+              embeds: commandResult.embeds,
             },
             {
               headers: {

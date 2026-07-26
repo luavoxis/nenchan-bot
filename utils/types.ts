@@ -68,8 +68,17 @@ export interface SimplifiedInteraction {
 }
 
 export type CommandExecuteUnpromised = {
-  content: string;
+  content?: string;
   flags?: MessageFlags;
+  embeds?: Array<{
+    title?: string;
+    description?: string;
+    color?: number;
+    fields?: Array<{ name: string; value: string; inline?: boolean }>;
+    image?: { url: string };
+    thumbnail?: { url: string };
+    footer?: { text: string };
+  }>;
 };
 
 export type CommandExecuteResult = Promise<CommandExecuteUnpromised>;
