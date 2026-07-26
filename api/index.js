@@ -683,6 +683,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
 .mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mention-item .m-bot{color:#5865F2;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
+.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:4px;transition:border-color .15s}
+.ban-card:hover{border-color:#444}
+.ban-card img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.ban-info{flex:1;min-width:0}
+.ban-name{color:#ddd;font-size:11px;font-weight:600}
+.ban-username{color:#555;font-size:10px}
+.ban-reason{color:#f44;font-size:9px;margin-top:2px;font-weight:600}
+.ban-date{color:#555;font-size:9px;font-weight:600}
+.ban-unban{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:monospace;flex-shrink:0}
+.ban-unban:hover{background:#f44;color:#fff}
 </style>
 </head>
 <body>
@@ -694,6 +704,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <button onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;whispers&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;banned&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
@@ -757,6 +768,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 </div>
 </div>
+<div id="panel-bans" class="panel">
+<p style="color:#555;font-size:10px;margin-bottom:6px">loading banned users...</p>
+<div id="banList"></div>
+</div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
 <div class="confirm-box">
@@ -797,6 +812,7 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
+  if(name==="bans")loadBans();
   if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none";stopDmPoll()}
   if(name!=="dms")stopDmPoll();
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
@@ -839,6 +855,42 @@ function loadDashboard(){
 }
 
 function toggleDashRoles(){g("dashRoleList").classList.toggle("show");g("dashRoleArrow").innerHTML=g("dashRoleList").classList.contains("show")?"&#9650;":"&#9660;"}
+
+function loadBans(){
+  g("banList").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
+  api({action:"bans"},function(d){
+    if(d.error){g("banList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    if(!d.bans||!d.bans.length){g("banList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no banned users</p>";return}
+    var h="";
+    for(var i=0;i<d.bans.length;i++){
+      var b=d.bans[i],u=b.user;
+      var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+      var name=u.global_name||u.username;
+      var date=b.reason?new Date(b.reason).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"";
+      h+="<div class='ban-card'>";
+      h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+      h+="<div class='ban-info'>";
+      h+="<div class='ban-name'>"+esc(name)+"</div>";
+      h+="<div class='ban-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
+      if(b.reason)h+="<div class='ban-reason'>"+esc(b.reason)+"</div>";
+      h+="</div>";
+      h+="<button class='ban-unban' data-uid='"+u.id+"' onclick='unbanUser(this)'>unban</button>";
+      h+="</div>";
+    }
+    g("banList").innerHTML=h;
+  });
+}
+
+function unbanUser(el){
+  if(!confirm("unban this user?"))return;
+  var uid=el.dataset.uid;
+  el.textContent="...";
+  el.disabled=true;
+  api({action:"unban",userId:uid},function(d){
+    if(d.success){loadBans()}
+    else{alert(d.error||"failed to unban");loadBans()}
+  });
+}
 
 function loadMsgChannels(){
   api({action:"channels"},function(d){
@@ -1677,6 +1729,22 @@ async function handlePanel(res, bodyStr) {
       await discordFetch3(
         `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
         { method: "PATCH", headers, body: JSON.stringify({ communication_disabled_until: until }) }
+      );
+      return res.json({ success: true });
+    }
+    if (body.action === "bans") {
+      const bans = await discordFetch3(
+        `https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`,
+        { headers }
+      );
+      return res.json({ bans });
+    }
+    if (body.action === "unban") {
+      const userId = body.userId;
+      if (!userId) return res.status(400).json({ error: "No user specified" });
+      await discordFetch3(
+        `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
+        { method: "DELETE", headers }
       );
       return res.json({ success: true });
     }
