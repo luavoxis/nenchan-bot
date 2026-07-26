@@ -122,9 +122,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="msgHistory" style="max-height:280px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
 </div>
-<div style="display:flex;gap:4px;margin-bottom:4px">
-<input type="file" id="msgFile" style="flex:1;color:#888;font:11px monospace;padding:3px;background:#000;border:1px solid #333" />
-<button onclick="g('msgFile').value=''" style="background:#555;padding:3px 8px;font-size:10px">clear</button>
+<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">
+<input type="file" id="msgFile" style="flex:1;color:#888;font:11px monospace;padding:4px 3px;background:#000;border:1px solid #333;height:24px;box-sizing:border-box" />
+<button onclick="g('msgFile').value=''" style="background:#555;padding:4px 8px;font-size:10px;height:24px;line-height:16px;box-sizing:border-box">clear</button>
 </div>
 <div style="display:flex;gap:4px;margin-bottom:4px">
 <select id="msgMention" style="flex:1" onchange="insertMention()"><option value="">@mention</option></select>
@@ -264,6 +264,7 @@ function loadMsgHistory(cid){
           }else{h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"}
         }
       }
+      h+="<span style='float:right;color:#555;cursor:pointer' onclick='deleteMsg(\""+cid+"\",\""+msg.id+"\",this)' title='delete'>&#10005;</span>";
       h+="</div>";
     }
     g("msgHistory").innerHTML=h||"<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";
@@ -297,6 +298,14 @@ function doSend(body,cid){
     }else{
       g("msgStatus").style.color="#f44";g("msgStatus").textContent=d.error||"failed";
     }
+  });
+}
+
+function deleteMsg(cid,mid,el){
+  if(!confirm("delete this message?"))return;
+  api({action:"delete",channelId:cid,messageId:mid},function(d){
+    if(d.success){el.parentElement.style.opacity="0.3"}
+    else{alert(d.error||"failed to delete")}
   });
 }
 
@@ -529,6 +538,14 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         { headers },
       );
       return res.json({ messages: r.data });
+    }
+
+    if (body.action === "delete") {
+      await axios.delete(
+        `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
+        { headers },
+      );
+      return res.json({ success: true });
     }
 
     if (body.action === "members") {
