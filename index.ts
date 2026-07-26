@@ -127,7 +127,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .menu-toggle:hover{color:#fff;border-color:#444}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
 @media(max-width:600px){
-  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100vh;transform:translateX(-100%);transition:transform .2s ease}
+  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100vh;transform:translateX(-100%);transition:transform .2s ease;padding-top:48px}
   .sidebar.open{transform:translateX(0)}
   .sidebar-overlay.show{display:block}
   .menu-toggle{display:block}
