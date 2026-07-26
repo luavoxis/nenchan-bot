@@ -10314,7 +10314,7 @@ import {
 } from "discord-api-types/v10";
 async function discordFetch(url, opts = {}) {
   const u = new URL(url);
-  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  const mod = u.protocol === "https:" ? await import("https") : await import("http");
   return new Promise((resolve, reject) => {
     const req = mod.request(u, {
       method: opts.method || "GET",
@@ -10640,7 +10640,7 @@ import {
 } from "discord-api-types/v10";
 async function discordFetch2(url, opts = {}) {
   const u = new URL(url);
-  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  const mod = u.protocol === "https:" ? await import("https") : await import("http");
   return new Promise((resolve, reject) => {
     const req = mod.request(u, {
       method: opts.method || "GET",
@@ -10741,7 +10741,7 @@ import "discord-interactions";
 var PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
 async function discordFetch3(url, opts = {}) {
   const u = new URL(url);
-  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  const mod = u.protocol === "https:" ? await import("https") : await import("http");
   return new Promise((resolve, reject) => {
     const req = mod.request(u, {
       method: opts.method || "GET",

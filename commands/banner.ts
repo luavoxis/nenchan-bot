@@ -10,7 +10,7 @@ import type {
 
 async function discordFetch(url: string, opts: any = {}): Promise<any> {
   const u = new URL(url);
-  const mod = u.protocol === "https:" ? require("https") : require("http");
+  const mod = u.protocol === "https:" ? await import("https") : await import("http");
   return new Promise((resolve, reject) => {
     const req = mod.request(u, {
       method: opts.method || "GET",
