@@ -179,7 +179,9 @@ function loadDashboard(){
     if(d.error)return;
     g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
       "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
-      "<div class='stat'><span>members</span><p>"+d.memberCount+"</p></div>"+
+      "<div class='stat'><span>total members</span><p>"+d.totalMembers+"</p></div>"+
+      "<div class='stat'><span>humans</span><p>"+d.humans+"</p></div>"+
+      "<div class='stat'><span>bots</span><p>"+d.bots+"</p></div>"+
       "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
       "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
       "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
@@ -378,17 +380,23 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
 
   try {
     if (body.action === "guildinfo") {
-      const [guildRes, chanRes, rolesRes] = await Promise.all([
+      const [guildRes, chanRes, rolesRes, memberRes] = await Promise.all([
         axios.get(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
         axios.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
         axios.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
+        axios.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
       ]);
       const guild = guildRes.data;
       const ownerRes = await axios.get(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
+      const members = memberRes.data;
+      const bots = members.filter((m: any) => m.user?.bot).length;
+      const humans = members.length - bots;
       return res.json({
         name: guild.name,
         owner: ownerRes.data.global_name || ownerRes.data.username,
-        memberCount: guild.approximate_member_count || guild.member_count || "?",
+        totalMembers: guild.approximate_member_count || guild.member_count || members.length,
+        bots,
+        humans,
         channelCount: chanRes.data.length,
         roleCount: rolesRes.data.length,
         created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
