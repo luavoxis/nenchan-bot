@@ -516,9 +516,34 @@ button:hover{background:#888}
 .success{color:#4f4;font-size:11px;margin-bottom:4px}
 textarea{resize:vertical;min-height:50px;font:12px monospace}
 select option{background:#000;color:#ccc}
-.stat{background:#0a0a0a;border:1px solid #222;padding:10px;margin-bottom:6px}
+.stat{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;margin-bottom:4px}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
+.dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px}
+.dash-icon{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:#111}
+.dash-info{flex:1;min-width:0}
+.dash-name{color:#fff;font-size:16px;font-weight:600;margin:0}
+.dash-id{color:#555;font-size:10px;margin-top:2px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+@media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
+.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px}
+.dash-card-icon{width:32px;height:32px;background:#111;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.dash-card-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.dash-card-val{color:#fff;font-size:14px;margin-top:1px}
+.dash-card-sub{color:#555;font-size:9px;margin-top:1px}
+.dash-boost{display:flex;align-items:center;gap:10px;padding:10px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px}
+.dash-boost-icon{font-size:20px;flex-shrink:0}
+.dash-boost-bar{flex:1}
+.dash-boost-label{color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.dash-boost-track{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden}
+.dash-boost-fill{height:100%;background:#ff73fa;border-radius:3px;transition:width .3s}
+.dash-boost-text{color:#fff;font-size:11px;margin-top:3px}
+.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0}
+.dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.dash-roles-header .role-arrow{color:#555;font-size:9px;transition:transform .15s}
+.dash-roles-list{display:none;background:#0a0a0a;border:1px solid #1a1a1a;border-top:none;padding:4px 6px;max-height:200px;overflow-y:auto;scrollbar-width:none;margin-bottom:6px}
+.dash-roles-list.show{display:block}
+.dash-roles-list::-webkit-scrollbar{display:none}
 table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
 td,th{padding:4px 6px;text-align:left;border-bottom:1px solid #222;color:#aaa}
 th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
@@ -785,22 +810,34 @@ function api(body,cb){
 function loadDashboard(){
   api({action:"guildinfo"},function(d){
     if(d.error)return;
-    var roleItems=d.roles.sort(function(a,b){return b.position-a.position}).map(function(r){
+    var iconHtml=d.icon?"<img class='dash-icon' src='"+d.icon+"' alt=''/>":"<div class='dash-icon' style='display:flex;align-items:center;justify-content:center;color:#555;font-size:22px'>"+esc(d.name.charAt(0))+"</div>";
+    var rolesSorted=d.roles.slice().sort(function(a,b){return b.position-a.position});
+    var hoisted=rolesSorted.filter(function(r){return r.hoist});
+    var roleItems=rolesSorted.map(function(r){
       var c=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#666";
       return "<div class='role-item'><span class='role-dot' style='background:"+c+"'></span>"+esc(r.name)+"</div>";
     }).join("");
-    g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
-      "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
-      "<div class='stat'><span>members</span><p>"+d.totalMembers+" total &middot; "+d.humans+" humans &middot; "+d.bots+" bots</p></div>"+
-      "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
-      "<div class='stat' onclick='toggleRoles()'><span>roles</span><p class='role-toggle'>"+d.roleCount+" <span id='roleArrow' style='color:#666;font-size:10px'>&#9660;</span></p>"+
-      "<div id='roleList' class='role-list'>"+roleItems+"</div></div>"+
-      "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
-      "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
+    var boostPct=Math.min((d.boostCount/14)*100,100);
+    var boostColors=["#57f287","#eb459e","#ff73fa","#ff73fa","#ff73fa","#f47fff"];
+    var boostBarColor=boostColors[d.boostLevel]||"#57f287";
+    var h="<div class='dash-header'>";
+    h+=iconHtml;
+    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.totalMembers+" members &middot; "+d.roleCount+" roles &middot; created "+d.created+"</div></div>";
+    h+="</div>";
+    h+="<div class='dash-grid'>";
+    h+="<div class='dash-card'><div class='dash-card-icon'>&#128101;</div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'>&#128172;</div><div><div class='dash-card-label'>channels</div><div class='dash-card-val'>"+d.channelCount+"</div><div class='dash-card-sub'>"+d.textChannels+" text &middot; "+d.voiceChannels+" voice &middot; "+d.categories+" categories</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'>&#128081;</div><div><div class='dash-card-label'>owner</div><div class='dash-card-val'>"+esc(d.owner)+"</div><div class='dash-card-sub'>"+d.ownerId+"</div></div></div>";
+    h+="<div class='dash-card'><div class='dash-card-icon'>&#11088;</div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+"</div><div class='dash-card-sub'>tier "+d.boostLevel+"</div></div></div>";
+    h+="</div>";
+    h+="<div class='dash-boost'><div class='dash-boost-icon'>&#127775;</div><div class='dash-boost-bar'><div class='dash-boost-label'>boost progress (tier "+d.boostLevel+")</div><div class='dash-boost-track'><div class='dash-boost-fill' style='width:"+boostPct+"%;background:"+boostBarColor+"'></div></div><div class='dash-boost-text'>"+d.boostCount+" boosts &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
+    h+="<div class='dash-roles-header' onclick='toggleDashRoles()'><span>roles ("+d.roleCount+")</span><span class='role-arrow' id='dashRoleArrow'>&#9660;</span></div>";
+    h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
+    g("dashContent").innerHTML=h;
   });
 }
 
-function toggleRoles(){g("roleList").classList.toggle("show");g("roleArrow").innerHTML=g("roleList").classList.contains("show")?"&#9650;":"&#9660;"}
+function toggleDashRoles(){g("dashRoleList").classList.toggle("show");g("dashRoleArrow").innerHTML=g("dashRoleList").classList.contains("show")?"&#9650;":"&#9660;"}
 
 function loadMsgChannels(){
   api({action:"channels"},function(d){
@@ -1433,18 +1470,36 @@ async function handlePanel(res, bodyStr) {
         totalMembers = guild.approximate_member_count || guild.member_count || members.length;
       } catch {
       }
+      let textCh = 0, voiceCh = 0, categoryCh = 0;
+      for (const ch of chanRes) {
+        if (ch.type === 0) textCh++;
+        else if (ch.type === 2) voiceCh++;
+        else if (ch.type === 4) categoryCh++;
+      }
+      let iconUrl = null;
+      if (guild.icon) {
+        const ext = guild.icon.startsWith("a_") ? ".gif" : ".png";
+        iconUrl = `https://cdn.discordapp.com/icons/${guildId}/${guild.icon}${ext}?size=256`;
+      }
       return res.json({
         name: guild.name,
+        icon: iconUrl,
         owner: ownerRes.global_name || ownerRes.username,
+        ownerId: guild.owner_id,
         totalMembers,
         bots,
         humans,
         channelCount: chanRes.length,
+        textChannels: textCh,
+        voiceChannels: voiceCh,
+        categories: categoryCh,
         roleCount: rolesRes.length,
-        roles: rolesRes.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
+        roles: rolesRes.map((r) => ({ id: r.id, name: r.name, color: r.color, position: r.position, hoist: r.hoist })),
         created: new Date(Number(BigInt(guild.id) >> 22n) + 14200704e5).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+        createdTs: Number(BigInt(guild.id) >> 22n) + 14200704e5,
         boostLevel: guild.premium_tier || 0,
-        boostCount: guild.premium_subscription_count || 0
+        boostCount: guild.premium_subscription_count || 0,
+        features: guild.features || []
       });
     }
     if (body.action === "channels") {
