@@ -629,7 +629,27 @@ function updateFileLabel(el){
   else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
-var allDmChannels=[],currentDmChannel=null;
+var allDmChannels=[],currentDmChannel=null,knownDms=[];
+function rememberDm(channelId,userId,name,avatar){
+  for(var i=0;i<knownDms.length;i++){if(knownDms[i].channelId===channelId)return}
+  knownDms.unshift({channelId:channelId,userId:userId,name:name,avatar:avatar});
+}
+function mergeDmLists(apiChannels){
+  var merged=[],ids={};
+  for(var i=0;i<knownDms.length;i++){
+    var k=knownDms[i];
+    if(!ids[k.channelId]){merged.push(k);ids[k.channelId]=1}
+  }
+  for(var i=0;i<apiChannels.length;i++){
+    var ch=apiChannels[i];
+    if(!ids[ch.id]){
+      var r=ch.recipients&&ch.recipients[0];
+      if(r)merged.push({channelId:ch.id,userId:r.id,name:r.global_name||r.username,avatar:r.avatar});
+      ids[ch.id]=1;
+    }
+  }
+  return merged;
+}
 function startDmById(){
   var uid=g("dmUserId").value.trim();
   if(!uid)return;
@@ -645,20 +665,22 @@ function startDmById(){
     if(d.error){g("dmHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     currentDmChannel=d.channelId;
     api({action:"userinfo",userId:uid},function(u){
-      if(u&&!u.error)g("dmChatName").textContent=u.global_name||u.username||uid;
+      var n=uid;
+      if(u&&!u.error)n=u.global_name||u.username||uid;
+      g("dmChatName").textContent=n;
+      rememberDm(d.channelId,uid,n,u&&!u.error?u.avatar:null);
+      loadDms();
     });
     loadDmHistory(d.channelId);
-    loadDms();
   });
 }
 function loadDms(){
   api({action:"dm_channels"},function(d){
-    if(d.error){g("dmList").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    var channels=d.channels||[];
-    channels=channels.filter(function(ch){return ch.type===1});
-    channels.sort(function(a,b){var al=a.last_message_id||a.id||"0";var bl=b.last_message_id||b.id||"0";return bl>al?1:bl<al?-1:0});
-    allDmChannels=channels;
-    renderDmList(channels);
+    var apiChannels=[];
+    if(!d.error&&d.channels){apiChannels=d.channels.filter(function(ch){return ch.type===1})}
+    var merged=mergeDmLists(apiChannels);
+    allDmChannels=merged;
+    renderDmList(merged);
   });
 }
 function renderDmList(channels){
@@ -666,14 +688,12 @@ function renderDmList(channels){
   var h="";
   for(var i=0;i<channels.length;i++){
     var ch=channels[i];
-    var r=ch.recipients&&ch.recipients[0];
-    if(!r)continue;
-    var name=r.global_name||r.username;
-    var avatar=r.avatar?"https://cdn.discordapp.com/avatars/"+r.id+"/"+r.avatar+(r.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(r.discriminator||"0")%5)+".png";
-    h+="<div class='dm-channel' data-cid='"+ch.id+"' data-name='"+esc(name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
+    var name=ch.name||ch.userId;
+    var avatar=ch.avatar?"https://cdn.discordapp.com/avatars/"+ch.userId+"/"+ch.avatar+(ch.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(ch.userId||"0")%5)+".png";
+    h+="<div class='dm-channel' data-cid='"+ch.channelId+"' data-name='"+esc(name)+"' onclick='openDm(this.dataset.cid,this.dataset.name)'>";
     h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
     h+="<div style='flex:1;min-width:0'><div class='dm-channel-name'>"+esc(name)+"</div>";
-    h+="<div class='dm-channel-preview'>@"+esc(r.username)+"</div></div>";
+    h+="<div class='dm-channel-preview'>@"+esc(name)+"</div></div>";
     h+="</div>";
   }
   g("dmList").innerHTML=h;
