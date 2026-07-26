@@ -179,9 +179,7 @@ function loadDashboard(){
     if(d.error)return;
     g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
       "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
-      "<div class='stat'><span>total members</span><p>"+d.totalMembers+"</p></div>"+
-      "<div class='stat'><span>humans</span><p>"+d.humans+"</p></div>"+
-      "<div class='stat'><span>bots</span><p>"+d.bots+"</p></div>"+
+      "<div class='stat'><span>members</span><p>"+d.totalMembers+" total &middot; "+d.humans+" humans &middot; "+d.bots+" bots</p></div>"+
       "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
       "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
       "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
