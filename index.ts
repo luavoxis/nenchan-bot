@@ -679,7 +679,8 @@ function loadDms(){
   api({action:"dm_channels"},function(d){
     if(d.error){g("dmList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     var channels=d.channels||[];
-    channels.sort(function(a,b){return new Date(b.last_message_id?b.id:0)-new Date(a.last_message_id?a.id:0)});
+    channels=channels.filter(function(ch){return ch.type===1});
+    channels.sort(function(a,b){var al=a.last_message_id||a.id||"0";var bl=b.last_message_id||b.id||"0";return bl>al?1:bl<al?-1:0});
     allDmChannels=channels;
     renderDmList(channels);
   });
