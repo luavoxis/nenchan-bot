@@ -39,20 +39,15 @@ export default {
       interaction.data.options?.find((o) => o.name === "user")?.value ||
       interaction.member.user.id;
 
-    const [userRes, memberRes] = await Promise.all([
-      axios.get(`https://discord.com/api/v10/users/${targetId}`, {
-        headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` },
-      }),
-      axios.get(
-        `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
-        {
-          headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` },
-        },
-      ),
-    ]);
+    const headers = {
+      Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+    };
 
+    const userRes = await axios.get(
+      `https://discord.com/api/v10/users/${targetId}`,
+      { headers },
+    );
     const user = userRes.data;
-    const member = memberRes.data;
 
     const isAnimated = user.avatar?.startsWith("a_");
     const ext = isAnimated ? "gif" : "png";
@@ -60,41 +55,23 @@ export default {
       ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`
       : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator) % 5}.png`;
 
-    const joinedAt = new Date(member.joined_at).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    const fields: Array<{ name: string; value: string; inline: boolean }> = [
+      { name: "Username", value: `@${user.username}`, inline: true },
+      { name: "Display Name", value: user.global_name || user.username, inline: true },
+      { name: "ID", value: `\`${user.id}\``, inline: false },
+      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
+      { name: "Joined Discord", value: snowflakeToDate(user.id), inline: true },
+    ];
 
-    const createdAt = snowflakeToDate(user.id);
+    if (user.accent_color) {
+      fields.push({
+        name: "Accent Color",
+        value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
+        inline: true,
+      });
+    }
 
-    const rolesRes = await axios.get(
-      `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
-      {
-        headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` },
-      },
-    );
-    const allRoles = rolesRes.data;
-    const memberRoleIds = member.roles as string[];
-    const memberRoles = allRoles
-      .filter((r: { id: string }) => memberRoleIds.includes(r.id))
-      .sort(
-        (a: { position: number }, b: { position: number }) =>
-          b.position - a.position,
-      );
-
-    const topRole = memberRoles[0]?.name || "None";
-    const roleCount = memberRoles.length;
-    const roleMentions = memberRoles
-      .slice(0, 10)
-      .map((r: { id: string }) => `<@&${r.id}>`)
-      .join(" ");
-    const roleSummary =
-      roleCount > 10
-        ? `${roleMentions} *+${roleCount - 10} more*`
-        : roleMentions || "None";
-
-    const badges = [];
+    const badges: string[] = [];
     const flags = user.public_flags ?? 0;
     if (flags & (1 << 0)) badges.push("Discord Staff");
     if (flags & (1 << 1)) badges.push("Partner");
@@ -110,26 +87,69 @@ export default {
     if (flags & (1 << 17)) badges.push("Certified Moderator");
     if (flags & (1 << 18)) badges.push("Bot HTTP Interactions");
     if (flags & (1 << 19)) badges.push("Active Developer");
-    const badgeText = badges.length ? badges.join(", ") : "None";
+    if (badges.length) {
+      fields.push({ name: "Badges", value: badges.join(", "), inline: false });
+    }
 
-    const fields = [
-      { name: "Username", value: `@${user.username}`, inline: true },
-      { name: "Display Name", value: member.nick || user.global_name || user.username, inline: true },
-      { name: "ID", value: `\`${user.id}\``, inline: false },
-      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
-      { name: "Top Role", value: topRole, inline: true },
-      { name: "Roles", value: roleSummary, inline: false },
-      { name: "Joined Server", value: joinedAt, inline: true },
-      { name: "Joined Discord", value: createdAt, inline: true },
-      { name: "Badges", value: badgeText, inline: false },
-    ];
+    try {
+      const memberRes = await axios.get(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
+        { headers },
+      );
+      const member = memberRes.data;
 
-    if (user.accent_color) {
-      fields.push({
-        name: "Accent Color",
-        value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
+      fields.splice(2, 0, {
+        name: "Nickname",
+        value: member.nick || "None",
         inline: true,
       });
+
+      const joinedAt = new Date(member.joined_at).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      fields.push({ name: "Joined Server", value: joinedAt, inline: true });
+
+      try {
+        const rolesRes = await axios.get(
+          `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
+          { headers },
+        );
+        const allRoles = rolesRes.data;
+        const memberRoleIds = member.roles as string[];
+        const memberRoles = allRoles
+          .filter((r: { id: string }) => memberRoleIds.includes(r.id))
+          .sort(
+            (a: { position: number }, b: { position: number }) =>
+              b.position - a.position,
+          );
+
+        fields.push({
+          name: "Top Role",
+          value: memberRoles[0]?.name || "None",
+          inline: true,
+        });
+
+        const roleMentions = memberRoles
+          .slice(0, 10)
+          .map((r: { id: string }) => `<@&${r.id}>`)
+          .join(" ");
+        const roleSummary =
+          memberRoles.length > 10
+            ? `${roleMentions} *+${memberRoles.length - 10} more*`
+            : roleMentions || "None";
+        fields.push({ name: "Roles", value: roleSummary, inline: false });
+      } catch {
+        fields.push({
+          name: "Roles",
+          value: "*Could not fetch roles*",
+          inline: false,
+        });
+      }
+    } catch {
+      fields.push({ name: "Note", value: "*Server member details unavailable (enable Server Members Intent in Discord Developer Portal)*", inline: false });
     }
 
     return {
