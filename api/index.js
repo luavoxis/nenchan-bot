@@ -550,6 +550,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .member-name span{color:#555;font-size:10px;font-weight:400}
 .member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
 .role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap}
+.role-group-header{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:12px 4px 4px;border-bottom:1px solid #1a1a1a;margin-top:4px;font-weight:600}
+.role-group-header:first-child{margin-top:0}
+.role-group-count{color:#333;font-weight:400}
 .member-joined{color:#444;font-size:9px;flex-shrink:0}
 .member-search{width:100%;padding:6px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;margin-bottom:8px;outline:none}
 .member-search:focus{border-color:#555}
@@ -868,34 +871,67 @@ function loadMembers(){
 }
 
 function renderMembers(members){
-  var sorted=members.slice().sort(function(a,b){
-    var an=a.nick||(a.user.global_name||a.user.username).toLowerCase();
-    var bn=b.nick||(b.user.global_name||b.user.username).toLowerCase();
-    return an.localeCompare(bn);
-  });
-  var h="";
-  for(var i=0;i<sorted.length;i++){
-    var m=sorted[i],name=m.nick||(m.user.global_name||m.user.username);
-    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
-    var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
-    var roleBadges="";
-    for(var j=0;j<m.roles.length&&j<3;j++){
-      var role=allRoles.find(function(x){return x.id===m.roles[j]});
-      if(role){
-        var rc=role.color?"#"+role.color.toString(16).padStart(6,"0"):"#555";
-        roleBadges+="<span class='role-badge' style='border-color:"+rc+"44;color:"+rc+"'>"+esc(role.name)+"</span>";
-      }
+  var sortedRoles=allRoles.slice().sort(function(a,b){return b.position-a.position});
+  var groups={};
+  var ungrouped=[];
+  for(var i=0;i<members.length;i++){
+    var m=members[i];
+    var highest=null;
+    for(var j=0;j<sortedRoles.length;j++){
+      if(m.roles.indexOf(sortedRoles[j].id)!==-1){highest=sortedRoles[j];break}
     }
-    if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
-    h+="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
-    h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
-    h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
-    h+="<span class='member-joined'>"+joined+"</span>";
-    h+="</div>";
+    if(highest){
+      if(!groups[highest.id])groups[highest.id]={role:highest,members:[]};
+      groups[highest.id].members.push(m);
+    }else{ungrouped.push(m)}
   }
-  if(!sorted.length)h="<p style='color:#555;text-align:center;padding:20px 0'>no members found</p>";
+  var h="";
+  for(var k=0;k<sortedRoles.length;k++){
+    var gid=sortedRoles[k].id;
+    if(!groups[gid])continue;
+    var g2=groups[gid];
+    var rc=g2.role.color?"#"+g2.role.color.toString(16).padStart(6,"0"):"#555";
+    g2.members.sort(function(a,b){
+      var an=a.nick||(a.user.global_name||a.user.username).toLowerCase();
+      var bn=b.nick||(b.user.global_name||b.user.username).toLowerCase();
+      return an.localeCompare(bn);
+    });
+    h+="<div class='role-group-header' style='color:"+rc+"'>"+esc(g2.role.name)+" <span class='role-group-count'>"+g2.members.length+"</span></div>";
+    for(var i=0;i<g2.members.length;i++){h+=renderMemberCard(g2.members[i])}
+  }
+  if(ungrouped.length){
+    ungrouped.sort(function(a,b){
+      var an=a.nick||(a.user.global_name||a.user.username).toLowerCase();
+      var bn=b.nick||(b.user.global_name||b.user.username).toLowerCase();
+      return an.localeCompare(bn);
+    });
+    h+="<div class='role-group-header'>offline <span class='role-group-count'>"+ungrouped.length+"</span></div>";
+    for(var i=0;i<ungrouped.length;i++){h+=renderMemberCard(ungrouped[i])}
+  }
+  if(!members.length)h="<p style='color:#555;text-align:center;padding:20px 0'>no members found</p>";
   g("memberList").innerHTML=h;
+}
+
+function renderMemberCard(m){
+  var name=m.nick||(m.user.global_name||m.user.username);
+  var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+  var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  var roleBadges="";
+  for(var j=0;j<m.roles.length&&j<3;j++){
+    var role=allRoles.find(function(x){return x.id===m.roles[j]});
+    if(role){
+      var rc=role.color?"#"+role.color.toString(16).padStart(6,"0"):"#555";
+      roleBadges+="<span class='role-badge' style='border-color:"+rc+"44;color:"+rc+"'>"+esc(role.name)+"</span>";
+    }
+  }
+  if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
+  var h="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
+  h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+  h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
+  h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
+  h+="<span class='member-joined'>"+joined+"</span>";
+  h+="</div>";
+  return h;
 }
 
 function filterMembers(q){
