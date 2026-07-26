@@ -675,6 +675,14 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .dm-channel-name{color:#ddd;font-size:11px}
 .dm-channel-preview{color:#555;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dm-channel-time{color:#555;font-size:9px;flex-shrink:0;margin-left:auto;font-weight:600}
+.mention-list{display:none;position:absolute;top:100%;left:0;right:0;background:#0a0a0a;border:1px solid #222;border-top:none;max-height:180px;overflow-y:auto;z-index:10;scrollbar-width:none}
+.mention-list::-webkit-scrollbar{display:none}
+.mention-list.show{display:block}
+.mention-item{display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;font-size:11px;color:#ccc}
+.mention-item:hover{background:#1a1a1a}
+.mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+.mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mention-item .m-bot{color:#5865F2;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
 </style>
 </head>
 <body>
@@ -702,7 +710,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="panel-messages" class="panel">
 <div class="msg-bar">
 <select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">select channel</option></select>
-<select id="msgMention" onchange="insertMention()"><option value="">@mention</option></select>
+</div>
+<div style="position:relative;margin-bottom:4px">
+<input type="text" id="mentionSearch" placeholder="@mention - search members..." oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0;width:100%;padding:4px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;outline:none"/>
+<div id="mentionList" class="mention-list"></div>
 </div>
 <div id="msgHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #1a1a1a;padding:4px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
@@ -843,15 +854,50 @@ function loadMsgChannels(){
     if(!count){s.innerHTML="<option value=''>no text channels</option>";return}
     api({action:"members"},function(md){
       if(md.error)return;
-      var sel=g("msgMention");
+      var seen={};
+      allMembers=[];
       for(var i=0;i<md.members.length;i++){
-        var m=md.members[i],name=m.nick||(m.user.global_name||m.user.username);
-        var o=document.createElement("option");o.value="<@"+m.user.id+">";o.textContent="@"+name;sel.appendChild(o);
+        var m=md.members[i];
+        if(!seen[m.user.id]){seen[m.user.id]=1;allMembers.push(m)}
       }
     });
   });
 }
 
+var mentionVisible=false;
+function showMentionList(){
+  mentionVisible=true;
+  var el=g("mentionList");
+  if(!el.children.length)filterMentions("");
+  el.classList.add("show");
+}
+function hideMentionList(){mentionVisible=false;setTimeout(function(){g("mentionList").classList.remove("show")},150)}
+function filterMentions(q){
+  q=q.toLowerCase();
+  var el=g("mentionList");
+  var h="";
+  var count=0;
+  for(var i=0;i<allMembers.length&&count<20;i++){
+    var m=allMembers[i],name=m.nick||(m.user.global_name||m.user.username);
+    if(q&&name.toLowerCase().indexOf(q)===-1&&m.user.username.indexOf(q)===-1&&m.user.id.indexOf(q)===-1)continue;
+    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+    h+="<div class='mention-item' data-uid='"+m.user.id+"' data-name='"+esc(name)+"' onclick='pickMention(this)'>";
+    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+    h+="<span class='m-name'>"+esc(name)+(m.user.bot?"<span class='m-bot'>bot</span>":"")+"</span>";
+    h+="</div>";
+    count++;
+  }
+  if(!count)h="<div class='mention-item' style='color:#555;cursor:default'>no results</div>";
+  el.innerHTML=h;
+  el.classList.add("show");
+}
+function pickMention(el){
+  var input=g("msgInput");
+  input.value+="<@"+el.dataset.uid+"> ";
+  input.focus();
+  g("mentionSearch").value="";
+  g("mentionList").classList.remove("show");
+}
 function insertMention(){
   var sel=g("msgMention");
   if(sel.value){g("msgInput").value+=sel.value+" ";sel.value=""}
@@ -1289,6 +1335,7 @@ function executeConfirm(){
     }
   });
 }
+document.addEventListener("click",function(e){if(!e.target.closest("#mentionSearch")&&!e.target.closest("#mentionList"))hideMentionList()});
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
 </body>
