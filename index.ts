@@ -141,6 +141,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .member-info{flex:1;min-width:0}
 .member-name{color:#ddd;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .member-name span{color:#555;font-size:10px;font-weight:400}
+.member-username{color:#555;font-size:10px}
 .member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
 .role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap}
 .role-group-header{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:12px 4px 4px;border-bottom:1px solid #1a1a1a;margin-top:4px;font-weight:600}
@@ -524,6 +525,7 @@ function renderMemberCard(m){
   var h="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
   h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
   h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
+  if(m.user.username!==name.toLowerCase()&&m.user.username!==(m.user.global_name||"").toLowerCase())h+="<div class='member-username'>"+esc(m.user.username)+"</div>";
   h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
   h+="<span class='member-joined'>"+joined+"</span>";
   h+="</div>";
@@ -554,15 +556,7 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
-  var bannerHtml="";
-  if(m.user.banner){
-    var ext=m.user.banner.startsWith("a_")?".gif":".png";
-    bannerHtml="<div class='modal-banner' style='background-image:url(https://cdn.discordapp.com/banners/"+m.user.id+"/"+m.user.banner+ext+"?size=480)'></div>";
-  }else if(m.user.accent_color!=null){
-    var ac="#"+m.user.accent_color.toString(16).padStart(6,"0");
-    bannerHtml="<div class='modal-banner-color' style='background:"+ac+"'></div>";
-  }
-  g("modalBox").innerHTML=bannerHtml+"<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
+  g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
     "<div class='modal-section'><div class='modal-section-label'>id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
     "<div class='modal-section'><div class='modal-section-label'>joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
@@ -571,6 +565,24 @@ function showMember(id){
     "</div>"+
     "<div class='modal-footer'><button onclick='c()'>close</button></div>";
   g("userModal").classList.add("show");
+  api({action:"userinfo",userId:id},function(u){
+    if(!u||u.error)return;
+    var bannerHtml="";
+    if(u.banner){
+      var ext=u.banner.startsWith("a_")?".gif":".png";
+      bannerHtml="<div class='modal-banner' style='background-image:url(https://cdn.discordapp.com/banners/"+u.id+"/"+u.banner+ext+"?size=480)'></div>";
+    }else if(u.accent_color!=null){
+      var ac="#"+u.accent_color.toString(16).padStart(6,"0");
+      bannerHtml="<div class='modal-banner-color' style='background:"+ac+"'></div>";
+    }
+    var box=g("modalBox");
+    box.insertAdjacentHTML("afterbegin",bannerHtml);
+    if(u.banner){
+      var newAvatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):avatar;
+      var headerImg=box.querySelector(".modal-header img");
+      if(headerImg)headerImg.src=newAvatar;
+    }
+  });
 }
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
@@ -854,6 +866,11 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         discordFetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
       ]);
       return res.json({ members: memberRes, roles: rolesRes });
+    }
+
+    if (body.action === "userinfo") {
+      const userRes = await discordFetch(`https://discord.com/api/v10/users/${body.userId}`, { headers });
+      return res.json(userRes);
     }
 
     return res.status(400).json({ error: "Unknown action" });
