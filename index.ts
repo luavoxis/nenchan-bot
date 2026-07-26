@@ -265,24 +265,23 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-dms" class="panel">
 <div id="dmStart">
+<p style="color:#555;font-size:10px;margin-bottom:6px">enter a user id to open dm</p>
 <div style="display:flex;gap:4px">
-<input type="text" id="dmUserId" placeholder="user id" style="flex:1;margin:0;padding:4px 6px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace;outline:none"/>
-<button onclick="startDmById()" style="margin:0;padding:4px 12px;border:1px solid #333;background:#111;color:#888;font:11px monospace;cursor:pointer;white-space:nowrap">open</button>
+<input type="text" id="dmUserId" placeholder="user id" style="flex:1;margin:0"/>
+<button onclick="startDmById()" style="margin:0;padding:4px 12px">open</button>
 </div>
 </div>
 <div id="dmChat" style="display:none">
-<div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #222;margin-bottom:8px">
-<button onclick="dmClose()" style="background:none;border:1px solid #333;color:#888;padding:2px 8px;font:11px monospace;cursor:pointer">close</button>
+<div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid #1a1a1a;margin-bottom:6px">
+<button onclick="dmClose()" style="margin:0;padding:2px 8px;background:#1a1a1a;color:#888;border:1px solid #333;font-size:11px">close</button>
 <span id="dmChatName" style="color:#fff;font-size:12px"></span>
 </div>
-<div id="dmHistory" style="max-height:360px;overflow-y:auto;margin-bottom:8px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
+<div id="dmHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #1a1a1a;padding:4px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">loading...</p>
 </div>
-<label>message</label>
-<textarea id="dmInput" placeholder="message" style="min-height:50px"></textarea>
-<div class="flex" style="gap:4px">
+<div class="msg-input-row">
+<textarea id="dmInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDm()}" style="min-height:36px;resize:none"></textarea>
 <button onclick="sendDm()">send</button>
-<button onclick="g('dmInput').value=''">clear</button>
 </div>
 <div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
@@ -711,38 +710,38 @@ function loadDmHistory(cid){
       if(!u)continue;
       var name=u.global_name||u.username;
       var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
-      var isBot=u.bot;
-      var color=isBot?"#4af":"#888";
-      h+="<div style='display:flex;gap:8px;margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
-      h+="<div style='flex:1;min-width:0'>";
-      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
-      if(msg.edited_timestamp)h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
-      h+="<br>";
+      var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+      h+="<div class='msg-row'>";
+      h+="<img class='msg-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+      h+="<div class='msg-body'>";
+      h+="<div><span class='msg-author'>"+esc(name)+"</span><span class='msg-time'>"+time+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>";
       if(msg.referenced_message&&msg.referenced_message.author){
         var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
+        h+="<div class='msg-ref'>&#8618; "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
       }
-      h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
+      h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
       if(msg.sticker_items&&msg.sticker_items.length){
         for(var j=0;j<msg.sticker_items.length;j++){
           var s=msg.sticker_items[j];
-          h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='' loading='lazy'/>";
+          h+="<img class='msg-sticker' src='https://cdn.discordapp.com/stickers/"+s.id+".png' alt='' loading='lazy'/>";
         }
       }
       if(msg.attachments&&msg.attachments.length){
         for(var j=0;j<msg.attachments.length;j++){
           var a=msg.attachments[j];
           if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-            h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+            h+="<img class='msg-img' src='"+a.url+"' alt='' loading='lazy'/>";
           }else if(a.content_type&&a.content_type.startsWith("video/")){
-            h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
+            h+="<video class='msg-video' src='"+a.url+"' controls></video>";
+          }else if(a.content_type&&a.content_type.startsWith("audio/")){
+            h+="<audio class='msg-audio' src='"+a.url+"' controls></audio>";
           }else{
-            h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>";
+            h+="<div><a class='msg-file-link' href='"+a.url+"'>"+esc(a.filename)+"</a></div>"
           }
         }
       }
       h+="</div>";
-      h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteDmMsg(this.dataset.cid,this.dataset.mid)" title="delete">&#10005;</span>';
+      h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteDmMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
       h+="</div>";
     }
     g("dmHistory").innerHTML=h;
