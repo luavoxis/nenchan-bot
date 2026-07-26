@@ -879,7 +879,7 @@ function renderMembers(members){
       }
     }
     if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
-    h+="<div class='member-card' onclick="showMember('"+m.user.id+"')">";
+    h+="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
     h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
     h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
     h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
