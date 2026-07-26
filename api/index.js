@@ -872,22 +872,23 @@ function loadMembers(){
 
 function renderMembers(members){
   var sortedRoles=allRoles.slice().sort(function(a,b){return b.position-a.position});
+  var hoistedRoles=sortedRoles.filter(function(r){return r.hoist});
   var groups={};
   var ungrouped=[];
   for(var i=0;i<members.length;i++){
     var m=members[i];
-    var highest=null;
+    var highestHoisted=null;
     for(var j=0;j<sortedRoles.length;j++){
-      if(m.roles.indexOf(sortedRoles[j].id)!==-1){highest=sortedRoles[j];break}
+      if(m.roles.indexOf(sortedRoles[j].id)!==-1&&sortedRoles[j].hoist){highestHoisted=sortedRoles[j];break}
     }
-    if(highest){
-      if(!groups[highest.id])groups[highest.id]={role:highest,members:[]};
-      groups[highest.id].members.push(m);
+    if(highestHoisted){
+      if(!groups[highestHoisted.id])groups[highestHoisted.id]={role:highestHoisted,members:[]};
+      groups[highestHoisted.id].members.push(m);
     }else{ungrouped.push(m)}
   }
   var h="";
-  for(var k=0;k<sortedRoles.length;k++){
-    var gid=sortedRoles[k].id;
+  for(var k=0;k<hoistedRoles.length;k++){
+    var gid=hoistedRoles[k].id;
     if(!groups[gid])continue;
     var g2=groups[gid];
     var rc=g2.role.color?"#"+g2.role.color.toString(16).padStart(6,"0"):"#555";
