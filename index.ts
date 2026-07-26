@@ -93,10 +93,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" class="tab active" style="display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:80vh">
-<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:300px;text-align:center">
-<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px">bot panel</h2>
-<div id="loginError" class="error"></div>
+<div id="loginScreen" class="tab active" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
+<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
+<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
+<div id="loginError" class="error" style="margin-bottom:6px"></div>
 <input type="password" id="password" placeholder="password" style="text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')login()"/>
 <button onclick="login()" style="width:100%">login</button>
 </div>
