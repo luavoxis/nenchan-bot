@@ -584,14 +584,18 @@ function loadMembers(){
   api({action:"members",guildId:guildId},function(d){
     if(d.error)return;
     allMembers=d.members;allRoles=d.roles;
-    var html="<table><tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
+    var tbl=document.createElement("table");
+    tbl.innerHTML="<tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
     for(var i=0;i<d.members.length;i++){
       var m=d.members[i],name=m.nick||(m.user.global_name||m.user.username);
       var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-      html+="<tr class='member-row' onclick='showMember(""+m.user.id+"")'><td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td></tr>";
+      var tr=document.createElement("tr");tr.className="member-row";
+      tr.onclick=function(id){return function(){showMember(id)}}(m.user.id);
+      tr.innerHTML="<td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td>";
+      tbl.appendChild(tr);
     }
-    html+="</table>";
-    g("memberList").innerHTML=html;
+    g("memberList").innerHTML="";
+    g("memberList").appendChild(tbl);
   });
 }
 
