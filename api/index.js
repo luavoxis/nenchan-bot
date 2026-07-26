@@ -1074,9 +1074,9 @@ function showMember(id){
     "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#555;font-size:10px'>no roles</span>")+"</div></div>"+
     "</div>"+
     "<div class='modal-actions'>"+
-    "<button class='btn-timeout' onclick='openConfirm("timeout",""+m.user.id+"",""+esc(name)+"")'>timeout</button>"+
-    "<button class='btn-kick' onclick='openConfirm("kick",""+m.user.id+"",""+esc(name)+"")'>kick</button>"+
-    "<button class='btn-ban' onclick='openConfirm("ban",""+m.user.id+"",""+esc(name)+"")'>ban</button>"+
+    "<button class='btn-timeout' data-action='timeout' data-uid='"+m.user.id+"' data-uname='"+esc(name)+"' onclick='openConfirm(this)'>timeout</button>"+
+    "<button class='btn-kick' data-action='kick' data-uid='"+m.user.id+"' data-uname='"+esc(name)+"' onclick='openConfirm(this)'>kick</button>"+
+    "<button class='btn-ban' data-action='ban' data-uid='"+m.user.id+"' data-uname='"+esc(name)+"' onclick='openConfirm(this)'>ban</button>"+
     "</div>"+
     "<div class='modal-footer'><button onclick='c()'>close</button></div>";
   g("userModal").classList.add("show");
@@ -1229,7 +1229,8 @@ function deleteDmMsg(cid,mid){
   });
 }
 var confirmData={};
-function openConfirm(action,userId,userName){
+function openConfirm(el){
+  var action=el.dataset.action,userId=el.dataset.uid,userName=el.dataset.uname;
   confirmData={action:action,userId:userId};
   var title={timeout:"timeout "+userName,kick:"kick "+userName,ban:"ban "+userName};
   var h="";
