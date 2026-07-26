@@ -122,18 +122,18 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="msgHistory" style="max-height:360px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
 </div>
-<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">
+<div style="display:flex;gap:4px;margin-bottom:4px;align-items:stretch">
 <input type="file" id="msgFile" style="flex:1;color:#888;font:11px monospace;padding:4px 3px;background:#000;border:1px solid #333;height:24px;box-sizing:border-box" />
-<button onclick="g('msgFile').value=''" style="background:#555;padding:4px 8px;font-size:10px;height:24px;line-height:16px;box-sizing:border-box">clear</button>
+<button onclick="g('msgFile').value=''" style="background:#555;padding:4px 8px;font-size:10px;height:24px;line-height:16px;box-sizing:border-box;border:1px solid #555;color:#eee;cursor:pointer">clear</button>
 </div>
 <div style="display:flex;gap:4px;margin-bottom:4px">
 <select id="msgMention" style="flex:1" onchange="insertMention()"><option value="">@mention</option></select>
 </div>
 <label>message</label>
 <textarea id="msgInput" placeholder="message" style="min-height:60px"></textarea>
-<div class="flex">
-<button onclick="sendMsg()">send</button>
-<button onclick="g('msgInput').value='';g('msgFile').value=''" style="background:#555">clear</button>
+<div class="flex" style="gap:4px">
+<button onclick="sendMsg()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">send</button>
+<button onclick="g('msgInput').value='';g('msgFile').value=''" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
 </div>
 <div id="msgStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
@@ -259,9 +259,9 @@ function loadMsgHistory(cid){
       h+="<br>";
       if(msg.referenced_message){
         var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+esc(msg.referenced_message.content||"(attachment)")+"</div>";
+        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
       }
-      h+="<span style='color:#ccc'>"+esc(msg.content||"")+"</span>";
+      h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
       if(msg.sticker_items&&msg.sticker_items.length){
         for(var j=0;j<msg.sticker_items.length;j++){
           var s=msg.sticker_items[j];
@@ -296,11 +296,11 @@ function loadMsgHistory(cid){
             if(e.url) h+="<a href='"+e.url+"' style='color:#59f;font-weight:bold;font-size:11px;text-decoration:none'>"+esc(e.title)+"</a><br>";
             else h+="<span style='color:#59f;font-weight:bold;font-size:11px'>"+esc(e.title)+"</span><br>";
           }
-          if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+esc(e.description)+"</span><br>";
+          if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+fmt(e.description||"")+"</span><br>";
           if(e.fields&&e.fields.length){
             for(var k=0;k<e.fields.length;k++){
               var f=e.fields[k];
-              h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+esc(f.value||"")+"</span></div>";
+              h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+fmt(f.value||"")+"</span></div>";
             }
           }
           if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
@@ -398,6 +398,11 @@ function showMember(id){
 }
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
+function fmt(s){
+  return esc(s)
+    .replace(/&lt;:([^:]+):(\\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>")
+    .replace(/&lt;a:([^:]+):(\\d+)&gt;/g,"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
+}
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
