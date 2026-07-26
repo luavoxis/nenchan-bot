@@ -1,8 +1,56 @@
 // index.ts
 import axios from "axios";
-import { InteractionResponseType, MessageFlags as MessageFlags2 } from "discord-api-types/v10";
+import { InteractionResponseType, MessageFlags as MessageFlags3 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
+
+// commands/profile.ts
+import {
+  ApplicationCommandOptionType,
+  MessageFlags
+} from "discord-api-types/v10";
+var profile_default = {
+  data: {
+    name: "profile",
+    description: "Bir kullan\u0131c\u0131n\u0131n profil foto\u011Fraf\u0131n\u0131 g\xF6sterir",
+    options: [
+      {
+        name: "kullanici",
+        description: "Profilini g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        type: ApplicationCommandOptionType.User,
+        required: true
+      }
+    ]
+  },
+  async execute(data) {
+    const interaction = data.interaction;
+    const userId = interaction.data.options?.find(
+      (o) => o.name === "kullanici"
+    )?.value;
+    if (!userId) {
+      return {
+        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
+        flags: MessageFlags.Ephemeral
+      };
+    }
+    const user = interaction.data.resolved?.users?.[userId];
+    if (!user) {
+      return {
+        content: "Kullan\u0131c\u0131 bulunamad\u0131.",
+        flags: MessageFlags.Ephemeral
+      };
+    }
+    const isAnimated = user.avatar.startsWith("a_");
+    const ext = isAnimated ? "gif" : "png";
+    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}`;
+    return {
+      content: `## ${user.username}
+**ID:** \`${user.id}\`
+**Avatar:**
+${avatarUrl}`
+    };
+  }
+};
 
 // commands/ping.ts
 var ping_default = {
@@ -24,9 +72,9 @@ var ping_default = {
 // commands/chat.ts
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
-  ApplicationCommandOptionType,
+  ApplicationCommandOptionType as ApplicationCommandOptionType2,
   ApplicationCommandType,
-  MessageFlags
+  MessageFlags as MessageFlags2
 } from "discord-api-types/v10";
 var chat_default = {
   data: {
@@ -40,7 +88,7 @@ var chat_default = {
         // The name of the prompt option
         description: "The prompt for the AI",
         // The description of the prompt option
-        type: ApplicationCommandOptionType.String,
+        type: ApplicationCommandOptionType2.String,
         required: true
       },
       {
@@ -48,7 +96,7 @@ var chat_default = {
         // The name of the image option
         description: "Optional image to include in the prompt",
         // The description of the image option
-        type: ApplicationCommandOptionType.Attachment,
+        type: ApplicationCommandOptionType2.Attachment,
         required: false
       }
     ]
@@ -62,7 +110,7 @@ var chat_default = {
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
         content: "This command can only be used as a chat input (slash) command.",
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags2.Ephemeral
         // Make the response visible only to the user
       };
     }
@@ -78,7 +126,7 @@ var chat_default = {
     if (prompt.length > 2e3) {
       return {
         content: "Prompt must be less than 2000 characters.",
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags2.Ephemeral
       };
     }
     try {
@@ -106,7 +154,7 @@ var chat_default = {
       console.error("Error during AI chat:", error);
       return {
         content: "An error occurred while processing your request.",
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags2.Ephemeral
       };
     }
   }
@@ -114,6 +162,7 @@ var chat_default = {
 
 // .discraft/commands/index.ts
 var commands_default = {
+  profile: profile_default,
   ping: ping_default,
   chat: chat_default
 };
@@ -183,7 +232,7 @@ async function handler(req, res) {
             {
               type: InteractionResponseType.DeferredChannelMessageWithSource,
               data: {
-                flags: command.data.initialEphemeral ? MessageFlags2.Ephemeral : 0
+                flags: command.data.initialEphemeral ? MessageFlags3.Ephemeral : 0
               }
             },
             {
@@ -205,7 +254,7 @@ async function handler(req, res) {
           });
           commandResult = {
             content: "An error occurred while processing your request.",
-            flags: MessageFlags2.Ephemeral
+            flags: MessageFlags3.Ephemeral
           };
         }
         try {
