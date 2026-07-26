@@ -10869,14 +10869,16 @@ function toggleRoles(){g("roleList").classList.toggle("show");g("roleArrow").inn
 
 function loadMsgChannels(){
   api({action:"channels"},function(d){
-    if(d.error)return;
+    if(d.error){g("msgChannel").innerHTML="<option value=''>error: "+esc(d.error)+"</option>";return}
     var s=g("msgChannel");
     s.innerHTML="<option value=''>select channel</option>";
+    var count=0;
     for(var i=0;i<d.channels.length;i++){
       if(d.channels[i].type===0){
-        var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o);
+        var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o);count++;
       }
     }
+    if(!count){s.innerHTML="<option value=''>no text channels</option>";return}
     api({action:"members"},function(md){
       if(md.error)return;
       var sel=g("msgMention");
@@ -10895,87 +10897,95 @@ function insertMention(){
 
 function loadMsgHistory(cid){
   if(!cid){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>select a channel</p>";return}
+  g("msgHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
   api({action:"messages",channelId:cid,limit:30},function(d){
     if(d.error){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";return}
+    if(!Array.isArray(d.messages)){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>invalid response: messages is not an array</p>";return}
     var h="";
-    for(var i=d.messages.length-1;i>=0;i--){
-      var msg=d.messages[i],u=msg.author;
-      var name=u.global_name||u.username;
-      var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
-      var color=u.bot?"#4af":"#888";
-      h+="<div style='margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
-      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
-      if(msg.edited_timestamp) h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
-      h+="<br>";
-      if(msg.referenced_message){
-        var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>\u21AA "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
-      }
-      h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
-      if(msg.sticker_items&&msg.sticker_items.length){
-        for(var j=0;j<msg.sticker_items.length;j++){
-          var s=msg.sticker_items[j];
-          h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='"+esc(s.name||"")+"' loading='lazy'/>";
+    try{
+      for(var i=d.messages.length-1;i>=0;i--){
+        var msg=d.messages[i],u=msg.author;
+        if(!u)continue;
+        var name=u.global_name||u.username;
+        var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+        var color=u.bot?"#4af":"#888";
+        h+="<div style='margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
+        h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
+        if(msg.edited_timestamp) h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
+        h+="<br>";
+        if(msg.referenced_message&&msg.referenced_message.author){
+          var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
+          h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>\u21AA "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
         }
-      }
-      if(msg.attachments&&msg.attachments.length){
-        for(var j=0;j<msg.attachments.length;j++){
-          var a=msg.attachments[j];
-          if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-            h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
-          }else if(a.content_type&&a.content_type.startsWith("video/")){
-            h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
-          }else if(a.content_type&&a.content_type.startsWith("audio/")){
-            h+="<br><audio src='"+a.url+"' style='width:200px;margin-top:3px' controls></audio>";
-          }else{
-            h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>\u{1F4CE} "+esc(a.filename)+"</a>"
+        h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
+        if(msg.sticker_items&&msg.sticker_items.length){
+          for(var j=0;j<msg.sticker_items.length;j++){
+            var s=msg.sticker_items[j];
+            h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='"+esc(s.name||"")+"' loading='lazy'/>";
           }
         }
-      }
-      if(msg.embeds&&msg.embeds.length){
-        for(var j=0;j<msg.embeds.length;j++){
-          var e=msg.embeds[j];
-          if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
-            h+="<br><img src='"+e.thumbnail.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
-            continue;
-          }
-          var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"#1a1a1a";
-          h+="<div style='margin:4px 0;padding:6px 8px;border-left:3px solid "+bg+";background:#0d0d0d;border-radius:2px'>";
-          if(e.author&&e.author.name) h+="<span style='color:#888;font-size:9px'>"+esc(e.author.name)+"</span><br>";
-          if(e.title){
-            if(e.url) h+="<a href='"+e.url+"' style='color:#59f;font-weight:bold;font-size:11px;text-decoration:none'>"+esc(e.title)+"</a><br>";
-            else h+="<span style='color:#59f;font-weight:bold;font-size:11px'>"+esc(e.title)+"</span><br>";
-          }
-          if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+fmt(e.description||"")+"</span><br>";
-          if(e.fields&&e.fields.length){
-            for(var k=0;k<e.fields.length;k++){
-              var f=e.fields[k];
-              h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+fmt(f.value||"")+"</span></div>";
+        if(msg.attachments&&msg.attachments.length){
+          for(var j=0;j<msg.attachments.length;j++){
+            var a=msg.attachments[j];
+            if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
+              h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+            }else if(a.content_type&&a.content_type.startsWith("video/")){
+              h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
+            }else if(a.content_type&&a.content_type.startsWith("audio/")){
+              h+="<br><audio src='"+a.url+"' style='width:200px;margin-top:3px' controls></audio>";
+            }else{
+              h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>\u{1F4CE} "+esc(a.filename)+"</a>"
             }
           }
-          if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
-          if(e.thumbnail&&e.thumbnail.url) h+="<img src='"+e.thumbnail.url+"' style='max-width:80px;max-height:80px;float:right;margin:2px' loading='lazy'/>";
-          if(e.footer&&e.footer.text) h+="<br><span style='color:#555;font-size:8px'>"+esc(e.footer.text)+"</span>";
-          if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>\u{1F3AC} video</span>";
-          h+="</div>";
         }
-      }
-      if(msg.reactions&&msg.reactions.length){
-        h+="<div style='margin-top:3px'>";
-        for(var j=0;j<msg.reactions.length;j++){
-          var r=msg.reactions[j],emo=r.emoji;
-          if(emo.id){
-            h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:16px;height:16px;vertical-align:middle' alt=''/> <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
-          }else{
-            h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'>"+esc(emo.name)+" <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+        if(msg.embeds&&msg.embeds.length){
+          for(var j=0;j<msg.embeds.length;j++){
+            var e=msg.embeds[j];
+            if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
+              h+="<br><img src='"+e.thumbnail.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+              continue;
+            }
+            var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"#1a1a1a";
+            h+="<div style='margin:4px 0;padding:6px 8px;border-left:3px solid "+bg+";background:#0d0d0d;border-radius:2px'>";
+            if(e.author&&e.author.name) h+="<span style='color:#888;font-size:9px'>"+esc(e.author.name)+"</span><br>";
+            if(e.title){
+              if(e.url) h+="<a href='"+e.url+"' style='color:#59f;font-weight:bold;font-size:11px;text-decoration:none'>"+esc(e.title)+"</a><br>";
+              else h+="<span style='color:#59f;font-weight:bold;font-size:11px'>"+esc(e.title)+"</span><br>";
+            }
+            if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+fmt(e.description||"")+"</span><br>";
+            if(e.fields&&e.fields.length){
+              for(var k=0;k<e.fields.length;k++){
+                var f=e.fields[k];
+                h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+fmt(f.value||"")+"</span></div>";
+              }
+            }
+            if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+            if(e.thumbnail&&e.thumbnail.url) h+="<img src='"+e.thumbnail.url+"' style='max-width:80px;max-height:80px;float:right;margin:2px' loading='lazy'/>";
+            if(e.footer&&e.footer.text) h+="<br><span style='color:#555;font-size:8px'>"+esc(e.footer.text)+"</span>";
+            if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>\u{1F3AC} video</span>";
+            h+="</div>";
           }
         }
+        if(msg.reactions&&msg.reactions.length){
+          h+="<div style='margin-top:3px'>";
+          for(var j=0;j<msg.reactions.length;j++){
+            var r=msg.reactions[j],emo=r.emoji;
+            if(emo.id){
+              h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:16px;height:16px;vertical-align:middle' alt=''/> <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+            }else{
+              h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'>"+esc(emo.name)+" <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+            }
+          }
+          h+="</div>";
+        }
+        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="float:right;color:#555;cursor:pointer" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this)" title="delete">&#10005;</span>';
         h+="</div>";
       }
-      h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="float:right;color:#555;cursor:pointer" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this)" title="delete">&#10005;</span>';
-      h+="</div>";
+    }catch(e){
+      h+="<p style='color:#f44;font-size:10px;margin-top:8px'>render error: "+esc(e.message)+"</p>";
     }
-    g("msgHistory").innerHTML=h||"<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";
+    g("msgHistory").innerHTML=h;
   });
 }
 
