@@ -81,6 +81,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-box{background:#111;border:1px solid #333;padding:16px;width:90%;max-width:400px}
 .modal-box h3{font-size:12px;color:#fff;margin-bottom:8px}
 .modal-box p{font-size:11px;color:#888;margin-bottom:6px}
+.login-tab{display:flex!important;flex-direction:column;justify-content:center;align-items:center;height:100vh}
+.login-tab:not(.active){display:none!important}
+.login-box{background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center}
+.login-title{margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400}
+.login-input{text-align:center;margin-bottom:8px}
+.login-btn{width:100%}
 </style>
 </head>
 <body>
@@ -93,12 +99,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
-<div id="loginScreen" class="tab active" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh">
-<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
-<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">bot panel</h2>
-<div id="loginError" class="error" style="margin-bottom:6px"></div>
-<input type="password" id="password" placeholder="password" style="text-align:center;margin-bottom:8px" onkeydown="if(event.key==='Enter')login()"/>
-<button onclick="login()" style="width:100%">login</button>
+<div id="loginScreen" class="tab active login-tab">
+<div class="login-box">
+<h2 class="login-title">bot panel</h2>
+<div id="loginError" class="error"></div>
+<input type="password" id="password" placeholder="password" class="login-input" onkeydown="if(event.key==='Enter')login()"/>
+<button onclick="login()" class="login-btn">login</button>
 </div>
 </div>
 <div id="tab-dashboard" class="tab">
