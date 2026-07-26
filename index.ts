@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import FormData from "form-data";
 import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
@@ -627,30 +626,19 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
       form.append("content", body.content || "");
       if (body.fileData && body.fileName) {
         const buf = Buffer.from(body.fileData, "base64");
-        form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
+        const blob = new Blob([buf], { type: body.fileType || "application/octet-stream" });
+        form.append("file", blob, body.fileName);
       }
-      const u = new URL(`https://discord.com/api/v10/channels/${body.channelId}/messages`);
-      await new Promise<void>((resolve, reject) => {
-        (form as any).submit({
-          protocol: u.protocol,
-          host: u.hostname,
-          path: u.pathname + u.search,
-          method: "POST",
-          headers: { ...headers },
-        }, (err: any, res: any) => {
-          if (err) { reject(err); return; }
-          let responseBody = "";
-          res.on("data", (chunk: any) => responseBody += chunk);
-          res.on("end", () => {
-            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) resolve();
-            else {
-              let msg = `HTTP ${res.statusCode}`;
-              try { const d = JSON.parse(responseBody); msg = d.message || msg; } catch {}
-              reject(new Error(msg));
-            }
-          });
-        });
+      const response = await fetch(`https://discord.com/api/v10/channels/${body.channelId}/messages`, {
+        method: "POST",
+        headers: { ...headers },
+        body: form,
       });
+      if (!response.ok) {
+        let msg = `HTTP ${response.status}`;
+        try { const d = await response.json(); msg = d.message || msg; } catch {}
+        throw new Error(msg);
+      }
       return res.json({ success: true });
     }
 
