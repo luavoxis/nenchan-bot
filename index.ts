@@ -151,6 +151,11 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-roles{display:flex;flex-wrap:wrap;gap:4px}
 .modal-role{display:flex;align-items:center;gap:4px;font-size:10px;color:#aaa;padding:3px 6px;background:#0d0d0d;border:1px solid #222}
 .modal-role-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.file-picker{position:relative;display:flex;align-items:center;gap:4px}
+.file-picker input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.file-label{flex:1;padding:5px 8px;background:#0a0a0a;border:1px solid #222;color:#555;font:11px monospace;cursor:pointer;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.file-label:hover{border-color:#444;color:#888}
+.file-label.has-file{color:#ccc;border-color:#333}
 .modal-footer{padding:10px 16px;border-top:1px solid #222;text-align:right}
 .modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px monospace;cursor:pointer}
 .modal-footer button:hover{background:#333;color:#fff}
@@ -184,8 +189,11 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
 </div>
 <div style="display:flex;gap:4px;margin-bottom:4px;align-items:stretch">
-<input type="file" id="msgFile" style="flex:1;color:#888;font:11px monospace;padding:4px 3px;background:#000;border:1px solid #333;height:24px;box-sizing:border-box" />
-<button onclick="g('msgFile').value=''" style="background:#555;padding:4px 8px;font-size:10px;height:24px;line-height:16px;box-sizing:border-box;border:1px solid #555;color:#eee;cursor:pointer">clear</button>
+<div class="file-picker">
+<input type="file" id="msgFile" onchange="updateFileLabel(this)"/>
+<div class="file-label" id="fileLabel">📎 attach file...</div>
+</div>
+<button onclick="g('msgFile').value='';updateFileLabel(g('msgFile'))" style="background:#333;padding:4px 8px;font-size:10px;border:1px solid #333;color:#888;cursor:pointer;font-family:monospace">clear</button>
 </div>
 <div style="display:flex;gap:4px;margin-bottom:4px">
 <select id="msgMention" style="flex:1" onchange="insertMention()"><option value="">@mention</option></select>
@@ -194,7 +202,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <textarea id="msgInput" placeholder="message" style="min-height:60px"></textarea>
 <div class="flex" style="gap:4px">
 <button onclick="sendMsg()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">send</button>
-<button onclick="g('msgInput').value='';g('msgFile').value=''" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
+<button onclick="g('msgInput').value='';g('msgFile').value='';updateFileLabel(g('msgFile'))" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
 </div>
 <div id="msgStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
@@ -413,7 +421,7 @@ function doSend(body,cid){
   api(body,function(d){
     if(d.success){
       g("msgStatus").style.color="#4f4";g("msgStatus").textContent="sent!";
-      g("msgInput").value="";g("msgFile").value="";
+      g("msgInput").value="";g("msgFile").value="";updateFileLabel(g("msgFile"));
       loadMsgHistory(cid);
     }else{
       g("msgStatus").style.color="#f44";g("msgStatus").textContent=d.error||"failed";
@@ -515,6 +523,11 @@ function fmt(s){
     .replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
 }
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
+function updateFileLabel(el){
+  var label=g("fileLabel");
+  if(el.files&&el.files.length){label.textContent="📎 "+el.files[0].name;label.classList.add("has-file")}
+  else{label.textContent="📎 attach file...";label.classList.remove("has-file")}
+}
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
 </body>
