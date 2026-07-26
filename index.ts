@@ -123,6 +123,41 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
+.msg-row{display:flex;gap:8px;padding:6px 4px;border-bottom:1px solid #111;position:relative}
+.msg-row:hover{background:#0a0a0a}
+.msg-row:last-child{border-bottom:none}
+.msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;margin-top:1px}
+.msg-body{flex:1;min-width:0}
+.msg-author{font-size:11px;font-weight:600;color:#4af}
+.msg-author .msg-time{font-weight:400;color:#444;font-size:9px;margin-left:6px}
+.msg-content{color:#ccc;font-size:11px;line-height:1.5;margin-top:1px;word-wrap:break-word}
+.msg-ref{margin:3px 0;padding:2px 8px;border-left:2px solid #444;color:#666;font-size:9px}
+.msg-embed{margin:4px 0;padding:6px 8px;border-left:3px solid #444;background:#0d0d0d;border-radius:2px}
+.msg-embed-title{color:#59f;font-weight:bold;font-size:11px}
+.msg-embed-desc{color:#bbb;font-size:10px;margin-top:2px}
+.msg-embed-author{color:#888;font-size:9px}
+.msg-embed-field-name{color:#888;font-size:9px;margin-top:3px}
+.msg-embed-field-val{color:#bbb;font-size:9px}
+.msg-reactions{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
+.msg-reaction{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;background:#111;border-radius:3px;font-size:11px;cursor:default}
+.msg-reaction-count{font-size:9px;color:#888}
+.msg-del{flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:3px;opacity:0}
+.msg-row:hover .msg-del{opacity:1}
+.msg-del:hover{color:#f44}
+.msg-img{max-width:200px;max-height:120px;margin-top:4px;border:1px solid #222;border-radius:2px}
+.msg-sticker{max-width:80px;max-height:80px}
+.msg-video{max-width:200px;max-height:120px;margin-top:4px}
+.msg-audio{width:200px;margin-top:4px}
+.msg-file-link{color:#59f;font-size:10px}
+.msg-edited{color:#555;font-size:8px;margin-left:4px}
+.drop-zone{border:1px dashed #333;padding:12px;text-align:center;color:#555;font-size:10px;cursor:pointer;transition:all .15s;margin-bottom:6px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#555;color:#888;background:#0a0a0a}
+.drop-zone.has-file{border-color:#59f;color:#59f}
+.msg-input-row{display:flex;gap:4px;align-items:stretch}
+.msg-input-row textarea{flex:1;margin:0;min-height:36px;resize:none}
+.msg-input-row button{padding:4px 12px;font-size:11px;white-space:nowrap}
+.msg-bar{display:flex;gap:4px;margin-bottom:4px}
+.msg-bar select{margin:0;flex:1}
 .menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#0a0a0a;border:1px solid #222;color:#888;width:32px;height:32px;font:14px monospace;cursor:pointer}
 .menu-toggle:hover{color:#fff;border-color:#444}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
@@ -206,26 +241,20 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="dashContent"><p style="color:#666">loading...</p></div>
 </div>
 <div id="panel-messages" class="panel">
-<label>channel</label>
-<select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">loading...</option></select>
-<div id="msgHistory" style="max-height:360px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
+<div class="msg-bar">
+<select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">select channel</option></select>
+<select id="msgMention" onchange="insertMention()"><option value="">@mention</option></select>
+</div>
+<div id="msgHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #1a1a1a;padding:4px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
 </div>
-<div style="display:flex;gap:4px;margin-bottom:4px;align-items:stretch">
-<div class="file-picker">
-<input type="file" id="msgFile" onchange="updateFileLabel(this)"/>
-<div class="file-label" id="fileLabel">attach file...</div>
+<div class="drop-zone" id="dropZone" onclick="g('msgFile').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+<span id="dropLabel">drop file or click to attach</span>
 </div>
-<button onclick="g('msgFile').value='';updateFileLabel(g('msgFile'))" style="background:#333;padding:4px 8px;font-size:10px;border:1px solid #333;color:#888;cursor:pointer;font-family:monospace">clear</button>
-</div>
-<div style="display:flex;gap:4px;margin-bottom:4px">
-<select id="msgMention" style="flex:1" onchange="insertMention()"><option value="">@mention</option></select>
-</div>
-<label>message</label>
-<textarea id="msgInput" placeholder="message" style="min-height:60px"></textarea>
-<div class="flex" style="gap:4px">
-<button onclick="sendMsg()" style="padding:4px 12px;font-size:11px;background:#333;color:#eee;border:1px solid #555;border-radius:0;cursor:pointer;font-family:monospace">send</button>
-<button onclick="g('msgInput').value='';g('msgFile').value='';updateFileLabel(g('msgFile'))" style="background:#555;padding:4px 12px;font-size:11px;border:1px solid #555;color:#eee;cursor:pointer;font-family:monospace">clear</button>
+<input type="file" id="msgFile" style="display:none" onchange="updateDropLabel(this)"/>
+<div class="msg-input-row">
+<textarea id="msgInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+<button onclick="sendMsg()">send</button>
 </div>
 <div id="msgStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
@@ -365,34 +394,33 @@ function loadMsgHistory(cid){
         if(!u||!u.bot)continue;
         var name=u.global_name||u.username;
         var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
-        var color=u.bot?"#4af":"#888";
-        h+="<div style='display:flex;gap:8px;margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
-        h+="<div style='flex:1;min-width:0'>";
-        h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
-        if(msg.edited_timestamp) h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
-        h+="<br>";
+        var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+        h+="<div class='msg-row'>";
+        h+="<img class='msg-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+        h+="<div class='msg-body'>";
+        h+="<div><span class='msg-author'>"+esc(name)+"</span><span class='msg-time'>"+time+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>";
         if(msg.referenced_message&&msg.referenced_message.author){
           var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-          h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
+          h+="<div class='msg-ref'>&#8618; "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
         }
-        h+="<span style='color:#ccc'>"+fmt(msg.content||"")+"</span>";
+        h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
         if(msg.sticker_items&&msg.sticker_items.length){
           for(var j=0;j<msg.sticker_items.length;j++){
             var s=msg.sticker_items[j];
-            h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='"+esc(s.name||"")+"' loading='lazy'/>";
+            h+="<img class='msg-sticker' src='https://cdn.discordapp.com/stickers/"+s.id+".png' alt='' loading='lazy'/>";
           }
         }
         if(msg.attachments&&msg.attachments.length){
           for(var j=0;j<msg.attachments.length;j++){
             var a=msg.attachments[j];
             if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-              h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+              h+="<img class='msg-img' src='"+a.url+"' alt='' loading='lazy'/>";
             }else if(a.content_type&&a.content_type.startsWith("video/")){
-              h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
+              h+="<video class='msg-video' src='"+a.url+"' controls></video>";
             }else if(a.content_type&&a.content_type.startsWith("audio/")){
-              h+="<br><audio src='"+a.url+"' style='width:200px;margin-top:3px' controls></audio>";
+              h+="<audio class='msg-audio' src='"+a.url+"' controls></audio>";
             }else{
-              h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"
+              h+="<div><a class='msg-file-link' href='"+a.url+"'>"+esc(a.filename)+"</a></div>"
             }
           }
         }
@@ -400,50 +428,50 @@ function loadMsgHistory(cid){
           for(var j=0;j<msg.embeds.length;j++){
             var e=msg.embeds[j];
             if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
-              h+="<br><img src='"+e.thumbnail.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+              h+="<img class='msg-img' src='"+e.thumbnail.url+"' alt='' loading='lazy'/>";
               continue;
             }
-            var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"#1a1a1a";
-            h+="<div style='margin:4px 0;padding:6px 8px;border-left:3px solid "+bg+";background:#0d0d0d;border-radius:2px'>";
-            if(e.author&&e.author.name) h+="<span style='color:#888;font-size:9px'>"+esc(e.author.name)+"</span><br>";
+            var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"#444";
+            h+="<div class='msg-embed' style='border-left-color:"+bg+"'>";
+            if(e.author&&e.author.name) h+="<div class='msg-embed-author'>"+esc(e.author.name)+"</div>";
             if(e.title){
-              if(e.url) h+="<a href='"+e.url+"' style='color:#59f;font-weight:bold;font-size:11px;text-decoration:none'>"+esc(e.title)+"</a><br>";
-              else h+="<span style='color:#59f;font-weight:bold;font-size:11px'>"+esc(e.title)+"</span><br>";
+              if(e.url) h+="<a class='msg-embed-title' href='"+e.url+"' style='text-decoration:none'>"+esc(e.title)+"</a>";
+              else h+="<div class='msg-embed-title'>"+esc(e.title)+"</div>";
             }
-            if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+fmt(e.description||"")+"</span><br>";
+            if(e.description) h+="<div class='msg-embed-desc'>"+fmt(e.description||"")+"</div>";
             if(e.fields&&e.fields.length){
               for(var k=0;k<e.fields.length;k++){
                 var f=e.fields[k];
-                h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+fmt(f.value||"")+"</span></div>";
+                h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"")+"</div></div>";
               }
             }
-            if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
-            if(e.thumbnail&&e.thumbnail.url) h+="<img src='"+e.thumbnail.url+"' style='max-width:80px;max-height:80px;float:right;margin:2px' loading='lazy'/>";
-            if(e.footer&&e.footer.text) h+="<br><span style='color:#555;font-size:8px'>"+esc(e.footer.text)+"</span>";
-            if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>video</span>";
+            if(e.image&&e.image.url) h+="<img class='msg-img' src='"+e.image.url+"' alt='' loading='lazy'/>";
+            if(e.thumbnail&&e.thumbnail.url) h+="<img class='msg-img' src='"+e.thumbnail.url+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
+            if(e.footer&&e.footer.text) h+="<div style='color:#555;font-size:8px;margin-top:3px'>"+esc(e.footer.text)+"</div>";
             h+="</div>";
           }
         }
         if(msg.reactions&&msg.reactions.length){
-          h+="<div style='margin-top:3px'>";
+          h+="<div class='msg-reactions'>";
           for(var j=0;j<msg.reactions.length;j++){
             var r=msg.reactions[j],emo=r.emoji;
             if(emo.id){
-              h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:16px;height:16px;vertical-align:middle' alt=''/> <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+              h+="<span class='msg-reaction'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:14px;height:14px' alt=''/> <span class='msg-reaction-count'>"+r.count+"</span></span>";
             }else{
-              h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'>"+esc(emo.name)+" <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+              h+="<span class='msg-reaction'>"+esc(emo.name)+" <span class='msg-reaction-count'>"+r.count+"</span></span>";
             }
           }
           h+="</div>";
         }
-        h+='</div>';
-        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteMsg(this.dataset.cid,this.dataset.mid)" title="delete">&#10005;</span>';
+        h+="</div>";
+        h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
         h+="</div>";
       }
     }catch(e){
       h+="<p style='color:#f44;font-size:10px;margin-top:8px'>render error: "+esc(e.message)+"</p>";
     }
     g("msgHistory").innerHTML=h;
+    g("msgHistory").scrollTop=g("msgHistory").scrollHeight;
   });
 }
 
@@ -625,9 +653,16 @@ function fmt(s){
 }
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
 function updateFileLabel(el){
-  var label=g("fileLabel");
-  if(el.files&&el.files.length){label.textContent=el.files[0].name;label.classList.add("has-file")}
-  else{label.textContent="attach file...";label.classList.remove("has-file")}
+  var label=g("dropLabel");
+  if(el.files&&el.files.length){label.textContent=el.files[0].name;g("dropZone").classList.add("has-file")}
+  else{label.textContent="drop file or click to attach";g("dropZone").classList.remove("has-file")}
+}
+function updateDropLabel(el){updateFileLabel(el)}
+function handleDrop(e){
+  e.preventDefault();
+  var dz=g("dropZone");dz.classList.remove("dragover");
+  var files=e.dataTransfer.files;
+  if(files.length){g("msgFile").files=files;updateFileLabel(g("msgFile"))}
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
 var currentDmChannel=null;
