@@ -602,7 +602,7 @@ function showMember(id){
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
-if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex";loadDashboard()}
+if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
 </body>
 </html>`;
@@ -720,21 +720,26 @@ async function handlePanel(res, bodyStr) {
   const guildId = process.env.GUILD_ID;
   try {
     if (body.action === "guildinfo") {
-      const [guildRes, chanRes, rolesRes, memberRes] = await Promise.all([
+      const [guildRes, chanRes, rolesRes] = await Promise.all([
         axios3.get(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
         axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers })
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       const guild = guildRes.data;
       const ownerRes = await axios3.get(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
-      const members = memberRes.data;
-      const bots = members.filter((m) => m.user?.bot).length;
-      const humans = members.length - bots;
+      let bots = 0, humans = 0, totalMembers = guild.approximate_member_count || guild.member_count || "?";
+      try {
+        const memberRes = await axios3.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
+        const members = memberRes.data;
+        bots = members.filter((m) => m.user?.bot).length;
+        humans = members.length - bots;
+        totalMembers = guild.approximate_member_count || guild.member_count || members.length;
+      } catch {
+      }
       return res.json({
         name: guild.name,
         owner: ownerRes.data.global_name || ownerRes.data.username,
-        totalMembers: guild.approximate_member_count || guild.member_count || members.length,
+        totalMembers,
         bots,
         humans,
         channelCount: chanRes.data.length,
