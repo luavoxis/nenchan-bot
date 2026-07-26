@@ -96,9 +96,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <body>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>bot panel</h1>
-<button class="active" onclick="switchTab('dashboard')"><span class=l>[</span> dashboard <span class=r>]</span></button>
-<button onclick="switchTab('messages')"><span class=l>[</span> messages  <span class=r>]</span></button>
-<button onclick="switchTab('members')"><span class=l>[</span> members   <span class=r>]</span></button>
+<button class="active" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
+<button onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
