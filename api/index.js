@@ -653,9 +653,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-dms" class="panel">
 <div id="dmStart">
-<div style="display:flex;gap:4px;align-items:center">
-<input type="text" id="dmUserId" placeholder="user id" style="flex:1;height:26px;box-sizing:border-box"/>
-<button onclick="startDmById()" style="height:26px;box-sizing:border-box">open</button>
+<div style="display:flex;gap:4px;align-items:stretch">
+<input type="text" id="dmUserId" placeholder="user id" style="flex:1;padding:4px 6px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace;outline:none"/>
+<button onclick="startDmById()" style="padding:4px 12px;border:1px solid #333;background:#111;color:#888;font:11px monospace;cursor:pointer">open</button>
 </div>
 </div>
 <div id="dmChat" style="display:none">
