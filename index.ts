@@ -499,8 +499,8 @@ function showMember(id){
   }
   g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
-    "<div class='modal-section'><div class='modal-section-label">id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
-    "<div class='modal-section'><div class='modal-section-label">joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
+    "<div class='modal-section'><div class='modal-section-label'>id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
+    "<div class='modal-section'><div class='modal-section-label'>joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
     (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#aaa;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
     "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#555;font-size:10px'>no roles</span>")+"</div></div>"+
     "</div>"+
