@@ -702,7 +702,7 @@ async function handlePanel(res, bodyStr) {
   try {
     if (body.action === "guildinfo") {
       const [guildRes, chanRes, rolesRes] = await Promise.all([
-        axios3.get(`https://discord.com/api/v10/guilds/${guildId}`, { headers }),
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
         axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
         axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
