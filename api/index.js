@@ -1,13 +1,126 @@
 // index.ts
-import axios2 from "axios";
-import { InteractionResponseType, MessageFlags as MessageFlags4 } from "discord-api-types/v10";
+import axios3 from "axios";
+import { InteractionResponseType, MessageFlags as MessageFlags5 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 
+// commands/userinfo.ts
+import {
+  ApplicationCommandOptionType
+} from "discord-api-types/v10";
+import axios from "axios";
+function snowflakeToDate(id) {
+  const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+}
+var userinfo_default = {
+  data: {
+    name: "userinfo",
+    description: "Shows detailed information about a user",
+    options: [
+      {
+        name: "user",
+        description: "The user to inspect (defaults to you)",
+        type: ApplicationCommandOptionType.User,
+        required: false
+      }
+    ]
+  },
+  async execute(data) {
+    const interaction = data.interaction;
+    const targetId = interaction.data.options?.find((o) => o.name === "user")?.value || interaction.member.user.id;
+    const [userRes, memberRes] = await Promise.all([
+      axios.get(`https://discord.com/api/v10/users/${targetId}`, {
+        headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` }
+      }),
+      axios.get(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
+        {
+          headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` }
+        }
+      )
+    ]);
+    const user = userRes.data;
+    const member = memberRes.data;
+    const isAnimated = user.avatar?.startsWith("a_");
+    const ext = isAnimated ? "gif" : "png";
+    const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator) % 5}.png`;
+    const joinedAt = new Date(member.joined_at).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+    const createdAt = snowflakeToDate(user.id);
+    const rolesRes = await axios.get(
+      `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
+      {
+        headers: { Authorization: `Bot ${process.env.DISCORD_TOKEN}` }
+      }
+    );
+    const allRoles = rolesRes.data;
+    const memberRoleIds = member.roles;
+    const memberRoles = allRoles.filter((r) => memberRoleIds.includes(r.id)).sort(
+      (a, b) => b.position - a.position
+    );
+    const topRole = memberRoles[0]?.name || "None";
+    const roleCount = memberRoles.length;
+    const roleMentions = memberRoles.slice(0, 10).map((r) => `<@&${r.id}>`).join(" ");
+    const roleSummary = roleCount > 10 ? `${roleMentions} *+${roleCount - 10} more*` : roleMentions || "None";
+    const badges = [];
+    const flags = user.public_flags ?? 0;
+    if (flags & 1 << 0) badges.push("Discord Staff");
+    if (flags & 1 << 1) badges.push("Partner");
+    if (flags & 1 << 2) badges.push("HypeSquad Events");
+    if (flags & 1 << 3) badges.push("Bug Hunter Lv1");
+    if (flags & 1 << 6) badges.push("HypeSquad Bravery");
+    if (flags & 1 << 7) badges.push("HypeSquad Brilliance");
+    if (flags & 1 << 8) badges.push("HypeSquad Balance");
+    if (flags & 1 << 9) badges.push("Early Supporter");
+    if (flags & 1 << 10) badges.push("Team User");
+    if (flags & 1 << 14) badges.push("Bug Hunter Lv2");
+    if (flags & 1 << 16) badges.push("Verified Bot Dev");
+    if (flags & 1 << 17) badges.push("Certified Moderator");
+    if (flags & 1 << 18) badges.push("Bot HTTP Interactions");
+    if (flags & 1 << 19) badges.push("Active Developer");
+    const badgeText = badges.length ? badges.join(", ") : "None";
+    const fields = [
+      { name: "Username", value: `@${user.username}`, inline: true },
+      { name: "Display Name", value: member.nick || user.global_name || user.username, inline: true },
+      { name: "ID", value: `\`${user.id}\``, inline: false },
+      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
+      { name: "Top Role", value: topRole, inline: true },
+      { name: "Roles", value: roleSummary, inline: false },
+      { name: "Joined Server", value: joinedAt, inline: true },
+      { name: "Joined Discord", value: createdAt, inline: true },
+      { name: "Badges", value: badgeText, inline: false }
+    ];
+    if (user.accent_color) {
+      fields.push({
+        name: "Accent Color",
+        value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
+        inline: true
+      });
+    }
+    return {
+      embeds: [
+        {
+          color: user.accent_color || 5793266,
+          thumbnail: { url: avatarUrl },
+          fields
+        }
+      ]
+    };
+  }
+};
+
 // commands/profile.ts
 import {
-  ApplicationCommandOptionType,
-  MessageFlags
+  ApplicationCommandOptionType as ApplicationCommandOptionType2,
+  MessageFlags as MessageFlags2
 } from "discord-api-types/v10";
 var profile_default = {
   data: {
@@ -17,7 +130,7 @@ var profile_default = {
       {
         name: "user",
         description: "The user you want to see the profile of",
-        type: ApplicationCommandOptionType.User,
+        type: ApplicationCommandOptionType2.User,
         required: true
       }
     ]
@@ -30,14 +143,14 @@ var profile_default = {
     if (!userId) {
       return {
         content: "Bir kullan\u0131c\u0131 belirtmelisin.",
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags2.Ephemeral
       };
     }
     const user = interaction.data.resolved?.users?.[userId];
     if (!user) {
       return {
         content: "Kullan\u0131c\u0131 bulunamad\u0131.",
-        flags: MessageFlags.Ephemeral
+        flags: MessageFlags2.Ephemeral
       };
     }
     const isAnimated = user.avatar.startsWith("a_");
@@ -78,9 +191,9 @@ var ping_default = {
 // commands/chat.ts
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
-  ApplicationCommandOptionType as ApplicationCommandOptionType2,
+  ApplicationCommandOptionType as ApplicationCommandOptionType3,
   ApplicationCommandType,
-  MessageFlags as MessageFlags2
+  MessageFlags as MessageFlags3
 } from "discord-api-types/v10";
 var chat_default = {
   data: {
@@ -94,7 +207,7 @@ var chat_default = {
         // The name of the prompt option
         description: "The prompt for the AI",
         // The description of the prompt option
-        type: ApplicationCommandOptionType2.String,
+        type: ApplicationCommandOptionType3.String,
         required: true
       },
       {
@@ -102,7 +215,7 @@ var chat_default = {
         // The name of the image option
         description: "Optional image to include in the prompt",
         // The description of the image option
-        type: ApplicationCommandOptionType2.Attachment,
+        type: ApplicationCommandOptionType3.Attachment,
         required: false
       }
     ]
@@ -116,7 +229,7 @@ var chat_default = {
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
         content: "This command can only be used as a chat input (slash) command.",
-        flags: MessageFlags2.Ephemeral
+        flags: MessageFlags3.Ephemeral
         // Make the response visible only to the user
       };
     }
@@ -132,7 +245,7 @@ var chat_default = {
     if (prompt.length > 2e3) {
       return {
         content: "Prompt must be less than 2000 characters.",
-        flags: MessageFlags2.Ephemeral
+        flags: MessageFlags3.Ephemeral
       };
     }
     try {
@@ -160,7 +273,7 @@ var chat_default = {
       console.error("Error during AI chat:", error);
       return {
         content: "An error occurred while processing your request.",
-        flags: MessageFlags2.Ephemeral
+        flags: MessageFlags3.Ephemeral
       };
     }
   }
@@ -168,10 +281,10 @@ var chat_default = {
 
 // commands/banner.ts
 import {
-  ApplicationCommandOptionType as ApplicationCommandOptionType3,
-  MessageFlags as MessageFlags3
+  ApplicationCommandOptionType as ApplicationCommandOptionType4,
+  MessageFlags as MessageFlags4
 } from "discord-api-types/v10";
-import axios from "axios";
+import axios2 from "axios";
 var banner_default = {
   data: {
     name: "banner",
@@ -180,7 +293,7 @@ var banner_default = {
       {
         name: "user",
         description: "The user you want to see the banner of",
-        type: ApplicationCommandOptionType3.User,
+        type: ApplicationCommandOptionType4.User,
         required: true
       }
     ]
@@ -192,10 +305,10 @@ var banner_default = {
     if (!userId) {
       return {
         content: "You must specify a user.",
-        flags: MessageFlags3.Ephemeral
+        flags: MessageFlags4.Ephemeral
       };
     }
-    const res = await axios.get(
+    const res = await axios2.get(
       `https://discord.com/api/v10/users/${userId}`,
       {
         headers: {
@@ -207,7 +320,7 @@ var banner_default = {
     if (!user.banner) {
       return {
         content: "This user doesn't have a banner.",
-        flags: MessageFlags3.Ephemeral
+        flags: MessageFlags4.Ephemeral
       };
     }
     const isAnimated = user.banner.startsWith("a_");
@@ -226,6 +339,7 @@ var banner_default = {
 
 // .discraft/commands/index.ts
 var commands_default = {
+  userinfo: userinfo_default,
   profile: profile_default,
   ping: ping_default,
   chat: chat_default,
@@ -292,12 +406,12 @@ async function handler(req, res) {
       const command = commands_default[commandName];
       if (command) {
         try {
-          await axios2.post(
+          await axios3.post(
             `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
             {
               type: InteractionResponseType.DeferredChannelMessageWithSource,
               data: {
-                flags: command.data.initialEphemeral ? MessageFlags4.Ephemeral : 0
+                flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0
               }
             },
             {
@@ -319,11 +433,11 @@ async function handler(req, res) {
           });
           commandResult = {
             content: "An error occurred while processing your request.",
-            flags: MessageFlags4.Ephemeral
+            flags: MessageFlags5.Ephemeral
           };
         }
         try {
-          await axios2.patch(
+          await axios3.patch(
             `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
             {
               content: commandResult.content ?? "",
