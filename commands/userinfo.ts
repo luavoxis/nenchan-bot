@@ -9,13 +9,32 @@ import type {
 } from "../utils/types";
 
 async function discordFetch(url: string, opts: any = {}): Promise<any> {
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try { const d = await res.json(); msg = d.message || msg; } catch {}
-    throw new Error(msg);
-  }
-  return res.json();
+  const u = new URL(url);
+  const mod = u.protocol === "https:" ? require("https") : require("http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(u, {
+      method: opts.method || "GET",
+      headers: { "Content-Type": "application/json", ...opts.headers },
+    }, (res: any) => {
+      let body = "";
+      res.on("data", (chunk: any) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try { resolve(JSON.parse(body)); } catch { resolve(body); }
+        } else {
+          let msg = `HTTP ${res.statusCode}`;
+          try { const d = JSON.parse(body); msg = d.message || msg; } catch {}
+          reject(new Error(msg));
+        }
+      });
+    });
+    req.on("error", reject);
+    if (opts.body) {
+      if (typeof opts.body === "string") req.write(opts.body);
+      else req.write(JSON.stringify(opts.body));
+    }
+    req.end();
+  });
 }
 
 function snowflakeToDate(id: string): string {

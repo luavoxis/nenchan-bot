@@ -10313,17 +10313,40 @@ import {
   ApplicationCommandOptionType
 } from "discord-api-types/v10";
 async function discordFetch(url, opts = {}) {
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try {
-      const d = await res.json();
-      msg = d.message || msg;
-    } catch {
+  const u = new URL(url);
+  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(u, {
+      method: opts.method || "GET",
+      headers: { "Content-Type": "application/json", ...opts.headers }
+    }, (res) => {
+      let body = "";
+      res.on("data", (chunk) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(body));
+          } catch {
+            resolve(body);
+          }
+        } else {
+          let msg = `HTTP ${res.statusCode}`;
+          try {
+            const d = JSON.parse(body);
+            msg = d.message || msg;
+          } catch {
+          }
+          reject(new Error(msg));
+        }
+      });
+    });
+    req.on("error", reject);
+    if (opts.body) {
+      if (typeof opts.body === "string") req.write(opts.body);
+      else req.write(JSON.stringify(opts.body));
     }
-    throw new Error(msg);
-  }
-  return res.json();
+    req.end();
+  });
 }
 function snowflakeToDate(id) {
   const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
@@ -10616,17 +10639,40 @@ import {
   MessageFlags as MessageFlags4
 } from "discord-api-types/v10";
 async function discordFetch2(url, opts = {}) {
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try {
-      const d = await res.json();
-      msg = d.message || msg;
-    } catch {
+  const u = new URL(url);
+  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(u, {
+      method: opts.method || "GET",
+      headers: { "Content-Type": "application/json", ...opts.headers }
+    }, (res) => {
+      let body = "";
+      res.on("data", (chunk) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(body));
+          } catch {
+            resolve(body);
+          }
+        } else {
+          let msg = `HTTP ${res.statusCode}`;
+          try {
+            const d = JSON.parse(body);
+            msg = d.message || msg;
+          } catch {
+          }
+          reject(new Error(msg));
+        }
+      });
+    });
+    req.on("error", reject);
+    if (opts.body) {
+      if (typeof opts.body === "string") req.write(opts.body);
+      else req.write(JSON.stringify(opts.body));
     }
-    throw new Error(msg);
-  }
-  return res.json();
+    req.end();
+  });
 }
 var banner_default = {
   data: {
@@ -10694,18 +10740,40 @@ import "discord-interactions";
 // index.ts
 var PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
 async function discordFetch3(url, opts = {}) {
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try {
-      const d = await res.json();
-      msg = d.message || msg;
-    } catch {
+  const u = new URL(url);
+  const mod = u.protocol === "https:" ? __require("https") : __require("http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(u, {
+      method: opts.method || "GET",
+      headers: { "Content-Type": "application/json", ...opts.headers }
+    }, (res) => {
+      let body = "";
+      res.on("data", (chunk) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(body));
+          } catch {
+            resolve(body);
+          }
+        } else {
+          let msg = `HTTP ${res.statusCode}`;
+          try {
+            const d = JSON.parse(body);
+            msg = d.message || msg;
+          } catch {
+          }
+          reject(new Error(msg));
+        }
+      });
+    });
+    req.on("error", reject);
+    if (opts.body) {
+      if (typeof opts.body === "string") req.write(opts.body);
+      else req.write(JSON.stringify(opts.body));
     }
-    throw new Error(msg);
-  }
-  if (res.headers.get("content-type")?.includes("application/json")) return res.json();
-  return res.text();
+    req.end();
+  });
 }
 function authToken() {
   return Buffer.from(PANEL_PASSWORD).toString("base64");
@@ -11258,10 +11326,35 @@ async function handlePanel(res, bodyStr) {
         const buf = Buffer.from(body.fileData, "base64");
         form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
       }
-      await discordFetch3(
-        `https://discord.com/api/v10/channels/${body.channelId}/messages`,
-        { method: "POST", headers: { ...headers, ...form.getHeaders() }, body: form }
-      );
+      const u = new URL(`https://discord.com/api/v10/channels/${body.channelId}/messages`);
+      await new Promise((resolve, reject) => {
+        form.submit({
+          protocol: u.protocol,
+          host: u.hostname,
+          path: u.pathname + u.search,
+          method: "POST",
+          headers: { ...headers }
+        }, (err, res2) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          let responseBody = "";
+          res2.on("data", (chunk) => responseBody += chunk);
+          res2.on("end", () => {
+            if (res2.statusCode && res2.statusCode >= 200 && res2.statusCode < 300) resolve();
+            else {
+              let msg = `HTTP ${res2.statusCode}`;
+              try {
+                const d = JSON.parse(responseBody);
+                msg = d.message || msg;
+              } catch {
+              }
+              reject(new Error(msg));
+            }
+          });
+        });
+      });
       return res.json({ success: true });
     }
     if (body.action === "messages") {

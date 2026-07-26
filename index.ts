@@ -13,14 +13,32 @@ import {
 const PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
 
 async function discordFetch(url: string, opts: any = {}): Promise<any> {
-  const res = await fetch(url, opts);
-  if (!res.ok) {
-    let msg = `HTTP ${res.status}`;
-    try { const d = await res.json(); msg = d.message || msg; } catch {}
-    throw new Error(msg);
-  }
-  if (res.headers.get("content-type")?.includes("application/json")) return res.json();
-  return res.text();
+  const u = new URL(url);
+  const mod = u.protocol === "https:" ? require("https") : require("http");
+  return new Promise((resolve, reject) => {
+    const req = mod.request(u, {
+      method: opts.method || "GET",
+      headers: { "Content-Type": "application/json", ...opts.headers },
+    }, (res: any) => {
+      let body = "";
+      res.on("data", (chunk: any) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          try { resolve(JSON.parse(body)); } catch { resolve(body); }
+        } else {
+          let msg = `HTTP ${res.statusCode}`;
+          try { const d = JSON.parse(body); msg = d.message || msg; } catch {}
+          reject(new Error(msg));
+        }
+      });
+    });
+    req.on("error", reject);
+    if (opts.body) {
+      if (typeof opts.body === "string") req.write(opts.body);
+      else req.write(JSON.stringify(opts.body));
+    }
+    req.end();
+  });
 }
 
 function authToken(): string {
@@ -611,10 +629,28 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         const buf = Buffer.from(body.fileData, "base64");
         form.append("file", buf, { filename: body.fileName, contentType: body.fileType || "application/octet-stream" });
       }
-      await discordFetch(
-        `https://discord.com/api/v10/channels/${body.channelId}/messages`,
-        { method: "POST", headers: { ...headers, ...form.getHeaders() }, body: form as any },
-      );
+      const u = new URL(`https://discord.com/api/v10/channels/${body.channelId}/messages`);
+      await new Promise<void>((resolve, reject) => {
+        (form as any).submit({
+          protocol: u.protocol,
+          host: u.hostname,
+          path: u.pathname + u.search,
+          method: "POST",
+          headers: { ...headers },
+        }, (err: any, res: any) => {
+          if (err) { reject(err); return; }
+          let responseBody = "";
+          res.on("data", (chunk: any) => responseBody += chunk);
+          res.on("end", () => {
+            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) resolve();
+            else {
+              let msg = `HTTP ${res.statusCode}`;
+              try { const d = JSON.parse(responseBody); msg = d.message || msg; } catch {}
+              reject(new Error(msg));
+            }
+          });
+        });
+      });
       return res.json({ success: true });
     }
 
