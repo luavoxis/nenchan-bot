@@ -627,6 +627,29 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-footer{padding:10px 16px;border-top:1px solid #222;text-align:right}
 .modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px monospace;cursor:pointer}
 .modal-footer button:hover{background:#333;color:#fff}
+.modal-actions{display:flex;gap:4px;padding:8px 16px;border-top:1px solid #222;background:#0d0d0d}
+.modal-actions button{flex:1;padding:5px 8px;font-size:10px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:monospace}
+.modal-actions button:hover{background:#1a1a1a;color:#fff}
+.btn-ban{border-color:#f444 !important;color:#f44 !important}
+.btn-ban:hover{background:#f44 !important;color:#fff !important}
+.btn-kick{border-color:#fa0 !important;color:#fa0 !important}
+.btn-kick:hover{background:#fa0 !important;color:#000 !important}
+.btn-timeout{border-color:#ff0 !important;color:#ff0 !important}
+.btn-timeout:hover{background:#ff0 !important;color:#000 !important}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:200}
+.confirm-overlay.show{display:flex}
+.confirm-box{background:#111;border:1px solid #333;padding:0;width:90%;max-width:320px;overflow:hidden}
+.confirm-title{padding:12px 16px;font-size:12px;color:#fff;border-bottom:1px solid #222}
+.confirm-body{padding:12px 16px}
+.confirm-body label{display:block;color:#666;font-size:9px;text-transform:uppercase;margin-bottom:2px;margin-top:8px}
+.confirm-body label:first-child{margin-top:0}
+.confirm-body input,.confirm-body select,.confirm-body textarea{width:100%;padding:5px 8px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace;outline:none;margin:0}
+.confirm-body input:focus,.confirm-body textarea:focus{border-color:#fff}
+.confirm-footer{display:flex;gap:4px;padding:8px 16px;border-top:1px solid #222}
+.confirm-footer button{flex:1;padding:5px 10px;font-size:11px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:monospace}
+.confirm-footer button:hover{background:#222;color:#fff}
+.confirm-footer .confirm-danger{border-color:#f44;color:#f44}
+.confirm-footer .confirm-danger:hover{background:#f44;color:#fff}
 .dm-channel{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;cursor:pointer;transition:border-color .15s;margin-bottom:4px}
 .dm-channel:hover{border-color:#444}
 .dm-channel img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
@@ -705,6 +728,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
+<div id="confirmOverlay" class="confirm-overlay">
+<div class="confirm-box">
+<div class="confirm-title" id="confirmTitle">confirm</div>
+<div class="confirm-body" id="confirmBody"></div>
+<div class="confirm-footer">
+<button onclick="closeConfirm()">cancel</button>
+<button class="confirm-danger" id="confirmBtn" onclick="executeConfirm()">confirm</button>
+</div>
+</div>
+</div>
 <script>
 function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
@@ -1040,6 +1073,11 @@ function showMember(id){
     (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#aaa;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
     "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#555;font-size:10px'>no roles</span>")+"</div></div>"+
     "</div>"+
+    "<div class='modal-actions'>"+
+    "<button class='btn-timeout' onclick='openConfirm("timeout",""+m.user.id+"",""+esc(name)+"")'>timeout</button>"+
+    "<button class='btn-kick' onclick='openConfirm("kick",""+m.user.id+"",""+esc(name)+"")'>kick</button>"+
+    "<button class='btn-ban' onclick='openConfirm("ban",""+m.user.id+"",""+esc(name)+"")'>ban</button>"+
+    "</div>"+
     "<div class='modal-footer'><button onclick='c()'>close</button></div>";
   g("userModal").classList.add("show");
   api({action:"userinfo",userId:id},function(u){
@@ -1188,6 +1226,39 @@ function deleteDmMsg(cid,mid){
   api({action:"delete",channelId:cid,messageId:mid},function(d){
     if(d.success){loadDmHistory(cid)}
     else{alert(d.error||"failed to delete")}
+  });
+}
+var confirmData={};
+function openConfirm(action,userId,userName){
+  confirmData={action:action,userId:userId};
+  var title={timeout:"timeout "+userName,kick:"kick "+userName,ban:"ban "+userName};
+  var h="";
+  if(action==="timeout"){
+    h+="<label>duration</label><select id='cfDuration'><option value='1'>1 minute</option><option value='5'>5 minutes</option><option value='10'>10 minutes</option><option value='30' selected>30 minutes</option><option value='60'>1 hour</option><option value='360'>6 hours</option><option value='1440'>24 hours</option><option value='10080'>7 days</option></select>";
+  }
+  h+="<label>reason (optional)</label><input type='text' id='cfReason' placeholder='reason...'/>";
+  g("confirmTitle").textContent=title[action];
+  g("confirmBody").innerHTML=h;
+  var btn=g("confirmBtn");
+  btn.className="confirm-danger";
+  btn.textContent=action;
+  g("confirmOverlay").classList.add("show");
+}
+function closeConfirm(){g("confirmOverlay").classList.remove("show")}
+function executeConfirm(){
+  var action=confirmData.action,userId=confirmData.userId,reason=g("cfReason").value;
+  var body={action:action,userId:userId};
+  if(reason)body.reason=reason;
+  if(action==="timeout")body.minutes=parseInt(g("cfDuration").value)||30;
+  closeConfirm();c();
+  g("memberList").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>executing "+action+"...</p>";
+  api(body,function(d){
+    if(d.success){
+      loadMembers();
+    }else{
+      alert(d.error||"failed to "+action);
+      loadMembers();
+    }
   });
 }
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
@@ -1481,6 +1552,40 @@ async function handlePanel(res, bodyStr) {
         }
       }
       return res.json({ success: true, channelId });
+    }
+    if (body.action === "ban") {
+      const userId = body.userId;
+      if (!userId) return res.status(400).json({ error: "No user specified" });
+      const banBody = {};
+      if (body.reason) banBody.reason = body.reason;
+      if (body.deleteDays) banBody.delete_message_days = body.deleteDays;
+      await discordFetch3(
+        `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
+        { method: "PUT", headers, body: JSON.stringify(banBody) }
+      );
+      return res.json({ success: true });
+    }
+    if (body.action === "kick") {
+      const userId = body.userId;
+      if (!userId) return res.status(400).json({ error: "No user specified" });
+      const kickHeaders = { ...headers };
+      if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+      await discordFetch3(
+        `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
+        { method: "DELETE", headers: kickHeaders }
+      );
+      return res.json({ success: true });
+    }
+    if (body.action === "timeout") {
+      const userId = body.userId;
+      if (!userId) return res.status(400).json({ error: "No user specified" });
+      if (!body.minutes) return res.status(400).json({ error: "No duration specified" });
+      const until = new Date(Date.now() + body.minutes * 60 * 1e3).toISOString();
+      await discordFetch3(
+        `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
+        { method: "PATCH", headers, body: JSON.stringify({ communication_disabled_until: until }) }
+      );
+      return res.json({ success: true });
     }
     return res.status(400).json({ error: "Unknown action" });
   } catch (err) {
