@@ -822,7 +822,7 @@ function loadDashboard(){
     var boostBarColor=boostColors[d.boostLevel]||"#57f287";
     var h="<div class='dash-header'>";
     h+=iconHtml;
-    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.totalMembers+" members &middot; "+d.roleCount+" roles &middot; created "+d.created+"</div></div>";
+    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+d.created.split(", ").pop()+"</div></div>";
     h+="</div>";
     h+="<div class='dash-grid'>";
     h+="<div class='dash-card'><div class='dash-card-icon'>&#128101;</div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
