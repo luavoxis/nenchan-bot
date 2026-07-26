@@ -191,7 +191,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div style="display:flex;gap:4px;margin-bottom:4px;align-items:stretch">
 <div class="file-picker">
 <input type="file" id="msgFile" onchange="updateFileLabel(this)"/>
-<div class="file-label" id="fileLabel">📎 attach file...</div>
+<div class="file-label" id="fileLabel">attach file...</div>
 </div>
 <button onclick="g('msgFile').value='';updateFileLabel(g('msgFile'))" style="background:#333;padding:4px 8px;font-size:10px;border:1px solid #333;color:#888;cursor:pointer;font-family:monospace">clear</button>
 </div>
@@ -344,7 +344,7 @@ function loadMsgHistory(cid){
             }else if(a.content_type&&a.content_type.startsWith("audio/")){
               h+="<br><audio src='"+a.url+"' style='width:200px;margin-top:3px' controls></audio>";
             }else{
-              h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>📎 "+esc(a.filename)+"</a>"
+              h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"
             }
           }
         }
@@ -372,7 +372,7 @@ function loadMsgHistory(cid){
             if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
             if(e.thumbnail&&e.thumbnail.url) h+="<img src='"+e.thumbnail.url+"' style='max-width:80px;max-height:80px;float:right;margin:2px' loading='lazy'/>";
             if(e.footer&&e.footer.text) h+="<br><span style='color:#555;font-size:8px'>"+esc(e.footer.text)+"</span>";
-            if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>🎬 video</span>";
+            if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>video</span>";
             h+="</div>";
           }
         }
@@ -525,8 +525,8 @@ function fmt(s){
 function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
 function updateFileLabel(el){
   var label=g("fileLabel");
-  if(el.files&&el.files.length){label.textContent="📎 "+el.files[0].name;label.classList.add("has-file")}
-  else{label.textContent="📎 attach file...";label.classList.remove("has-file")}
+  if(el.files&&el.files.length){label.textContent=el.files[0].name;label.classList.add("has-file")}
+  else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
