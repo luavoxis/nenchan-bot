@@ -123,6 +123,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
+.menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#0a0a0a;border:1px solid #222;color:#888;width:32px;height:32px;font:14px monospace;cursor:pointer}
+.menu-toggle:hover{color:#fff;border-color:#444}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
+@media(max-width:600px){
+  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100vh;transform:translateX(-100%);transition:transform .2s ease}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.show{display:block}
+  .menu-toggle{display:block}
+  .main{padding:16px 12px 16px 48px}
+}
 .member-grid{display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 180px);overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .member-grid::-webkit-scrollbar{display:none}
 .member-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;cursor:pointer;transition:border-color .15s}
@@ -165,6 +175,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </style>
 </head>
 <body>
+<button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</button>
+<div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>nenchan v1.0</h1>
 <button class="active" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
@@ -243,6 +255,7 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
+  if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
 }
 
 function api(body,cb){
@@ -562,6 +575,7 @@ function updateFileLabel(el){
   if(el.files&&el.files.length){label.textContent=el.files[0].name;label.classList.add("has-file")}
   else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
+function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
 if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
 </script>
 </body>
