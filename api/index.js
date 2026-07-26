@@ -652,8 +652,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <div id="memberList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
 </div>
 <div id="panel-dms" class="panel">
-<input type="text" class="member-search" id="dmSearch" placeholder="search user to dm..." oninput="filterDmSearch(this.value)"/>
-<div id="dmSearchResults" style="display:none;margin-bottom:8px"></div>
+<div style="display:flex;gap:4px;margin-bottom:8px">
+<input type="text" id="dmUserId" placeholder="user id" style="flex:1;padding:4px 6px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace"/>
+<button onclick="startDmById()" style="padding:4px 10px;font-size:11px;background:#333;color:#eee;border:1px solid #555;cursor:pointer;font-family:monospace">open</button>
+</div>
 <div id="dmList"></div>
 <div id="dmChat" style="display:none">
 <div id="dmChatHeader" style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #222;margin-bottom:8px">
@@ -1044,51 +1046,24 @@ function updateFileLabel(el){
   else{label.textContent="attach file...";label.classList.remove("has-file")}
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
-var allDmChannels=[],currentDmChannel=null,pendingDmUserId=null;
-function filterDmSearch(q){
-  if(!q){g("dmSearchResults").style.display="none";return}
-  if(!allMembers.length){api({action:"members"},function(d){if(!d.error){allMembers=d.members;filterDmSearch(q)}});return}
-  var ql=q.toLowerCase();
-  var results=allMembers.filter(function(m){
-    if(m.user.bot)return false;
-    var u=m.user.username.toLowerCase();
-    var g2=(m.user.global_name||"").toLowerCase();
-    var n=(m.nick||"").toLowerCase();
-    return u.indexOf(ql)!==-1||g2.indexOf(ql)!==-1||n.indexOf(ql)!==-1;
-  }).slice(0,8);
-  if(!results.length){g("dmSearchResults").innerHTML="<p style='color:#555;font-size:10px;padding:4px'>no results</p>";g("dmSearchResults").style.display="block";return}
-  var h="";
-  for(var i=0;i<results.length;i++){
-    var m=results[i];
-    var name=m.nick||(m.user.global_name||m.user.username);
-    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
-    h+="<div class='dm-channel' data-uid='"+m.user.id+"' data-uname='"+esc(name)+"' onclick='startDmWith(this.dataset.uid,this.dataset.uname)'>";
-    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div><div class='dm-channel-name'>"+esc(name)+"</div><div class='dm-channel-preview'>@"+esc(m.user.username)+"</div></div>";
-    h+="</div>";
-  }
-  g("dmSearchResults").innerHTML=h;
-  g("dmSearchResults").style.display="block";
-}
-function startDmWith(uid,name){
-  g("dmSearchResults").style.display="none";
-  g("dmSearch").value="";
+var allDmChannels=[],currentDmChannel=null;
+function startDmById(){
+  var uid=g("dmUserId").value.trim();
+  if(!uid)return;
+  g("dmUserId").value="";
   currentDmChannel=null;
-  pendingDmUserId=uid;
   g("dmList").style.display="none";
   g("dmChat").style.display="block";
-  g("dmChatName").textContent=name;
+  g("dmChatName").textContent=uid;
   g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>opening dm...</p>";
   g("dmInput").value="";
   g("dmStatus").textContent="";
-  loadDmHistoryForUser(uid);
-}
-function loadDmHistoryForUser(uid){
-  g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
   api({action:"dm_send",userId:uid,content:""},function(d){
     if(d.error){g("dmHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     currentDmChannel=d.channelId;
-    pendingDmUserId=null;
+    api({action:"userinfo",userId:uid},function(u){
+      if(u&&!u.error)g("dmChatName").textContent=u.global_name||u.username||uid;
+    });
     loadDmHistory(d.channelId);
   });
 }
@@ -1131,6 +1106,7 @@ function dmBack(){
   currentDmChannel=null;
   g("dmList").style.display="block";
   g("dmChat").style.display="none";
+  loadDms();
 }
 function loadDmHistory(cid){
   g("dmHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
@@ -1186,13 +1162,12 @@ function sendDm(){
   g("dmStatus").style.color="#aaa";g("dmStatus").textContent="sending...";
   var body={action:"dm_send",content:m};
   if(c)body.channelId=c;
-  else if(pendingDmUserId)body.userId=pendingDmUserId;
   else{g("dmStatus").style.color="#f44";g("dmStatus").textContent="no recipient";return}
   api(body,function(d){
     if(d.success){
       g("dmStatus").style.color="#4f4";g("dmStatus").textContent="sent!";
       g("dmInput").value="";
-      if(d.channelId&&!currentDmChannel){currentDmChannel=d.channelId;pendingDmUserId=null}
+      if(d.channelId&&!currentDmChannel)currentDmChannel=d.channelId;
       if(currentDmChannel)loadDmHistory(currentDmChannel);
     }else{
       g("dmStatus").style.color="#f44";g("dmStatus").textContent=d.error||"failed";
