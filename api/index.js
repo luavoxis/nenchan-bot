@@ -735,7 +735,8 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
-  if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none"}
+  if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none";stopDmPoll()}
+  if(name!=="dms")stopDmPoll();
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
 }
 
@@ -1083,6 +1084,14 @@ function handleDrop(e){
 }
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
 var currentDmChannel=null;
+var dmPollTimer=null;
+function startDmPoll(){
+  if(dmPollTimer)clearInterval(dmPollTimer);
+  dmPollTimer=setInterval(function(){if(currentDmChannel)loadDmHistory(currentDmChannel)},4000);
+}
+function stopDmPoll(){
+  if(dmPollTimer){clearInterval(dmPollTimer);dmPollTimer=null}
+}
 function startDmById(){
   var uid=g("dmUserId").value.trim();
   if(!uid)return;
@@ -1095,6 +1104,7 @@ function startDmById(){
   api({action:"dm_send",userId:uid,content:""},function(d){
     if(d.error){g("dmHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     currentDmChannel=d.channelId;
+    startDmPoll();
     api({action:"userinfo",userId:uid},function(u){
       if(u&&!u.error)g("dmChatName").textContent=u.global_name||u.username||uid;
     });
@@ -1103,6 +1113,7 @@ function startDmById(){
 }
 function dmClose(){
   currentDmChannel=null;
+  stopDmPoll();
   g("dmChat").style.display="none";
   g("dmStart").style.display="block";
 }
@@ -1152,6 +1163,7 @@ function loadDmHistory(cid){
       h+="</div>";
     }
     g("dmHistory").innerHTML=h;
+    g("dmHistory").scrollTop=g("dmHistory").scrollHeight;
   });
 }
 function sendDm(){
