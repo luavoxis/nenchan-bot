@@ -80,6 +80,13 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 .modal-box{background:#111;border:1px solid #333;padding:16px;width:90%;max-width:400px}
 .modal-box h3{font-size:12px;color:#fff;margin-bottom:8px}
 .modal-box p{font-size:11px;color:#888;margin-bottom:6px}
+.role-toggle{cursor:pointer;user-select:none}
+.role-toggle:hover{color:#fff}
+.role-list{display:none;max-height:200px;overflow-y:auto;margin-top:4px;padding:4px 0;border-top:1px solid #222}
+.role-list.show{display:block}
+.role-item{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:10px;color:#aaa}
+.role-item:hover{background:#111}
+.role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -177,15 +184,22 @@ function api(body,cb){
 function loadDashboard(){
   api({action:"guildinfo"},function(d){
     if(d.error)return;
+    var roleItems=d.roles.sort(function(a,b){return b.position-a.position}).map(function(r){
+      var c=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#666";
+      return "<div class='role-item'><span class='role-dot' style='background:"+c+"'></span>"+esc(r.name)+"</div>";
+    }).join("");
     g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
       "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
       "<div class='stat'><span>members</span><p>"+d.totalMembers+" total &middot; "+d.humans+" humans &middot; "+d.bots+" bots</p></div>"+
       "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
-      "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
+      "<div class='stat' onclick='toggleRoles()'><span>roles</span><p class='role-toggle'>"+d.roleCount+" <span style='color:#666;font-size:10px'>click to expand</span></p>"+
+      "<div id='roleList' class='role-list'>"+roleItems+"</div></div>"+
       "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
       "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
   });
 }
+
+function toggleRoles(){g("roleList").classList.toggle("show")}
 
 function loadMsgChannels(){
   api({action:"channels"},function(d){
@@ -397,6 +411,7 @@ async function handlePanel(res: VercelResponse, bodyStr: string) {
         humans,
         channelCount: chanRes.data.length,
         roleCount: rolesRes.data.length,
+        roles: rolesRes.data.map((r: any) => ({ id: r.id, name: r.name, color: r.color, position: r.position })),
         created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0,
