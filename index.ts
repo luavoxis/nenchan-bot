@@ -264,7 +264,7 @@ function loadMsgHistory(cid){
           }else{h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"}
         }
       }
-      h+="<span style='float:right;color:#555;cursor:pointer' onclick='deleteMsg(\""+cid+"\",\""+msg.id+"\",this)' title='delete'>&#10005;</span>";
+      h+="<span style='float:right;color:#555;cursor:pointer' onclick='deleteMsg(\\\"+cid+\\\",\\\"+msg.id+\\\",this)' title='delete'>&#10005;</span>";
       h+="</div>";
     }
     g("msgHistory").innerHTML=h||"<p style='color:#555;text-align:center;padding:20px 0'>no messages</p>";
