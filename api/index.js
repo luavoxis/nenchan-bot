@@ -119,8 +119,9 @@ var userinfo_default = {
           inline: false
         });
       }
-    } catch {
-      fields.push({ name: "Note", value: "*Server member details unavailable (enable Server Members Intent in Discord Developer Portal)*", inline: false });
+    } catch (err) {
+      const status = axios.isAxiosError(err) ? err.response?.status : "?";
+      fields.push({ name: "Note", value: `*Could not fetch member data (HTTP ${status}) - make sure the bot has Server Members Intent enabled and try re-inviting with \`guilds.members.read\` scope*`, inline: false });
     }
     return {
       embeds: [
