@@ -371,141 +371,229 @@ import consola from "consola";
 import "discord-interactions";
 
 // index.ts
+var PANEL_PASSWORD = process.env.PANEL_PASSWORD || "admin";
+function authToken() {
+  return Buffer.from(PANEL_PASSWORD).toString("base64");
+}
+function verifyToken(token) {
+  try {
+    return Buffer.from(token, "base64").toString() === PANEL_PASSWORD;
+  } catch {
+    return false;
+  }
+}
+function getToken(req) {
+  const auth = req.headers.authorization;
+  if (auth?.startsWith("Bearer ")) return auth.slice(7);
+  const cookie = req.headers.cookie;
+  if (cookie) {
+    const match = cookie.match(/token=([^;]+)/);
+    if (match) return match[1];
+  }
+  return null;
+}
+function html() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Bot Panel</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.5 system-ui,sans-serif;background:#1a1a2e;color:#e0e0e0;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.card{background:#16213e;padding:2rem;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.4);width:100%;max-width:500px}
+h1{text-align:center;margin-bottom:1.5rem;color:#c9a0dc;font-size:1.5rem}
+label{display:block;margin-bottom:.25rem;color:#aaa;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
+input,textarea,select{width:100%;padding:.6rem .8rem;border:1px solid #2a2a4a;border-radius:6px;background:#0f3460;color:#e0e0e0;font:inherit;margin-bottom:1rem}
+input:focus,textarea:focus,select:focus{outline:2px solid #c9a0dc;border-color:transparent}
+button{width:100%;padding:.7rem;background:#c9a0dc;color:#1a1a2e;border:none;border-radius:6px;font:600 1rem system-ui,sans-serif;cursor:pointer;transition:opacity .2s}
+button:hover{opacity:.85}
+.error{color:#e74c3c;margin-bottom:.5rem;font-size:.85rem}
+.success{color:#2ecc71;margin-bottom:.5rem;font-size:.85rem}
+.hidden{display:none}
+.flex{display:flex;gap:.5rem}
+.flex button{flex:1}
+#logout{background:transparent;color:#e74c3c;border:1px solid #e74c3c;margin-top:1rem;padding:.4rem}
+#logout:hover{background:#e74c3c20}
+textarea{resize:vertical;min-height:80px}
+small{color:#888;font-size:.8rem}
+select option{background:#0f3460;color:#e0e0e0}
+</style>
+</head>
+<body>
+<div class="card" id="loginScreen">
+<h1>\u{1F510} Bot Panel</h1>
+<div id="loginError" class="error"></div>
+<label>Password</label>
+<input type="password" id="password" placeholder="Enter panel password" onkeydown="if(event.key==='Enter')login()"/>
+<button onclick="login()">Login</button>
+</div>
+<div class="card hidden" id="panelScreen">
+<h1>\u{1F916} Bot Control</h1>
+<div id="panelMsg" class="success"></div>
+<label>Server</label>
+<select id="guildSelect" onchange="loadChannels()"><option value="">Loading servers...</option></select>
+<label>Channel</label>
+<select id="channelSelect"><option value="">Select a server first</option></select>
+<label>Message</label>
+<textarea id="messageInput" placeholder="Type your message..."></textarea>
+<div class="flex">
+<button onclick="sendMessage()">Send</button>
+<button onclick="clearForm()" style="background:#555">Clear</button>
+</div>
+<button id="logout" onclick="logout()">Logout</button>
+</div>
+<script>
+const API = window.location.origin + "/api";
+let token = getCookie("token");
+if (token) { showPanel(); } else { showLogin(); }
+function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?m[2]:null}
+function showLogin(){document.getElementById("loginScreen").classList.remove("hidden");document.getElementById("panelScreen").classList.add("hidden")}
+function showPanel(){document.getElementById("loginScreen").classList.add("hidden");document.getElementById("panelScreen").classList.remove("hidden");loadGuilds()}
+function msg(t,e){const d=document.getElementById("panelMsg");d.textContent=t;d.className=e==="error"?"error":"success";setTimeout(()=>d.textContent="",3000)}
+async function login(){const p=document.getElementById("password").value;const e=document.getElementById("loginError");e.textContent="";try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"login",password:p})});const d=await r.json();if(d.token){document.cookie="token="+d.token+";path=/;max-age=86400;SameSite=Lax";token=d.token;showPanel()}else{e.textContent=d.error||"Wrong password"}}catch(a){e.textContent="Connection error"}}
+async function loadGuilds(){const s=document.getElementById("guildSelect");try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"guilds"})});const d=await r.json();if(d.error){s.innerHTML='<option value="">'+d.error+'</option>';return}s.innerHTML='<option value="">Select a server</option>'+d.guilds.map(g=>'<option value="'+g.id+'">'+g.name+"</option>").join("")}catch(a){s.innerHTML='<option value="">Failed to load</option>'}}
+async function loadChannels(){const g=document.getElementById("guildSelect").value;const s=document.getElementById("channelSelect");s.innerHTML='<option value="">Loading...</option>';try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"channels",guildId:g})});const d=await r.json();if(d.error){s.innerHTML='<option value="">'+d.error+'</option>';return}s.innerHTML='<option value="">Select a channel</option>'+d.channels.filter(c=>c.type===0).map(c=>'<option value="'+c.id+'">#'+c.name+"</option>").join("")}catch(a){s.innerHTML='<option value="">Failed to load</option>'}}
+async function sendMessage(){const g=document.getElementById("guildSelect").value;const c=document.getElementById("channelSelect").value;const m=document.getElementById("messageInput").value;if(!g||!c||!m){msg("Fill all fields","error");return}try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({action:"send",channelId:c,content:m})});const d=await r.json();if(d.success){msg("Message sent!","success");document.getElementById("messageInput").value=""}else{msg(d.error||"Failed","error")}}catch(a){msg("Connection error","error")}}
+function clearForm(){document.getElementById("messageInput").value=""}
+function logout(){document.cookie="token=;path=/;max-age=0";token=null;showLogin()}
+</script>
+</body>
+</html>`;
+}
 async function handler(req, res) {
   try {
-    consola.debug("Request received", { method: req.method, url: req.url });
+    if (req.method === "GET") {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.status(200).send(html());
+    }
     if (req.method !== "POST") {
-      consola.warn("Method not allowed", { method: req.method });
-      return res.status(405).send({ error: "Method Not Allowed" });
+      return res.status(405).json({ error: "Method Not Allowed" });
     }
-    const signature = req.headers["x-signature-ed25519"];
-    const timestamp = req.headers["x-signature-timestamp"];
-    if (!signature || !timestamp || typeof signature !== "string" || typeof timestamp !== "string") {
-      consola.error("Invalid request headers", { signature, timestamp });
-      return res.status(401).send({ error: "Invalid request headers" });
+    const isDiscord = typeof req.headers["x-signature-ed25519"] === "string" && typeof req.headers["x-signature-timestamp"] === "string";
+    if (isDiscord) {
+      return await handleDiscord(req, res);
     }
-    if (!process.env.DISCORD_PUBLIC_KEY) {
-      consola.error("DISCORD_PUBLIC_KEY environment variable not set");
-      return res.status(500).send({ error: "Internal server configuration error" });
-    }
-    const rawBody = await getRawBody(req);
-    if (!rawBody) {
-      consola.error("Missing request body");
-      return res.status(400).send({ error: "Missing request body" });
-    }
-    let isValidRequest = false;
-    try {
-      isValidRequest = await verifyKey(
-        rawBody,
-        signature,
-        timestamp,
-        process.env.DISCORD_PUBLIC_KEY
-      );
-    } catch (err) {
-      consola.error("Signature verification failed", {
-        error: err,
-        signature,
-        timestamp
-      });
-      return res.status(401).send({ error: "Invalid request signature" });
-    }
-    if (!isValidRequest) {
-      consola.error("Invalid request signature", { signature, timestamp });
-      return res.status(401).send({ error: "Invalid request signature" });
-    }
-    const message = JSON.parse(rawBody.toString());
-    consola.debug("Parsed message", { message });
-    if (message.type === InteractionType2.PING) {
-      consola.debug("Handling Ping request");
-      return res.status(200).json({ type: InteractionResponseType.Pong });
-    } else if (message.type === InteractionType2.APPLICATION_COMMAND) {
-      const commandName = message.data.name.toLowerCase();
-      consola.debug("Handling application command", { commandName });
-      const command = commands_default[commandName];
-      if (command) {
-        try {
-          await axios3.post(
-            `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
-            {
-              type: InteractionResponseType.DeferredChannelMessageWithSource,
-              data: {
-                flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0
-              }
-            },
-            {
-              headers: { "Content-Type": "application/json" }
-            }
-          );
-        } catch (deferError) {
-          consola.error("Failed to defer command", { deferError });
-          return res.status(500).json({ error: "Failed to defer command" });
-        }
-        let commandResult;
-        try {
-          commandResult = await command.execute({ interaction: message });
-          consola.debug("Command executed successfully", { commandName });
-        } catch (error) {
-          consola.error("Error executing command", {
-            commandName,
-            error
-          });
-          const errMsg = error instanceof Error ? error.message : "Unknown error";
-          commandResult = {
-            flags: MessageFlags5.Ephemeral,
-            embeds: [
-              {
-                color: 15548997,
-                title: "Command Error",
-                fields: [
-                  { name: "Command", value: `/${commandName}`, inline: true },
-                  {
-                    name: "Error",
-                    value: `\`\`\`
-${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
-\`\`\``,
-                    inline: false
-                  }
-                ]
-              }
-            ]
-          };
-        }
-        try {
-          await axios3.patch(
-            `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
-            {
-              content: commandResult.content ?? "",
-              flags: commandResult.flags,
-              embeds: commandResult.embeds
-            },
-            {
-              headers: {
-                "Content-Type": "application/json"
-              }
-            }
-          );
-          consola.debug("Original response edited successfully");
-          return res.status(200).end();
-        } catch (patchError) {
-          consola.error("Failed to edit original response", {
-            patchError
-          });
-          return res.status(500).json({ error: "Failed to update the message." });
-        }
-      }
-      consola.warn("Unknown command", { commandName });
-      return res.status(400).json({ error: "Unknown Command" });
-    } else {
-      consola.warn("Unknown Interaction Type", { type: message.type });
-      return res.status(400).json({ error: "Unknown Interaction Type" });
-    }
+    return await handlePanel(req, res);
   } catch (error) {
-    consola.error("Error processing request", {
-      error
-    });
+    consola.error("Handler error", { error });
+    return res.status(500).json({ error: "Internal error" });
+  }
+}
+async function handleDiscord(req, res) {
+  const signature = req.headers["x-signature-ed25519"];
+  const timestamp = req.headers["x-signature-timestamp"];
+  if (!process.env.DISCORD_PUBLIC_KEY) {
+    return res.status(500).json({ error: "No public key" });
+  }
+  const rawBody = await getRawBody(req);
+  if (!rawBody) return res.status(400).json({ error: "Missing body" });
+  let isValid = false;
+  try {
+    isValid = await verifyKey(rawBody, signature, timestamp, process.env.DISCORD_PUBLIC_KEY);
+  } catch {
+    return res.status(401).json({ error: "Invalid signature" });
+  }
+  if (!isValid) return res.status(401).json({ error: "Invalid signature" });
+  const message = JSON.parse(rawBody.toString());
+  if (message.type === InteractionType2.PING) {
+    return res.status(200).json({ type: InteractionResponseType.Pong });
+  }
+  if (message.type === InteractionType2.APPLICATION_COMMAND) {
+    const commandName = message.data.name.toLowerCase();
+    const command = commands_default[commandName];
+    if (command) {
+      try {
+        await axios3.post(
+          `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
+          {
+            type: InteractionResponseType.DeferredChannelMessageWithSource,
+            data: { flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0 }
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+      } catch {
+        return res.status(500).json({ error: "Failed to defer" });
+      }
+      let commandResult;
+      try {
+        commandResult = await command.execute({ interaction: message });
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : "Unknown error";
+        commandResult = {
+          flags: MessageFlags5.Ephemeral,
+          embeds: [{
+            color: 15548997,
+            title: "Command Error",
+            fields: [
+              { name: "Command", value: `/${commandName}`, inline: true },
+              { name: "Error", value: `\`\`\`
+${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
+\`\`\``, inline: false }
+            ]
+          }]
+        };
+      }
+      try {
+        await axios3.patch(
+          `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
+          {
+            content: commandResult.content ?? "",
+            flags: commandResult.flags,
+            embeds: commandResult.embeds
+          },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        return res.status(200).end();
+      } catch {
+        return res.status(500).json({ error: "Failed to update message" });
+      }
+    }
+    return res.status(400).json({ error: "Unknown Command" });
+  }
+  return res.status(400).json({ error: "Unknown Interaction Type" });
+}
+async function handlePanel(req, res) {
+  let body;
+  try {
+    body = typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
+  } catch {
+    return res.status(400).json({ error: "Invalid JSON" });
+  }
+  const { action } = body;
+  if (action === "login") {
+    if (body.password === PANEL_PASSWORD) {
+      return res.json({ token: authToken() });
+    }
+    return res.status(401).json({ error: "Wrong password" });
+  }
+  const token = getToken(req);
+  if (!token || !verifyToken(token)) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const headers = { Authorization: `Bot ${process.env.DISCORD_TOKEN}` };
+  try {
+    if (action === "guilds") {
+      const r = await axios3.get("https://discord.com/api/v10/users/@me/guilds", { headers });
+      return res.json({ guilds: r.data });
+    }
+    if (action === "channels") {
+      const r = await axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/channels`, { headers });
+      return res.json({ channels: r.data });
+    }
+    if (action === "send") {
+      await axios3.post(
+        `https://discord.com/api/v10/channels/${body.channelId}/messages`,
+        { content: body.content },
+        { headers }
+      );
+      return res.json({ success: true });
+    }
+    return res.status(400).json({ error: "Unknown action" });
+  } catch (err) {
     return res.status(500).json({
-      error: "Failed to process request",
-      details: error instanceof Error ? error.message : "Unknown error"
+      error: err.response?.data?.message || err.message || "Request failed"
     });
   }
 }
