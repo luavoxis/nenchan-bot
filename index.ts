@@ -359,7 +359,7 @@ function loadMsgHistory(cid){
           h+="</div>";
         }
         h+='</div>';
-        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteMsg(this.dataset.cid,this.dataset.mid,this.parentElement)" title="delete">&#10005;</span>';
+        h+='<span data-cid="'+cid+'" data-mid="'+msg.id+'" style="flex-shrink:0;color:#555;cursor:pointer;font-size:10px;padding-top:2px" onclick="deleteMsg(this.dataset.cid,this.dataset.mid)" title="delete">&#10005;</span>';
         h+="</div>";
       }
     }catch(e){
@@ -399,10 +399,10 @@ function doSend(body,cid){
   });
 }
 
-function deleteMsg(cid,mid,el){
+function deleteMsg(cid,mid){
   if(!confirm("delete this message?"))return;
   api({action:"delete",channelId:cid,messageId:mid},function(d){
-    if(d.success){el.parentElement.style.opacity="0.3"}
+    if(d.success){loadMsgHistory(cid)}
     else{alert(d.error||"failed to delete")}
   });
 }
