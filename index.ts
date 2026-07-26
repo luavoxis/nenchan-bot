@@ -119,7 +119,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <h2>messages</h2>
 <label>channel</label>
 <select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">loading...</option></select>
-<div id="msgHistory" style="max-height:280px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
+<div id="msgHistory" style="max-height:360px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #222;padding:8px;font-size:10px;line-height:1.5">
 <p style="color:#555;text-align:center;padding:20px 0">select a channel</p>
 </div>
 <div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">
@@ -248,21 +248,79 @@ function loadMsgHistory(cid){
   api({action:"messages",channelId:cid,limit:30},function(d){
     if(d.error){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
     var h="";
-    for(var i=0;i<d.messages.length;i++){
+    for(var i=d.messages.length-1;i>=0;i--){
       var msg=d.messages[i],u=msg.author;
       var name=u.global_name||u.username;
       var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
       var color=u.bot?"#4af":"#888";
-      h+="<div style='margin-bottom:4px;border-bottom:1px solid #111;padding-bottom:4px'>";
-      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span><br>";
+      h+="<div style='margin-bottom:6px;border-bottom:1px solid #111;padding-bottom:6px'>";
+      h+="<span style='color:"+color+"'>"+esc(name)+"</span> <span style='color:#444;font-size:9px'>"+time+"</span>";
+      if(msg.edited_timestamp) h+=" <span style='color:#555;font-size:8px'>(edited)</span>";
+      h+="<br>";
+      if(msg.referenced_message){
+        var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
+        h+="<div style='margin:2px 0;padding:2px 6px;border-left:2px solid #444;color:#666;font-size:9px'>↪ "+esc(rn)+": "+esc(msg.referenced_message.content||"(attachment)")+"</div>";
+      }
       h+="<span style='color:#ccc'>"+esc(msg.content||"")+"</span>";
+      if(msg.sticker_items&&msg.sticker_items.length){
+        for(var j=0;j<msg.sticker_items.length;j++){
+          var s=msg.sticker_items[j];
+          h+="<br><img src='https://cdn.discordapp.com/stickers/"+s.id+".png' style='max-width:80px;max-height:80px' alt='"+esc(s.name||"")+"' loading='lazy'/>";
+        }
+      }
       if(msg.attachments&&msg.attachments.length){
         for(var j=0;j<msg.attachments.length;j++){
           var a=msg.attachments[j];
-          if(a.content_type&&a.content_type.startsWith("image/")){
+          if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
             h+="<br><img src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
-          }else{h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>"+esc(a.filename)+"</a>"}
+          }else if(a.content_type&&a.content_type.startsWith("video/")){
+            h+="<br><video src='"+a.url+"' style='max-width:200px;max-height:120px;margin-top:3px' controls></video>";
+          }else if(a.content_type&&a.content_type.startsWith("audio/")){
+            h+="<br><audio src='"+a.url+"' style='width:200px;margin-top:3px' controls></audio>";
+          }else{
+            h+="<br><a href='"+a.url+"' style='color:#59f;font-size:10px'>📎 "+esc(a.filename)+"</a>"
+          }
         }
+      }
+      if(msg.embeds&&msg.embeds.length){
+        for(var j=0;j<msg.embeds.length;j++){
+          var e=msg.embeds[j];
+          if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
+            h+="<br><img src='"+e.thumbnail.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+            continue;
+          }
+          var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"#1a1a1a";
+          h+="<div style='margin:4px 0;padding:6px 8px;border-left:3px solid "+bg+";background:#0d0d0d;border-radius:2px'>";
+          if(e.author&&e.author.name) h+="<span style='color:#888;font-size:9px'>"+esc(e.author.name)+"</span><br>";
+          if(e.title){
+            if(e.url) h+="<a href='"+e.url+"' style='color:#59f;font-weight:bold;font-size:11px;text-decoration:none'>"+esc(e.title)+"</a><br>";
+            else h+="<span style='color:#59f;font-weight:bold;font-size:11px'>"+esc(e.title)+"</span><br>";
+          }
+          if(e.description) h+="<span style='color:#bbb;font-size:10px'>"+esc(e.description)+"</span><br>";
+          if(e.fields&&e.fields.length){
+            for(var k=0;k<e.fields.length;k++){
+              var f=e.fields[k];
+              h+="<div style='margin:2px 0'><span style='color:#888;font-size:9px'>"+esc(f.name)+"</span><br><span style='color:#bbb;font-size:9px'>"+esc(f.value||"")+"</span></div>";
+            }
+          }
+          if(e.image&&e.image.url) h+="<img src='"+e.image.url+"' style='max-width:200px;max-height:120px;margin-top:3px;border:1px solid #222' loading='lazy'/>";
+          if(e.thumbnail&&e.thumbnail.url) h+="<img src='"+e.thumbnail.url+"' style='max-width:80px;max-height:80px;float:right;margin:2px' loading='lazy'/>";
+          if(e.footer&&e.footer.text) h+="<br><span style='color:#555;font-size:8px'>"+esc(e.footer.text)+"</span>";
+          if(e.video&&e.video.url) h+="<br><span style='color:#888;font-size:9px'>🎬 video</span>";
+          h+="</div>";
+        }
+      }
+      if(msg.reactions&&msg.reactions.length){
+        h+="<div style='margin-top:3px'>";
+        for(var j=0;j<msg.reactions.length;j++){
+          var r=msg.reactions[j],emo=r.emoji;
+          if(emo.id){
+            h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:16px;height:16px;vertical-align:middle' alt=''/> <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+          }else{
+            h+="<span style='display:inline-block;padding:1px 5px;margin:1px;background:#111;border-radius:3px;font-size:12px'>"+esc(emo.name)+" <span style='font-size:9px;color:#888'>"+r.count+"</span></span>";
+          }
+        }
+        h+="</div>";
       }
       h+="<span style='float:right;color:#555;cursor:pointer' onclick='deleteMsg(\\\"+cid+\\\",\\\"+msg.id+\\\",this)' title='delete'>&#10005;</span>";
       h+="</div>";
