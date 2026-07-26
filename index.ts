@@ -504,7 +504,7 @@ function showMember(id){
     (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#aaa;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
     "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#555;font-size:10px'>no roles</span>")+"</div></div>"+
     "</div>"+
-    "<div class='modal-footer'><button onclick=\"c()\">close</button></div>";
+    "<div class='modal-footer'><button onclick='c()'>close</button></div>";
   g("userModal").classList.add("show");
 }
 function c(){g("userModal").classList.remove("show")}
