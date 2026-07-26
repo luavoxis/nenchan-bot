@@ -994,14 +994,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const signature = req.headers["x-signature-ed25519"];
     const timestamp = req.headers["x-signature-timestamp"];
 
-    if (typeof signature === "string" && typeof timestamp === "string") {
-      const rawBody = JSON.stringify(req.body);
-      return await handleDiscord(req, res, rawBody, signature, timestamp);
+    let body: any = req.body;
+    if (!body) {
+      try {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        const raw = Buffer.concat(chunks).toString();
+        if (raw) body = JSON.parse(raw);
+      } catch {}
+    }
+    if (!body || typeof body !== "object") {
+      return res.status(400).json({ error: "Invalid body", bodyType: typeof body, hasReqBody: "req.body" in req });
     }
 
-    const body = req.body;
-    if (!body || typeof body !== "object") {
-      return res.status(400).json({ error: "Invalid body" });
+    if (typeof signature === "string" && typeof timestamp === "string") {
+      return await handleDiscord(req, res, JSON.stringify(body), signature, timestamp);
     }
 
     return await handlePanel(res, body);
