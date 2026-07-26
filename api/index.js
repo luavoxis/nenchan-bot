@@ -401,47 +401,46 @@ function html() {
 <title>Bot Panel</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:14px/1.5 system-ui,sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center}
-.card{background:#111;padding:2rem;border-radius:8px;border:1px solid #222;width:100%;max-width:500px}
-h1{text-align:center;margin-bottom:1.5rem;color:#fff;font-size:1.5rem}
-label{display:block;margin-bottom:.25rem;color:#888;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px}
-input,textarea,select{width:100%;padding:.6rem .8rem;border:1px solid #333;border-radius:4px;background:#000;color:#fff;font:inherit;margin-bottom:1rem}
-input:focus,textarea:focus,select:focus{outline:1px solid #fff;border-color:#fff}
-button{width:100%;padding:.7rem;background:#fff;color:#000;border:none;border-radius:4px;font:600 1rem system-ui,sans-serif;cursor:pointer}
-button:hover{opacity:.8}
-.error{color:#ff4444;margin-bottom:.5rem;font-size:.85rem}
-.success{color:#44ff44;margin-bottom:.5rem;font-size:.85rem}
-.hidden{display:none}
-.flex{display:flex;gap:.5rem}
+body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;padding:20px}
+.card{background:#111;padding:16px;border:1px solid #222;max-width:480px;margin:0 auto}
+h1{text-align:center;margin-bottom:12px;color:#fff;font-size:14px;font-weight:400;text-transform:uppercase;letter-spacing:2px}
+label{display:block;color:#666;font-size:10px;text-transform:uppercase;margin-bottom:2px}
+input,textarea,select{width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;margin-bottom:8px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:#fff}
+button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer;display:inline-block;width:auto}
+button:hover{background:#888}
+.flex{display:flex;gap:4px}
 .flex button{flex:1}
-#logout{background:transparent;color:#ff4444;border:1px solid #ff4444;margin-top:1rem;padding:.4rem}
-textarea{resize:vertical;min-height:80px}
-small{color:#666;font-size:.8rem}
-select option{background:#000;color:#fff}
+.error{color:#f44;font-size:11px;margin-bottom:4px}
+.success{color:#4f4;font-size:11px;margin-bottom:4px}
+.hidden{display:none}
+#logout{background:none;color:#f44;border:1px solid #f44;margin-top:8px;padding:3px 8px;font-size:10px}
+textarea{resize:vertical;min-height:50px;font:12px monospace}
+select option{background:#000;color:#ccc}
 </style>
 </head>
 <body>
 <div class="card" id="loginScreen">
-<h1>\u{1F510} Bot Panel</h1>
+<h1>BOT PANEL</h1>
 <div id="loginError" class="error"></div>
-<label>Password</label>
-<input type="password" id="password" placeholder="Enter panel password" onkeydown="if(event.key==='Enter')login()"/>
-<button onclick="login()">Login</button>
+<label>password</label>
+<input type="password" id="password" placeholder="password" onkeydown="if(event.key==='Enter')login()"/>
+<button onclick="login()">login</button>
 </div>
 <div class="card hidden" id="panelScreen">
-<h1>\u{1F916} Bot Control</h1>
+<h1>BOT CONTROL</h1>
 <div id="panelMsg" class="success"></div>
-<label>Server</label>
-<select id="guildSelect" onchange="loadChannels()"><option value="">Loading servers...</option></select>
-<label>Channel</label>
-<select id="channelSelect"><option value="">Select a server first</option></select>
-<label>Message</label>
-<textarea id="messageInput" placeholder="Type your message..."></textarea>
+<label>server</label>
+<select id="guildSelect" onchange="loadChannels()"><option value="">loading...</option></select>
+<label>channel</label>
+<select id="channelSelect"><option value="">select server first</option></select>
+<label>message</label>
+<textarea id="messageInput" placeholder="message"></textarea>
 <div class="flex">
-<button onclick="sendMessage()">Send</button>
-<button onclick="clearForm()" style="background:#555">Clear</button>
+<button onclick="sendMessage()">send</button>
+<button onclick="clearForm()" style="background:#555">clear</button>
 </div>
-<button id="logout" onclick="logout()">Logout</button>
+<button id="logout" onclick="logout()">logout</button>
 </div>
 <script>
 const API = window.location.origin + "/api";
