@@ -165,29 +165,31 @@ function switchTab(name){
   if(name==="dashboard"&&guildId)loadDashboard();
 }
 
-function loadGuilds(){
+function api(body,cb){
   var x=new XMLHttpRequest();
   x.open("POST","/api",true);
   x.setRequestHeader("Content-Type","application/json");
-  x.setRequestHeader("Authorization","Bearer "+token);
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      if(d.error)return;
-      var sel=g("guildSel");
-      sel.innerHTML="<label style='margin-top:8px;color:#666;font-size:10px;text-transform:uppercase'>server</label>";
-      for(var i=0;i<d.guilds.length;i++){
-        (function(gid,gname){
-          var b=document.createElement("button");
-          b.textContent=gname;b.style.fontSize="10px";b.style.padding="4px 8px";
-          b.onclick=function(){selectGuild(gid,gname)};
-          sel.appendChild(b);
-        })(d.guilds[i].id,d.guilds[i].name);
-      }
-      if(d.guilds.length)selectGuild(d.guilds[0].id,d.guilds[0].name);
-    }catch(e){}
-  };
-  x.send(JSON.stringify({action:"guilds"}));
+  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){cb({error:"parse error"})}};
+  x.onerror=function(){cb({error:"connection error"})};
+  body.token=token;
+  x.send(JSON.stringify(body));
+}
+
+function loadGuilds(){
+  api({action:"guilds"},function(d){
+    if(d.error)return;
+    var sel=g("guildSel");
+    sel.innerHTML="<label style='margin-top:8px;color:#666;font-size:10px;text-transform:uppercase'>server</label>";
+    for(var i=0;i<d.guilds.length;i++){
+      (function(gid,gname){
+        var b=document.createElement("button");
+        b.textContent=gname;b.style.fontSize="10px";b.style.padding="4px 8px";
+        b.onclick=function(){selectGuild(gid,gname)};
+        sel.appendChild(b);
+      })(d.guilds[i].id,d.guilds[i].name);
+    }
+    if(d.guilds.length)selectGuild(d.guilds[0].id,d.guilds[0].name);
+  });
 }
 
 function selectGuild(id,name){
@@ -200,83 +202,51 @@ function selectGuild(id,name){
 
 function loadDashboard(){
   if(!guildId)return;
-  var x=new XMLHttpRequest();
-  x.open("POST","/api",true);
-  x.setRequestHeader("Content-Type","application/json");
-  x.setRequestHeader("Authorization","Bearer "+token);
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      if(d.error)return;
-      g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
-        "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
-        "<div class='stat'><span>members</span><p>"+d.memberCount+"</p></div>"+
-        "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
-        "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
-        "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
-        "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
-    }catch(e){}
-  };
-  x.send(JSON.stringify({action:"guildinfo",guildId:guildId}));
+  api({action:"guildinfo",guildId:guildId},function(d){
+    if(d.error)return;
+    g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
+      "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
+      "<div class='stat'><span>members</span><p>"+d.memberCount+"</p></div>"+
+      "<div class='stat'><span>channels</span><p>"+d.channelCount+"</p></div>"+
+      "<div class='stat'><span>roles</span><p>"+d.roleCount+"</p></div>"+
+      "<div class='stat'><span>created</span><p>"+d.created+"</p></div>"+
+      "<div class='stat'><span>boost level</span><p>"+d.boostLevel+" ("+d.boostCount+" boosts)</p></div>";
+  });
 }
 
 function loadMsgChannels(){
   if(!guildId)return;
-  var x=new XMLHttpRequest();
-  x.open("POST","/api",true);
-  x.setRequestHeader("Content-Type","application/json");
-  x.setRequestHeader("Authorization","Bearer "+token);
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      if(d.error)return;
-      var s=g("msgChannel");
-      s.innerHTML="<option value=''>select channel</option>";
-      for(var i=0;i<d.channels.length;i++){if(d.channels[i].type===0){var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o)}}
-    }catch(e){}
-  };
-  x.send(JSON.stringify({action:"channels",guildId:guildId}));
+  api({action:"channels",guildId:guildId},function(d){
+    if(d.error)return;
+    var s=g("msgChannel");
+    s.innerHTML="<option value=''>select channel</option>";
+    for(var i=0;i<d.channels.length;i++){if(d.channels[i].type===0){var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o)}}
+  });
 }
 
 function sendMsg(){
   var c=g("msgChannel").value,m=g("msgInput").value;
   if(!c||!m){g("msgStatus").textContent="fill all fields";return}
-  var x=new XMLHttpRequest();
-  x.open("POST","/api",true);
-  x.setRequestHeader("Content-Type","application/json");
-  x.setRequestHeader("Authorization","Bearer "+token);
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      g("msgStatus").textContent=d.success?"sent!":(d.error||"failed");
-      if(d.success)g("msgInput").value="";
-    }catch(e){g("msgStatus").textContent="error"}
-  };
-  x.send(JSON.stringify({action:"send",channelId:c,content:m}));
+  api({action:"send",channelId:c,content:m},function(d){
+    g("msgStatus").textContent=d.success?"sent!":(d.error||"failed");
+    if(d.success)g("msgInput").value="";
+  });
 }
 
 function loadMembers(){
   if(!guildId)return;
-  var x=new XMLHttpRequest();
-  x.open("POST","/api",true);
-  x.setRequestHeader("Content-Type","application/json");
-  x.setRequestHeader("Authorization","Bearer "+token);
-  x.onload=function(){
-    try{
-      var d=JSON.parse(x.responseText);
-      if(d.error)return;
-      allMembers=d.members;allRoles=d.roles;
-      var html="<table><tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
-      for(var i=0;i<d.members.length;i++){
-        var m=d.members[i],name=m.nick||(m.user.global_name||m.user.username);
-        var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
-        html+="<tr class='member-row' onclick='showMember(\""+m.user.id+"\")'><td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td></tr>";
-      }
-      html+="</table>";
-      g("memberList").innerHTML=html;
-    }catch(e){}
-  };
-  x.send(JSON.stringify({action:"members",guildId:guildId}));
+  api({action:"members",guildId:guildId},function(d){
+    if(d.error)return;
+    allMembers=d.members;allRoles=d.roles;
+    var html="<table><tr><th>name</th><th>id</th><th>joined</th><th>roles</th></tr>";
+    for(var i=0;i<d.members.length;i++){
+      var m=d.members[i],name=m.nick||(m.user.global_name||m.user.username);
+      var joined=new Date(m.joined_at).toLocaleDateString("en-US",{month:"short",day:"numeric"});
+      html+="<tr class='member-row' onclick='showMember(\""+m.user.id+"\")'><td>"+esc(name)+"</td><td style='color:#666'>"+m.user.id.slice(-4)+"</td><td>"+joined+"</td><td>"+m.roles.length+"</td></tr>";
+    }
+    html+="</table>";
+    g("memberList").innerHTML=html;
+  });
 }
 
 function showMember(id){
@@ -309,41 +279,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
-    const isDiscord =
-      typeof req.headers["x-signature-ed25519"] === "string" &&
-      typeof req.headers["x-signature-timestamp"] === "string";
+    const rawBody = await getRawBody(req);
+    if (!rawBody) return res.status(400).json({ error: "Missing body" });
+    const bodyStr = rawBody.toString();
 
-    if (isDiscord) {
-      return await handleDiscord(req, res);
+    const signature = req.headers["x-signature-ed25519"];
+    const timestamp = req.headers["x-signature-timestamp"];
+
+    if (typeof signature === "string" && typeof timestamp === "string") {
+      return await handleDiscord(req, res, bodyStr, signature, timestamp);
     }
 
-    return await handlePanel(req, res);
+    return await handlePanel(res, bodyStr);
   } catch (error) {
     logger.error("Handler error", { error });
     return res.status(500).json({ error: "Internal error" });
   }
 }
 
-async function handleDiscord(req: VercelRequest, res: VercelResponse) {
-  const signature = req.headers["x-signature-ed25519"] as string;
-  const timestamp = req.headers["x-signature-timestamp"] as string;
-
+async function handleDiscord(req: VercelRequest, res: VercelResponse, rawBody: string, signature: string, timestamp: string) {
   if (!process.env.DISCORD_PUBLIC_KEY) {
     return res.status(500).json({ error: "No public key" });
   }
 
-  const rawBody = await getRawBody(req);
-  if (!rawBody) return res.status(400).json({ error: "Missing body" });
-
   let isValid = false;
   try {
-    isValid = await verifyKey(rawBody, signature, timestamp, process.env.DISCORD_PUBLIC_KEY);
+    isValid = await verifyKey(Buffer.from(rawBody), signature, timestamp, process.env.DISCORD_PUBLIC_KEY);
   } catch {
     return res.status(401).json({ error: "Invalid signature" });
   }
   if (!isValid) return res.status(401).json({ error: "Invalid signature" });
 
-  const message: SimplifiedInteraction = JSON.parse(rawBody.toString());
+  const message: SimplifiedInteraction = JSON.parse(rawBody);
 
   if (message.type === InteractionType.PING) {
     return res.status(200).json({ type: InteractionResponseType.Pong });
@@ -407,25 +374,26 @@ async function handleDiscord(req: VercelRequest, res: VercelResponse) {
   return res.status(400).json({ error: "Unknown Interaction Type" });
 }
 
-async function handlePanel(req: VercelRequest, res: VercelResponse) {
+async function handlePanel(res: VercelResponse, bodyStr: string) {
   let body: any;
   try {
-    body = typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
+    body = JSON.parse(bodyStr);
   } catch {
     return res.status(400).json({ error: "Invalid JSON" });
   }
 
-  const { action } = body;
-
-  if (action === "login") {
+  if (body.action === "login") {
     if (body.password === PANEL_PASSWORD) {
       return res.json({ token: authToken() });
     }
     return res.status(401).json({ error: "Wrong password" });
   }
 
-  const token = getToken(req);
-  if (!token || !verifyToken(token)) {
+  // token check for non-login actions
+  // token comes from Authorization header or cookie, sent by client
+  // but since this is a serverless function, we'll trust the token in the body too
+  const reqToken = body.token || "";
+  if (!verifyToken(reqToken)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
