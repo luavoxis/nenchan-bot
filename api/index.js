@@ -434,7 +434,6 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 <button class="active" onclick="switchTab('dashboard')">[ dashboard ]</button>
 <button onclick="switchTab('messages')">[ messages ]</button>
 <button onclick="switchTab('members')">[ members ]</button>
-<div id="guildSel"></div>
 <button id="logoutBtn" onclick="logout()">[ logout ]</button>
 </div>
 <div class="main">
@@ -448,12 +447,12 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-dashboard" class="panel">
 <h2>dashboard</h2>
-<div id="dashContent"><p style="color:#666">select a server from the sidebar</p></div>
+<div id="dashContent"><p style="color:#666">loading...</p></div>
 </div>
 <div id="panel-messages" class="panel">
 <h2>messages</h2>
 <label>channel</label>
-<select id="msgChannel"><option value="">select server first</option></select>
+<select id="msgChannel"><option value="">loading...</option></select>
 <label>message</label>
 <textarea id="msgInput" placeholder="message"></textarea>
 <div class="flex">
@@ -464,14 +463,14 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:400}
 </div>
 <div id="panel-members" class="panel">
 <h2>members</h2>
-<div id="memberList"><p style="color:#666">select a server from the sidebar</p></div>
+<div id="memberList"><p style="color:#666">loading...</p></div>
 </div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box"><h3 id="modalName"></h3><p id="modalId"></p><p id="modalJoined"></p><p id="modalRoles"></p><div class="flex" style="margin-top:8px"><button onclick="c()">close</button></div></div></div>
 <script>
 function g(i){return document.getElementById(i)}
 function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
-var token=getCookie("token"),guildId="",allMembers=[],allRoles=[];
+var token=getCookie("token"),allMembers=[],allRoles=[];
 
 function login(){
   var pwd=g("password").value,err=g("loginError");
@@ -496,7 +495,7 @@ function login(){
 function initPanel(){
   g("sidebar").style.display="flex";
   g("loginScreen").style.display="none";
-  loadGuilds();
+  loadDashboard();loadMembers();loadMsgChannels();
 }
 
 function switchTab(name){
@@ -506,9 +505,9 @@ function switchTab(name){
   document.querySelectorAll(".sidebar button").forEach(function(b){b.classList.remove("active")});
   var btns=document.querySelectorAll(".sidebar button");
   for(var i=0;i<btns.length;i++){if(btns[i].textContent.includes(name)){btns[i].classList.add("active");break}}
-  if(name==="messages"&&guildId)loadMsgChannels();
-  if(name==="members"&&guildId)loadMembers();
-  if(name==="dashboard"&&guildId)loadDashboard();
+  if(name==="messages")loadMsgChannels();
+  if(name==="members")loadMembers();
+  if(name==="dashboard")loadDashboard();
 }
 
 function api(body,cb){
@@ -521,34 +520,8 @@ function api(body,cb){
   x.send(JSON.stringify(body));
 }
 
-function loadGuilds(){
-  api({action:"guilds"},function(d){
-    if(d.error)return;
-    var sel=g("guildSel");
-    sel.innerHTML="<label style='margin-top:8px;color:#666;font-size:10px;text-transform:uppercase'>server</label>";
-    for(var i=0;i<d.guilds.length;i++){
-      (function(gid,gname){
-        var b=document.createElement("button");
-        b.textContent=gname;b.style.fontSize="10px";b.style.padding="4px 8px";
-        b.onclick=function(){selectGuild(gid,gname)};
-        sel.appendChild(b);
-      })(d.guilds[i].id,d.guilds[i].name);
-    }
-    if(d.guilds.length)selectGuild(d.guilds[0].id,d.guilds[0].name);
-  });
-}
-
-function selectGuild(id,name){
-  guildId=id;
-  var btns=g("guildSel").querySelectorAll("button");
-  for(var i=0;i<btns.length;i++){btns[i].classList.remove("active");if(btns[i].textContent===name)btns[i].classList.add("active")}
-  loadDashboard();loadMsgChannels();loadMembers();
-  switchTab("dashboard");
-}
-
 function loadDashboard(){
-  if(!guildId)return;
-  api({action:"guildinfo",guildId:guildId},function(d){
+  api({action:"guildinfo"},function(d){
     if(d.error)return;
     g("dashContent").innerHTML="<div class='stat'><span>server</span><p>"+esc(d.name)+"</p></div>"+
       "<div class='stat'><span>owner</span><p>"+esc(d.owner)+"</p></div>"+
@@ -561,8 +534,7 @@ function loadDashboard(){
 }
 
 function loadMsgChannels(){
-  if(!guildId)return;
-  api({action:"channels",guildId:guildId},function(d){
+  api({action:"channels"},function(d){
     if(d.error)return;
     var s=g("msgChannel");
     s.innerHTML="<option value=''>select channel</option>";
@@ -580,8 +552,7 @@ function sendMsg(){
 }
 
 function loadMembers(){
-  if(!guildId)return;
-  api({action:"members",guildId:guildId},function(d){
+  api({action:"members"},function(d){
     if(d.error)return;
     allMembers=d.members;allRoles=d.roles;
     var tbl=document.createElement("table");
@@ -727,16 +698,13 @@ async function handlePanel(res, bodyStr) {
     return res.status(401).json({ error: "Unauthorized" });
   }
   const headers = { Authorization: `Bot ${process.env.DISCORD_TOKEN}` };
+  const guildId = process.env.GUILD_ID;
   try {
-    if (action === "guilds") {
-      const r = await axios3.get("https://discord.com/api/v10/users/@me/guilds", { headers });
-      return res.json({ guilds: r.data });
-    }
-    if (action === "guildinfo") {
+    if (body.action === "guildinfo") {
       const [guildRes, chanRes, rolesRes] = await Promise.all([
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/channels`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/roles`, { headers })
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}`, { headers }),
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       const guild = guildRes.data;
       const ownerRes = await axios3.get(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
@@ -751,11 +719,11 @@ async function handlePanel(res, bodyStr) {
         boostCount: guild.premium_subscription_count || 0
       });
     }
-    if (action === "channels") {
-      const r = await axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/channels`, { headers });
+    if (body.action === "channels") {
+      const r = await axios3.get(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
       return res.json({ channels: r.data });
     }
-    if (action === "send") {
+    if (body.action === "send") {
       await axios3.post(
         `https://discord.com/api/v10/channels/${body.channelId}/messages`,
         { content: body.content },
@@ -763,10 +731,10 @@ async function handlePanel(res, bodyStr) {
       );
       return res.json({ success: true });
     }
-    if (action === "members") {
+    if (body.action === "members") {
       const [memberRes, rolesRes] = await Promise.all([
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/members?limit=1000`, { headers }),
-        axios3.get(`https://discord.com/api/v10/guilds/${body.guildId}/roles`, { headers })
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
+        axios3.get(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       return res.json({ members: memberRes.data, roles: rolesRes.data });
     }
