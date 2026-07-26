@@ -282,7 +282,7 @@ function loadMsgHistory(cid){
     try{
       for(var i=d.messages.length-1;i>=0;i--){
         var msg=d.messages[i],u=msg.author;
-        if(!u)continue;
+        if(!u||!u.bot)continue;
         var name=u.global_name||u.username;
         var time=new Date(msg.timestamp).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
         var color=u.bot?"#4af":"#888";
