@@ -516,7 +516,7 @@ function html() {
 <style>
 @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;src:url('/fonts/space-grotesk-latin.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:13px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
+body{font:14px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
 .sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:1px;min-height:100vh}
 .sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:0;text-align:center}
 .sidebar button{background:none;border:none;color:#666;font:12px 'Space Grotesk',monospace;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
@@ -525,9 +525,11 @@ body{font:13px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-heig
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
 .sidebar button:hover img{opacity:.7}
 .sidebar button.active img{opacity:1;filter:none}
-#logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
+#logoutBtn{color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
 #logoutBtn:hover{background:#1a0000!important}
 #logoutBtn img{opacity:.6;filter:none}
+.bocchi-wrap{text-align:center;margin-top:auto;padding:8px 0 4px}
+.bocchi-wrap img{width:60px;height:auto;opacity:.85}
 .main{flex:1;padding:16px;max-width:800px}
 .panel{display:none}
 .panel.show{display:block}
@@ -547,29 +549,32 @@ select option{background:#000;color:#ccc}
 .stat:hover{border-color:#333}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
-.dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px;border-radius:6px;transition:border-color .15s}
+.dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:8px;border-radius:8px;transition:border-color .15s}
 .dash-header:hover{border-color:#333}
-.dash-icon{width:64px;height:64px;border-radius:16px;flex-shrink:0;background:#111;border:1px solid #222;overflow:hidden}
+.dash-icon{width:64px;height:64px;border-radius:18px;flex-shrink:0;background:#111;border:1px solid #222;overflow:hidden}
 .dash-icon img{width:100%;height:100%;object-fit:cover}
 .dash-info{flex:1;min-width:0}
 .dash-name{color:#fff;font-size:16px;font-weight:600;margin:0}
 .dash-id{color:#555;font-size:10px;margin-top:2px;font-weight:600}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 @media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
-.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px;border-radius:4px;transition:border-color .15s}
+.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px;border-radius:8px;transition:border-color .15s}
 .dash-card:hover{border-color:#333}
-.dash-card-icon{width:32px;height:32px;background:#111;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:6px;border:1px solid #222}
-.dash-card-icon img{width:16px;height:16px;opacity:.6}
+.dash-card-icon{width:32px;height:32px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:8px}
+.dash-card-icon img{width:16px;height:16px}
 .dash-card-label{color:#666;font-size:9px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:9px;margin-top:1px;font-weight:600}
-.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0;border-radius:4px 4px 0 0;transition:background .15s}
+.dash-roles-wrap{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;margin-bottom:8px;transition:border-color .15s}
+.dash-roles-wrap:hover{border-color:#333}
+.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;transition:background .15s}
 .dash-roles-header:hover{background:#0f0f0f}
 .dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-roles-header .role-arrow{color:#555;font-size:9px;transition:transform .15s}
-.dash-roles-list{display:none;background:#0a0a0a;border:1px solid #1a1a1a;border-top:none;padding:4px 6px;max-height:200px;overflow-y:auto;scrollbar-width:none;margin-bottom:6px;border-radius:0 0 4px 4px}
-.dash-roles-list.show{display:block}
-.dash-roles-list::-webkit-scrollbar{display:none}
+.dash-roles-list{max-height:0;overflow:hidden;transition:max-height .25s ease;border-top:0 solid #1a1a1a}
+.dash-roles-list.show{max-height:300px;border-top-width:1px;padding:6px 8px}
+.dash-roles-list::-webkit-scrollbar{width:4px}
+.dash-roles-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
 table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
 td,th{padding:4px 6px;text-align:left;border-bottom:1px solid #222;color:#aaa}
 th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
@@ -586,9 +591,9 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .role-toggle:hover{color:#fff}
 .role-list{display:none;max-height:200px;overflow-y:auto;margin-top:4px;padding:4px 0;border-top:1px solid #222}
 .role-list.show{display:block}
-.role-item{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:10px;color:#aaa}
+.role-item{display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:10px;color:#aaa;border-radius:4px;transition:background .1s}
 .role-item:hover{background:#111}
-.role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.05)}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
 .msg-row{display:flex;gap:8px;padding:6px 4px;border-bottom:1px solid #111;position:relative}
@@ -760,6 +765,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
 <button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
 <button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
+<div class="bocchi-wrap"><img src="/icons/bocchi-rotate.gif" alt=""/></div>
 </div>
 <div class="main">
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99;justify-content:center;align-items:center">
@@ -906,8 +912,10 @@ function loadDashboard(){
     h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/owner.png' alt=''/></div><div><div class='dash-card-label'>owner</div><div class='dash-card-val'>"+esc(d.owner)+"</div><div class='dash-card-sub'>"+d.ownerId+"</div></div></div>";
     h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/boost.png' alt=''/></div><div><div class='dash-card-label'>boosts</div><div class='dash-card-val'>"+d.boostCount+" boosts</div><div class='dash-card-sub'>tier "+d.boostLevel+" &middot; "+Math.max(0,14-d.boostCount)+" to next tier</div></div></div>";
     h+="</div>";
+    h+="<div class='dash-roles-wrap'>";
     h+="<div class='dash-roles-header' onclick='toggleDashRoles()'><span>roles ("+d.roleCount+")</span><span class='role-arrow' id='dashRoleArrow'>&#9660;</span></div>";
     h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
+    h+="</div>";
     g("dashContent").innerHTML=h;
   });
 }
