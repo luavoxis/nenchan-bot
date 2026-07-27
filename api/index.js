@@ -791,7 +791,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="banStats" class="member-stats"></div>
 <div id="banTimeouts" class="mod-section"></div>
 <div id="banBans" class="mod-section"></div>
-<div id="banEmpty" style="display:none" class="ban-empty">/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style="font-size:9px;color:#444'>no active moderations</span></div>
+<div id="banEmpty" style="display:none" class="ban-empty">/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style="font-size:9px;color:#444">no active moderations</span></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -1519,6 +1519,12 @@ async function handler(req, res) {
       const code = req.query.code;
       if (code) {
         return await handleOAuthCallback(req, res, code);
+      }
+      const oauthError = req.query.error;
+      if (oauthError) {
+        const desc = req.query.error_description || "Login was denied.";
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>" + desc.replace(/[<>"']/g, "") + "</p><a href='/api' style='color:#59f'>&larr; back</a></div></body></html>");
       }
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(200).send(html());

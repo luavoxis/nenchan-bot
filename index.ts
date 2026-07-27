@@ -374,7 +374,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="banStats" class="member-stats"></div>
 <div id="banTimeouts" class="mod-section"></div>
 <div id="banBans" class="mod-section"></div>
-<div id="banEmpty" style="display:none" class="ban-empty">/ᐠ - ˕ -マ ᶻ 𝗓 𐰁<br><span style="font-size:9px;color:#444'>no active moderations</span></div>
+<div id="banEmpty" style="display:none" class="ban-empty">/ᐠ - ˕ -マ ᶻ 𝗓 𐰁<br><span style="font-size:9px;color:#444">no active moderations</span></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -1103,6 +1103,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const code = req.query.code as string | undefined;
       if (code) {
         return await handleOAuthCallback(req, res, code);
+      }
+      const oauthError = req.query.error as string | undefined;
+      if (oauthError) {
+        const desc = (req.query.error_description as string) || "Login was denied.";
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>" + desc.replace(/[<>"']/g, "") + "</p><a href='/api' style='color:#59f'>&larr; back</a></div></body></html>");
       }
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(200).send(html());
