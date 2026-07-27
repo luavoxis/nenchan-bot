@@ -244,7 +244,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .modal-banner{height:80px;background-size:cover;background-position:center}
 .modal-banner-color{height:8px}
 .modal-header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #252a32;background:#1e2228}
-.modal-header img{width:48px;height:48px;border-radius:50%;border:3px solid #1e2228;margin-top:-24px}
+.modal-header img{width:48px;height:48px;border-radius:50%;border:3px solid #252a32;flex-shrink:0}
 .modal-header-info h3{font-size:13px;color:#e0dce4;margin:0;font-weight:600}
 .modal-header-info p{font-size:10px;color:#5a5260;margin:2px 0 0}
 .modal-body{padding:12px 16px}
