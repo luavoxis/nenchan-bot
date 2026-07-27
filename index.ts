@@ -1095,7 +1095,10 @@ function executeConfirm(){
   });
 }
 document.addEventListener("click",function(e){if(!e.target.closest("#mentionSearch")&&!e.target.closest("#mentionList"))hideMentionList()});
-if(token){initPanel()}else{g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
+api({action:"guildinfo"},function(d){
+  if(d.error&&d.error==="Unauthorized"){g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
+  else{initPanel()}
+});
 </script>
 </body>
 </html>`;
