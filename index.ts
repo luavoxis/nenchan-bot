@@ -304,7 +304,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <h1>nenchan v1.0</h1>
 <button class="active" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
-<button onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;moderation</span><span class=r>]</span></button>
+<button onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;&nbsp;&nbsp;mod&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;whispers&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
