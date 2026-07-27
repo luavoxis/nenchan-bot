@@ -516,14 +516,16 @@ function html() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
-.sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:2px;min-height:100vh}
-.sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 4px}
-.sidebar button{background:none;border:none;color:#888;font:11px monospace;padding:6px 8px;text-align:left;cursor:pointer;min-width:140px}
-.sidebar button:hover{color:#fff;background:#111}
-.sidebar button.active{color:#fff;background:#222}
-.sidebar button .l{color:#555}
-.sidebar button .r{color:#555}
-#logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important}
+.sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:1px;min-height:100vh}
+.sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:0 8px}
+.sidebar button{background:none;border:none;color:#666;font:11px monospace;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.sidebar button:hover{color:#ccc;background:#111}
+.sidebar button.active{color:#fff;background:#181818;border-left:2px solid #fff;padding-left:8px}
+.sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
+.sidebar button:hover img{opacity:.7}
+.sidebar button.active img{opacity:1;filter:none}
+#logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
+#logoutBtn:hover{background:#1a0000!important}
 .main{flex:1;padding:16px;max-width:800px}
 .panel{display:none}
 .panel.show{display:block}
@@ -636,10 +638,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .member-name{color:#ddd;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .member-name span{color:#555;font-size:10px;font-weight:400}
 .member-username{color:#555;font-size:10px}
-.member-bio{color:#666;font-size:9px;font-style:italic;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .member-badges{display:flex;gap:3px;margin-top:2px}
 .member-badge{font-size:8px;padding:1px 4px;border-radius:2px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.badge-nitro{background:#5865F2;color:#fff}
 .badge-boost{background:#f47fff;color:#fff}
 .member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
 .role-badge{font-size:9px;padding:1px 5px;border-radius:2px;background:#1a1a1a;color:#888;border:1px solid #222;white-space:nowrap;font-weight:600}
@@ -747,11 +747,11 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>nenchan v1.0</h1>
-<button class="active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
-<button data-tab="members" onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
-<button data-tab="bans" onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;sanctions&nbsp;</span><span class=r>]</span></button>
-<button data-tab="messages" onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
-<button data-tab="dms" onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;whispers&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button class="active" data-tab="dashboard" onclick="switchTab('dashboard')"><img src="/icons/dashboard.png" alt="">dashboard</button>
+<button data-tab="members" onclick="switchTab('members')"><img src="/icons/members.png" alt="">members</button>
+<button data-tab="bans" onclick="switchTab('bans')"><img src="/icons/sanctions.png" alt="">sanctions</button>
+<button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
+<button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
@@ -1294,18 +1294,12 @@ function renderMemberCard(m){
     }
   }
   if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
-  var p=m.profile||m.user||{};
   var badges="";
   if(m.premium_since)badges+="<span class='member-badge badge-boost'>boost</span>";
-  if(p.premium_type&&p.premium_type>0)badges+="<span class='member-badge badge-nitro'>nitro</span>";
-  var bioText=p.bio||"";
-  var bioPreview=bioText?esc(bioText):"";
-  if(bioPreview.length>60)bioPreview=bioPreview.substring(0,60)+"...";
   var h="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
   h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
   h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
   if(m.user.username!==name.toLowerCase()&&m.user.username!==(m.user.global_name||"").toLowerCase())h+="<div class='member-username'>"+esc(m.user.username)+"</div>";
-  if(bioPreview)h+="<div class='member-bio'>"+bioPreview+"</div>";
   if(badges)h+="<div class='member-badges'>"+badges+"</div>";
   h+="<div class='member-roles'>"+(roleBadges||"<span class='role-badge'>no roles</span>")+"</div></div>";
   h+="<span class='member-joined'>"+joined+"</span>";
@@ -1337,31 +1331,9 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
-  var p=m.profile||m.user||{};
-  var flagsList=[];
-  var f=p.public_flags||p.flags||0;
-  if(f&1)flagsList.push("Discord Staff");
-  if(f&2)flagsList.push("Discord Partner");
-  if(f&4)flagsList.push("HypeSquad Events");
-  if(f&8)flagsList.push("Bug Hunter L1");
-  if(f&64)flagsList.push("Bug Hunter L2");
-  if(f&128)flagsList.push("HypeSquad Bravery");
-  if(f&256)flagsList.push("HypeSquad Brilliance");
-  if(f&512)flagsList.push("HypeSquad Balance");
-  if(f&16384)flagsList.push("Early Supporter");
-  if(f&131072)flagsList.push("Verified Bot Developer");
-  var flagsHtml=flagsList.length?"<div class='modal-section'><div class='modal-section-label'>badges</div><div style='display:flex;flex-wrap:wrap;gap:3px'>"+flagsList.map(function(fl){return "<span style='font-size:9px;padding:2px 6px;background:#1a1a1a;border:1px solid #222;border-radius:2px;color:#888'>"+fl+"</span>"}).join("")+"</div></div>":"";
-  var nitroHtml="";
-  if(p.premium_type===1)nitroHtml="<div class='modal-section'><div class='modal-section-label'>subscription</div><p style='color:#5865F2;font-size:11px'>Nitro Classic</p></div>";
-  else if(p.premium_type===2)nitroHtml="<div class='modal-section'><div class='modal-section-label'>subscription</div><p style='color:#5865F2;font-size:11px'>Nitro</p></div>";
-  else if(p.premium_type===3)nitroHtml="<div class='modal-section'><div class='modal-section-label'>subscription</div><p style='color:#5865F2;font-size:11px'>Nitro Basic</p></div>";
-  var bioHtml="";
-  if(p.bio)bioHtml="<div class='modal-section'><div class='modal-section-label'>about me</div><p style='color:#bbb;font-size:11px;line-height:1.5'>"+esc(p.bio)+"</p></div>";
   g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
-    bioHtml+
-    flagsHtml+
-    nitroHtml+
+    "<div id='modalBadges'></div>"+
     "<div class='modal-section'><div class='modal-section-label'>id</div><p style='color:#aaa;font-size:11px'>"+m.user.id+"</p></div>"+
     "<div class='modal-section'><div class='modal-section-label'>joined</div><p style='color:#aaa;font-size:11px'>"+joined+"</p></div>"+
     (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#aaa;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
@@ -1391,6 +1363,20 @@ function showMember(id){
       var headerImg=box.querySelector(".modal-header img");
       if(headerImg)headerImg.src=newAvatar;
     }
+    var flagsList=[];
+    var f=u.public_flags||u.flags||0;
+    if(f&1)flagsList.push("Discord Staff");
+    if(f&2)flagsList.push("Discord Partner");
+    if(f&4)flagsList.push("HypeSquad Events");
+    if(f&8)flagsList.push("Bug Hunter L1");
+    if(f&64)flagsList.push("Bug Hunter L2");
+    if(f&128)flagsList.push("HypeSquad Bravery");
+    if(f&256)flagsList.push("HypeSquad Brilliance");
+    if(f&512)flagsList.push("HypeSquad Balance");
+    if(f&16384)flagsList.push("Early Supporter");
+    if(f&131072)flagsList.push("Verified Bot Developer");
+    var badgesEl=g("modalBadges");
+    if(badgesEl&&flagsList.length)badgesEl.innerHTML="<div class='modal-section'><div class='modal-section-label'>badges</div><div style='display:flex;flex-wrap:wrap;gap:3px'>"+flagsList.map(function(fl){return "<span style='font-size:9px;padding:2px 6px;background:#1a1a1a;border:1px solid #222;border-radius:2px;color:#888'>"+fl+"</span>"}).join("")+"</div></div>";
   });
 }
 function c(){g("userModal").classList.remove("show")}
@@ -1841,23 +1827,7 @@ async function handlePanel(res, body, req) {
         discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       const members = Array.isArray(memberRes) ? memberRes : [];
-      const nonBotIds = members.filter((m) => !m.user?.bot).map((m) => m.user.id);
-      const profiles = {};
-      const BATCH = 20;
-      for (let i = 0; i < nonBotIds.length; i += BATCH) {
-        const batch = nonBotIds.slice(i, i + BATCH);
-        const results = await Promise.allSettled(
-          batch.map((id) => discordFetch3(`https://discord.com/api/v10/users/${id}`, { headers }))
-        );
-        results.forEach((r, idx) => {
-          if (r.status === "fulfilled" && r.value) profiles[batch[idx]] = r.value;
-        });
-      }
-      const enriched = members.map((m) => ({
-        ...m,
-        profile: profiles[m.user?.id] || null
-      }));
-      return res.json({ members: enriched, roles: rolesRes });
+      return res.json({ members, roles: rolesRes });
     }
     if (body.action === "userinfo") {
       if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
