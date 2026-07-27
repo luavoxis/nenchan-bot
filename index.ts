@@ -105,7 +105,7 @@ body{font:15px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-heig
 #logoutBtn img{opacity:.6;filter:none}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
-.main{flex:1;padding:16px;max-width:800px}
+.main{flex:1;padding:16px;max-width:680px}
 .panel{display:none}
 .panel.show{display:block}
 h2{font-size:13px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
@@ -124,7 +124,7 @@ select option{background:#000;color:#ccc}
 .stat:hover{border-color:#333}
 .stat span{color:#666;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#fff;font-size:14px;margin-top:2px}
-.dash-banner{height:120px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;margin-bottom:8px;overflow:hidden;background-size:cover;background-position:center}
+.dash-banner{height:100px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;margin-bottom:8px;overflow:hidden;background-size:cover;background-position:center}
 .dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:8px;border-radius:8px;transition:border-color .15s}
 .dash-header:hover{border-color:#333}
 .dash-icon{width:64px;height:64px;border-radius:18px;flex-shrink:0;background:#111;border:1px solid #222;overflow:hidden}
@@ -132,9 +132,8 @@ select option{background:#000;color:#ccc}
 .dash-info{flex:1;min-width:0}
 .dash-name{color:#fff;font-size:17px;font-weight:600;margin:0}
 .dash-id{color:#555;font-size:11px;margin-top:2px;font-weight:600}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
-@media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
-.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px;border-radius:8px;transition:border-color .15s}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:8px 10px;display:flex;align-items:center;gap:10px;border-radius:8px;transition:border-color .15s;min-width:0}
 .dash-card:hover{border-color:#333}
 .dash-card-icon{width:32px;height:32px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:8px}
 .dash-card-icon img{width:16px;height:16px}
