@@ -110,17 +110,17 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;mi
 .panel.show{display:block}
 h2{font-size:12px;color:#6d6572;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
 label{display:block;color:#6d6572;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px;font-weight:600}
-input,textarea,select{width:100%;padding:4px 6px;border:1px solid #3a424c;border-radius:0;background:#13161b;color:#c0bcc4;font:12px 'Space Grotesk',monospace;margin-bottom:6px;outline:none}
+input,textarea,select{width:100%;padding:4px 6px;border:1px solid #2e343c;border-radius:6px;background:#191d23;color:#c0bcc4;font:12px 'Space Grotesk',monospace;margin-bottom:6px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#b48899}
-button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px 'Space Grotesk',monospace;cursor:pointer}
-button:hover{background:#888}
+button{padding:4px 10px;background:#252a32;color:#c0bcc4;border:1px solid #2e343c;border-radius:6px;font:11px 'Space Grotesk',monospace;cursor:pointer;transition:all .15s}
+button:hover{background:#2e343c;color:#e0dce4}
 .flex{display:flex;gap:4px;margin-bottom:4px}
 .flex button{flex:1}
 .error{color:#d45555;font-size:11px;margin-bottom:4px}
 .success{color:#55b488;font-size:11px;margin-bottom:4px}
 textarea{resize:vertical;min-height:50px;font:12px 'Space Grotesk',monospace}
 select option{background:#13161b;color:#c0bcc4}
-.stat{background:#191d23;border:1px solid #252a32;padding:10px;margin-bottom:4px;border-radius:4px;transition:border-color .15s}
+.stat{background:#191d23;border:1px solid #252a32;padding:10px;margin-bottom:4px;border-radius:8px;transition:border-color .15s}
 .stat:hover{border-color:#3a3340}
 .stat span{color:#6d6572;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#e0dce4;font-size:13px;margin-top:2px}
@@ -168,41 +168,42 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.05)}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
-.msg-row{display:flex;gap:8px;padding:6px 4px;border-bottom:1px solid #111;position:relative}
+.msg-row{display:flex;gap:8px;padding:6px 8px;border-bottom:1px solid #1e2228;position:relative;border-radius:6px}
 .msg-row:hover{background:#191d23}
 .msg-row:last-child{border-bottom:none}
-.msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;margin-top:1px}
+.msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;margin-top:1px}
 .msg-body{flex:1;min-width:0}
 .msg-author{font-size:11px;font-weight:600;color:#b48899}
-.msg-author .msg-time{font-weight:400;color:#4a4350;font-size:9px;margin-left:6px}
+.msg-author .msg-time{font-weight:400;color:#5a5260;font-size:9px;margin-left:6px}
 .msg-content{color:#c0bcc4;font-size:11px;line-height:1.5;margin-top:1px;word-wrap:break-word}
-.msg-ref{margin:3px 0;padding:2px 8px;border-left:2px solid #4a5460;color:#6d6572;font-size:9px;font-weight:600}
-.msg-embed{margin:4px 0;padding:6px 8px;border-left:3px solid #444;background:#1e2228;border-radius:2px}
+.msg-ref{margin:3px 0;padding:3px 8px;border-left:2px solid #b48899;color:#6d6572;font-size:9px;font-weight:600;border-radius:0 4px 4px 0;background:rgba(180,136,153,.05)}
+.msg-embed{margin:4px 0;padding:6px 8px;border-left:3px solid #b48899;background:#252a32;border-radius:0 6px 6px 0}
 .msg-embed-title{color:#b48899;font-weight:bold;font-size:11px}
 .msg-embed-desc{color:#bbb;font-size:10px;margin-top:2px}
 .msg-embed-author{color:#7d7582;font-size:9px;font-weight:600}
 .msg-embed-field-name{color:#7d7582;font-size:9px;margin-top:3px;font-weight:600}
 .msg-embed-field-val{color:#bbb;font-size:9px}
 .msg-reactions{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
-.msg-reaction{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;background:#1e2228;border-radius:3px;font-size:11px;cursor:default}
+.msg-reaction{display:inline-flex;align-items:center;gap:3px;padding:1px 5px;background:#252a32;border:1px solid #2e343c;border-radius:4px;font-size:11px;cursor:default}
 .msg-reaction-count{font-size:9px;color:#7d7582}
-.msg-del{flex-shrink:0;color:#5a5260;cursor:pointer;font-size:10px;padding-top:3px;opacity:0}
+.msg-del{flex-shrink:0;color:#5a5260;cursor:pointer;font-size:10px;padding-top:3px;opacity:0;transition:color .15s}
 .msg-row:hover .msg-del{opacity:1}
 .msg-del:hover{color:#d45555}
-.msg-img{max-width:200px;max-height:120px;margin-top:4px;border:1px solid #2e343c;border-radius:2px}
+.msg-img{max-width:200px;max-height:120px;margin-top:4px;border:1px solid #2e343c;border-radius:6px}
 .msg-sticker{max-width:80px;max-height:80px}
-.msg-video{max-width:200px;max-height:120px;margin-top:4px}
+.msg-video{max-width:200px;max-height:120px;margin-top:4px;border-radius:6px}
 .msg-audio{width:200px;margin-top:4px}
 .msg-file-link{color:#b48899;font-size:10px}
 .msg-edited{color:#5a5260;font-size:8px;margin-left:4px}
-.drop-zone{border:1px dashed #3a424c;padding:12px;text-align:center;color:#5a5260;font-size:10px;cursor:pointer;transition:all .15s;margin-bottom:6px}
-.drop-zone:hover,.drop-zone.dragover{border-color:#5a5260;color:#7d7582;background:#191d23}
+.drop-zone{border:1px dashed #2e343c;padding:12px;text-align:center;color:#5a5260;font-size:10px;cursor:pointer;transition:all .15s;margin-bottom:6px;border-radius:8px}
+.drop-zone:hover,.drop-zone.dragover{border-color:#b48899;color:#b48899;background:rgba(180,136,153,.05)}
 .drop-zone.has-file{border-color:#b48899;color:#b48899}
 .msg-input-row{display:flex;gap:4px;align-items:stretch}
-.msg-input-row textarea{flex:1;margin:0;min-height:36px;resize:none}
-.msg-input-row button{padding:4px 12px;font-size:11px;white-space:nowrap}
-.msg-bar{display:flex;gap:4px;margin-bottom:4px}
-.msg-bar select{margin:0;flex:1}
+.msg-input-row textarea{flex:1;margin:0;min-height:36px;resize:none;border-radius:6px}
+.msg-input-row button{padding:4px 12px;font-size:11px;white-space:nowrap;border-radius:6px;background:#b48899;color:#13161b;font-weight:600;border:none;cursor:pointer;transition:background .15s}
+.msg-input-row button:hover{background:#c9a0ae}
+.msg-bar{display:flex;gap:4px;margin-bottom:6px}
+.msg-bar select{margin:0;flex:1;border-radius:6px}
 .menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#191d23;border:1px solid #2e343c;color:#7d7582;width:32px;height:32px;font:14px 'Space Grotesk',monospace;cursor:pointer}
 .menu-toggle:hover{color:#e0dce4;border-color:#4a4350}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
@@ -227,7 +228,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .badge-boost{background:rgba(180,136,153,.15);color:#b48899}
 .member-roles{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
 .role-badge{font-size:9px;padding:1px 5px;border-radius:3px;background:#252a32;color:#7d7582;border:1px solid #2e343c;white-space:nowrap;font-weight:600}
-.role-group-header{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px 6px;border-bottom:1px solid #252a32;margin-top:10px;font-weight:600;display:flex;align-items:center;gap:6px}
+.role-group-header{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px 6px;margin-top:10px;font-weight:600;display:flex;align-items:center;gap:6px}
 .role-group-header:first-child{margin-top:0}
 .role-group-count{color:#5a5260;font-weight:400;font-size:10px}
 .member-joined{color:#5a5260;font-size:9px;flex-shrink:0;font-weight:600}
@@ -283,47 +284,47 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .confirm-footer button:hover{background:#2e343c;color:#e0dce4}
 .confirm-footer .confirm-danger{border-color:#d45555;color:#d45555}
 .confirm-footer .confirm-danger:hover{background:#d45555;color:#e0dce4}
-.dm-channel{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;cursor:pointer;transition:border-color .15s;margin-bottom:4px}
-.dm-channel:hover{border-color:#4a4350}
-.dm-channel img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
-.dm-channel-name{color:#ddd;font-size:11px}
+.dm-channel{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s;margin-bottom:4px}
+.dm-channel:hover{border-color:#3a3340}
+.dm-channel img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
+.dm-channel-name{color:#e0dce4;font-size:11px;font-weight:600}
 .dm-channel-preview{color:#5a5260;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dm-channel-time{color:#5a5260;font-size:9px;flex-shrink:0;margin-left:auto;font-weight:600}
-.mention-list{display:none;position:absolute;top:100%;left:0;right:0;background:#191d23;border:1px solid #2e343c;border-top:none;max-height:180px;overflow-y:auto;z-index:10;scrollbar-width:none}
+.mention-list{display:none;position:absolute;top:100%;left:0;right:0;background:#1e2228;border:1px solid #2e343c;border-top:none;max-height:180px;overflow-y:auto;z-index:10;scrollbar-width:none;border-radius:0 0 8px 8px}
 .mention-list::-webkit-scrollbar{display:none}
 .mention-list.show{display:block}
-.mention-item{display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;font-size:11px;color:#c0bcc4}
+.mention-item{display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;font-size:11px;color:#c0bcc4;transition:background .15s}
 .mention-item:hover{background:#252a32}
 .mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
 .mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mention-item .m-bot{color:#b48899;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
-.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;cursor:pointer;transition:border-color .15s}
-.ban-card:hover{border-color:#4a4350}
-.ban-card img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s}
+.ban-card:hover{border-color:#3a3340}
+.ban-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
 .ban-info{flex:1;min-width:0}
-.ban-name{color:#ddd;font-size:11px;font-weight:600}
+.ban-name{color:#e0dce4;font-size:11px;font-weight:600}
 .ban-name span{color:#5a5260;font-size:10px;font-weight:400}
 .ban-username{color:#5a5260;font-size:10px}
 .ban-reason{color:#d45555;font-size:10px;margin-top:2px;font-weight:600}
 .ban-reason::before{content:"reason: "}
-.ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#1e2228;color:#d45555;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600}
+.ban-unban-btn{padding:4px 12px;font-size:10px;border:1px solid #d45555;border-radius:6px;background:#252a32;color:#d45555;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
 .ban-unban-btn:hover{background:#d45555;color:#e0dce4}
-.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #2a2200;cursor:pointer;transition:border-color .15s}
-.timeout-card:hover{border-color:#665500}
-.timeout-card img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s}
+.timeout-card:hover{border-color:#3a3340}
+.timeout-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
 .timeout-info{flex:1;min-width:0}
-.timeout-name{color:#ddd;font-size:11px;font-weight:600}
+.timeout-name{color:#e0dce4;font-size:11px;font-weight:600}
 .timeout-name span{color:#5a5260;font-size:10px;font-weight:400}
 .timeout-username{color:#5a5260;font-size:10px}
 .timeout-detail{font-size:10px;margin-top:2px}
-.timeout-expiry{color:#d4b455;font-weight:600}
-.timeout-remaining{color:#aa0;font-size:9px}
-.timeout-reason{color:#fa0;font-weight:600}
+.timeout-expiry{color:#b48899;font-weight:600}
+.timeout-remaining{color:#6d6572;font-size:9px}
+.timeout-reason{color:#e8a630;font-weight:600}
 .timeout-reason::before{content:"reason: "}
-.timeout-remove{padding:3px 10px;font-size:10px;border:1px solid #ff0;background:#1e2228;color:#d4b455;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600}
-.timeout-remove:hover{background:#d4b455;color:#000}
-.mod-section-title{font-size:10px;color:#5a5260;text-transform:uppercase;letter-spacing:.5px;padding:10px 4px 6px;border-bottom:1px solid #252a32;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
-.mod-section-title .count{color:#3a3340;font-weight:400}
+.timeout-remove{padding:4px 12px;font-size:10px;border:1px solid #b48899;border-radius:6px;background:#252a32;color:#b48899;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
+.timeout-remove:hover{background:#b48899;color:#13161b}
+.mod-section-title{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px 6px;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mod-section-title .count{color:#5a5260;font-weight:400}
 .mod-section-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .mod-section{margin-bottom:4px}
 </style>
@@ -342,7 +343,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <div class="main">
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(19,22,27,.92);z-index:99;justify-content:center;align-items:center">
-<div style="background:#1e2228;border:1px solid #252a32;padding:32px 28px;width:100%;max-width:300px;text-align:center;border-radius:6px">
+<div style="background:#1e2228;border:1px solid #252a32;padding:32px 28px;width:100%;max-width:300px;text-align:center;border-radius:12px">
 <div style="width:48px;height:48px;margin:0 auto 16px;background:#232830;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #2e343c">
 <img src="/icons/dashboard.png" alt="" style="width:22px;height:22px;opacity:.5"/>
 </div>
@@ -361,10 +362,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">select channel</option></select>
 </div>
 <div style="position:relative;margin-bottom:4px">
-<input type="text" id="mentionSearch" placeholder="@mention - search members..." oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0;width:100%;padding:4px 8px;border:1px solid #2e343c;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none"/>
+<input type="text" id="mentionSearch" placeholder="@mention - search members..." oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0;width:100%;padding:6px 8px;border:1px solid #2e343c;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none"/>
 <div id="mentionList" class="mention-list"></div>
 </div>
-<div id="msgHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#191d23;border:1px solid #252a32;padding:4px;font-size:10px;line-height:1.5">
+<div id="msgHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#191d23;border:1px solid #252a32;padding:6px;font-size:10px;line-height:1.5;border-radius:8px">
 <p style="color:#5a5260;text-align:center;padding:20px 0">select a channel</p>
 </div>
 <div class="drop-zone" id="dropZone" onclick="g('msgFile').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
@@ -384,23 +385,23 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <div id="panel-dms" class="panel">
 <div id="dmStart">
-<p style="color:#5a5260;font-size:10px;margin-bottom:6px">enter a user id to open dm</p>
+<p style="color:#6d6572;font-size:10px;margin-bottom:6px">enter a user id to open dm</p>
 <div style="display:flex;gap:4px">
-<input type="text" id="dmUserId" placeholder="user id" style="flex:1;margin:0"/>
-<button onclick="startDmById()" style="margin:0;padding:4px 12px">open</button>
+<input type="text" id="dmUserId" placeholder="user id" style="flex:1;margin:0;border-radius:6px"/>
+<button onclick="startDmById()" style="margin:0;padding:4px 12px;border-radius:6px;background:#b48899;color:#13161b;font-weight:600;border:none">open</button>
 </div>
 </div>
 <div id="dmChat" style="display:none">
-<div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid #252a32;margin-bottom:6px">
-<button onclick="dmClose()" style="margin:0;padding:2px 8px;background:#252a32;color:#7d7582;border:1px solid #3a424c;font-size:11px">close</button>
-<span id="dmChatName" style="color:#e0dce4;font-size:12px"></span>
+<div style="display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid #252a32;margin-bottom:6px">
+<button onclick="dmClose()" style="margin:0;padding:3px 10px;background:#252a32;color:#7d7582;border:1px solid #2e343c;border-radius:6px;font-size:11px">close</button>
+<span id="dmChatName" style="color:#e0dce4;font-size:12px;font-weight:600"></span>
 </div>
-<div id="dmHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#191d23;border:1px solid #252a32;padding:4px;font-size:10px;line-height:1.5">
+<div id="dmHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#191d23;border:1px solid #252a32;padding:6px;font-size:10px;line-height:1.5;border-radius:8px">
 <p style="color:#5a5260;text-align:center;padding:20px 0">loading...</p>
 </div>
 <div class="msg-input-row">
-<textarea id="dmInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDm()}" style="min-height:36px;resize:none"></textarea>
-<button onclick="sendDm()">send</button>
+<textarea id="dmInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDm()}" style="min-height:36px;resize:none;border-radius:6px"></textarea>
+<button onclick="sendDm()" style="border-radius:6px;background:#b48899;color:#13161b;font-weight:600;border:none">send</button>
 </div>
 <div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
