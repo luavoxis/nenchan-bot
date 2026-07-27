@@ -528,8 +528,8 @@ body{font:14px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-heig
 #logoutBtn{color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
 #logoutBtn:hover{background:#1a0000!important}
 #logoutBtn img{opacity:.6;filter:none}
-.bocchi-wrap{text-align:center;margin-top:auto;padding:8px 0 4px}
-.bocchi-wrap img{width:60px;height:auto;opacity:.85}
+.bocchi-wrap{text-align:center;padding:12px 0 8px}
+.bocchi-wrap img{width:90px;height:auto;opacity:.85}
 .main{flex:1;padding:16px;max-width:800px}
 .panel{display:none}
 .panel.show{display:block}
@@ -764,8 +764,8 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="bans" onclick="switchTab('bans')"><img src="/icons/sanctions.png" alt="">sanctions</button>
 <button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
 <button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
-<button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
 <div class="bocchi-wrap"><img src="/icons/bocchi-rotate.gif" alt=""/></div>
+<button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
 </div>
 <div class="main">
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99;justify-content:center;align-items:center">
