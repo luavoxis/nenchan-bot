@@ -514,11 +514,12 @@ function html() {
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>nenchan v1.0</title>
 <style>
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;src:url('/fonts/space-grotesk-latin.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
+body{font:12px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-height:100vh;display:flex}
 .sidebar{width:160px;background:#0a0a0a;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:1px;min-height:100vh}
 .sidebar h1{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:0 8px}
-.sidebar button{background:none;border:none;color:#666;font:11px monospace;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
+.sidebar button{background:none;border:none;color:#666;font:11px 'Space Grotesk',monospace;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
 .sidebar button:hover{color:#ccc;background:#111}
 .sidebar button.active{color:#fff;background:#181818;border-left:2px solid #fff;padding-left:8px}
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
@@ -532,15 +533,15 @@ body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display
 .panel.show{display:block}
 h2{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
 label{display:block;color:#666;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px;font-weight:600}
-input,textarea,select{width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px monospace;margin-bottom:6px;outline:none}
+input,textarea,select{width:100%;padding:4px 6px;border:1px solid #333;border-radius:0;background:#000;color:#ccc;font:12px 'Space Grotesk',monospace;margin-bottom:6px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:#fff}
-button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px monospace;cursor:pointer}
+button{padding:4px 10px;background:#fff;color:#000;border:none;border-radius:0;font:11px 'Space Grotesk',monospace;cursor:pointer}
 button:hover{background:#888}
 .flex{display:flex;gap:4px;margin-bottom:4px}
 .flex button{flex:1}
 .error{color:#f44;font-size:11px;margin-bottom:4px}
 .success{color:#4f4;font-size:11px;margin-bottom:4px}
-textarea{resize:vertical;min-height:50px;font:12px monospace}
+textarea{resize:vertical;min-height:50px;font:12px 'Space Grotesk',monospace}
 select option{background:#000;color:#ccc}
 .stat{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;margin-bottom:4px}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
@@ -620,7 +621,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .msg-input-row button{padding:4px 12px;font-size:11px;white-space:nowrap}
 .msg-bar{display:flex;gap:4px;margin-bottom:4px}
 .msg-bar select{margin:0;flex:1}
-.menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#0a0a0a;border:1px solid #222;color:#888;width:32px;height:32px;font:14px monospace;cursor:pointer}
+.menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#0a0a0a;border:1px solid #222;color:#888;width:32px;height:32px;font:14px 'Space Grotesk',monospace;cursor:pointer}
 .menu-toggle:hover{color:#fff;border-color:#444}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
 @media(max-width:600px){
@@ -648,7 +649,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .role-group-header:first-child{margin-top:0}
 .role-group-count{color:#333;font-weight:400}
 .member-joined{color:#444;font-size:9px;flex-shrink:0;font-weight:600}
-.member-search{width:100%;padding:6px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;margin-bottom:8px;outline:none}
+.member-search{width:100%;padding:6px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px 'Space Grotesk',monospace;margin-bottom:8px;outline:none}
 .member-search:focus{border-color:#555}
 .member-stats{display:flex;gap:6px;margin-bottom:8px}
 .member-stat{flex:1;text-align:center;padding:6px;background:#0a0a0a;border:1px solid #1a1a1a}
@@ -669,14 +670,14 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .modal-role-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .file-picker{position:relative;display:flex;align-items:center;gap:4px}
 .file-picker input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-.file-label{flex:1;padding:5px 8px;background:#0a0a0a;border:1px solid #222;color:#555;font:11px monospace;cursor:pointer;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.file-label{flex:1;padding:5px 8px;background:#0a0a0a;border:1px solid #222;color:#555;font:11px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .file-label:hover{border-color:#444;color:#888}
 .file-label.has-file{color:#ccc;border-color:#333}
 .modal-footer{padding:10px 16px;border-top:1px solid #222;text-align:right}
-.modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px monospace;cursor:pointer}
+.modal-footer button{background:#222;color:#aaa;border:1px solid #333;padding:4px 16px;font:11px 'Space Grotesk',monospace;cursor:pointer}
 .modal-footer button:hover{background:#333;color:#fff}
 .modal-actions{display:flex;gap:4px;padding:8px 16px;border-top:1px solid #222;background:#0d0d0d}
-.modal-actions button{flex:1;padding:5px 8px;font-size:10px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:monospace}
+.modal-actions button{flex:1;padding:5px 8px;font-size:10px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:'Space Grotesk',monospace}
 .modal-actions button:hover{background:#1a1a1a;color:#fff}
 .btn-ban{border-color:#f444 !important;color:#f44 !important}
 .btn-ban:hover{background:#f44 !important;color:#fff !important}
@@ -691,10 +692,10 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .confirm-body{padding:12px 16px}
 .confirm-body label{display:block;color:#666;font-size:9px;text-transform:uppercase;margin-bottom:2px;margin-top:8px;font-weight:600}
 .confirm-body label:first-child{margin-top:0}
-.confirm-body input,.confirm-body select,.confirm-body textarea{width:100%;padding:5px 8px;border:1px solid #333;background:#000;color:#ccc;font:11px monospace;outline:none;margin:0}
+.confirm-body input,.confirm-body select,.confirm-body textarea{width:100%;padding:5px 8px;border:1px solid #333;background:#000;color:#ccc;font:11px 'Space Grotesk',monospace;outline:none;margin:0}
 .confirm-body input:focus,.confirm-body textarea:focus{border-color:#fff}
 .confirm-footer{display:flex;gap:4px;padding:8px 16px;border-top:1px solid #222}
-.confirm-footer button{flex:1;padding:5px 10px;font-size:11px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:monospace}
+.confirm-footer button{flex:1;padding:5px 10px;font-size:11px;border:1px solid #333;background:#111;color:#aaa;cursor:pointer;font-family:'Space Grotesk',monospace}
 .confirm-footer button:hover{background:#222;color:#fff}
 .confirm-footer .confirm-danger{border-color:#f44;color:#f44}
 .confirm-footer .confirm-danger:hover{background:#f44;color:#fff}
@@ -721,7 +722,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .ban-username{color:#555;font-size:10px}
 .ban-reason{color:#f44;font-size:10px;margin-top:2px;font-weight:600}
 .ban-reason::before{content:"reason: "}
-.ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
+.ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600}
 .ban-unban-btn:hover{background:#f44;color:#fff}
 .timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #2a2200;cursor:pointer;transition:border-color .15s}
 .timeout-card:hover{border-color:#665500}
@@ -735,7 +736,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .timeout-remaining{color:#aa0;font-size:9px}
 .timeout-reason{color:#fa0;font-weight:600}
 .timeout-reason::before{content:"reason: "}
-.timeout-remove{padding:3px 10px;font-size:10px;border:1px solid #ff0;background:#111;color:#ff0;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
+.timeout-remove{padding:3px 10px;font-size:10px;border:1px solid #ff0;background:#111;color:#ff0;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600}
 .timeout-remove:hover{background:#ff0;color:#000}
 .mod-section-title{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:10px 4px 6px;border-bottom:1px solid #1a1a1a;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
 .mod-section-title .count{color:#333;font-weight:400}
@@ -760,7 +761,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
 <h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">nenchan v1.0</h2>
 <div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
-<button onclick="loginDiscord()" style="width:100%;padding:8px 10px;background:#5865F2;color:#fff;border:none;border-radius:0;font:12px monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="14" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.9048 3.0581 26.1885 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.4218 0.384528C20.3584 1.2916 15.5057 2.8214 10.9776 4.8978C10.9384 4.9147 10.9048 4.9429 10.8825 4.9795C1.57795 18.7309 -0.143566 32.1443 0.0634574 45.3916C0.0665884 45.4562 0.112098 45.5182 0.178348 45.5477C6.45866 50.1432 12.3413 52.9005 18.1105 54.6698C18.1853 54.7047 18.2723 54.6929 18.3373 54.6448C19.7468 52.7248 20.9917 50.72 22.0603 48.6493C22.1217 48.5282 22.076 48.3822 21.9537 48.3014C18.488 47.0774 15.1632 45.2637 11.9822 42.9226C11.7211 42.7424 11.6658 42.3689 11.8429 42.1275C12.3622 41.4599 12.8867 40.7605 13.3636 40.0481C13.4187 39.9667 13.5316 39.9389 13.6177 39.9713C26.135 45.707 39.6821 45.707 52.1169 39.7713C52.203 39.7389 52.3159 39.7667 52.371 39.8481C52.8479 40.5605 53.3724 41.2599 53.8917 41.9275C54.0688 42.1689 54.0263 42.5424 53.7652 42.7224C50.5842 45.2637 47.2594 47.0774 43.7937 48.3014C43.6714 48.3822 43.628 48.5282 43.6893 48.6493C44.758 50.72 46.0029 52.7248 47.4124 54.6448C47.4774 54.6929 47.5644 54.7047 47.6392 54.6698C53.4121 52.9005 59.2949 50.1432 65.5752 45.5551C65.6428 45.5256 65.6897 45.4616 65.6911 45.3968C65.9378 30.0424 62.7177 16.6909 53.4859 4.9829C53.4627 4.9442 53.4283 4.9167 53.3898 4.8998L60.1045 4.8978Z" fill="white"/></svg> Login with Discord</button>
+<button onclick="loginDiscord()" style="width:100%;padding:8px 10px;background:#5865F2;color:#fff;border:none;border-radius:0;font:12px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="14" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.9048 3.0581 26.1885 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.4218 0.384528C20.3584 1.2916 15.5057 2.8214 10.9776 4.8978C10.9384 4.9147 10.9048 4.9429 10.8825 4.9795C1.57795 18.7309 -0.143566 32.1443 0.0634574 45.3916C0.0665884 45.4562 0.112098 45.5182 0.178348 45.5477C6.45866 50.1432 12.3413 52.9005 18.1105 54.6698C18.1853 54.7047 18.2723 54.6929 18.3373 54.6448C19.7468 52.7248 20.9917 50.72 22.0603 48.6493C22.1217 48.5282 22.076 48.3822 21.9537 48.3014C18.488 47.0774 15.1632 45.2637 11.9822 42.9226C11.7211 42.7424 11.6658 42.3689 11.8429 42.1275C12.3622 41.4599 12.8867 40.7605 13.3636 40.0481C13.4187 39.9667 13.5316 39.9389 13.6177 39.9713C26.135 45.707 39.6821 45.707 52.1169 39.7713C52.203 39.7389 52.3159 39.7667 52.371 39.8481C52.8479 40.5605 53.3724 41.2599 53.8917 41.9275C54.0688 42.1689 54.0263 42.5424 53.7652 42.7224C50.5842 45.2637 47.2594 47.0774 43.7937 48.3014C43.6714 48.3822 43.628 48.5282 43.6893 48.6493C44.758 50.72 46.0029 52.7248 47.4124 54.6448C47.4774 54.6929 47.5644 54.7047 47.6392 54.6698C53.4121 52.9005 59.2949 50.1432 65.5752 45.5551C65.6428 45.5256 65.6897 45.4616 65.6911 45.3968C65.9378 30.0424 62.7177 16.6909 53.4859 4.9829C53.4627 4.9442 53.4283 4.9167 53.3898 4.8998L60.1045 4.8978Z" fill="white"/></svg> Login with Discord</button>
 </div>
 </div>
 <div id="panel-dashboard" class="panel">
@@ -771,7 +772,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">select channel</option></select>
 </div>
 <div style="position:relative;margin-bottom:4px">
-<input type="text" id="mentionSearch" placeholder="@mention - search members..." oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0;width:100%;padding:4px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px monospace;outline:none"/>
+<input type="text" id="mentionSearch" placeholder="@mention - search members..." oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0;width:100%;padding:4px 8px;border:1px solid #222;background:#0a0a0a;color:#ccc;font:11px 'Space Grotesk',monospace;outline:none"/>
 <div id="mentionList" class="mention-list"></div>
 </div>
 <div id="msgHistory" style="max-height:380px;overflow-y:auto;margin-bottom:6px;background:#0a0a0a;border:1px solid #1a1a1a;padding:4px;font-size:10px;line-height:1.5">
