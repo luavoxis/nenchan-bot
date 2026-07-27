@@ -442,7 +442,7 @@ async function discordFetch3(url, opts = {}) {
   return new Promise((resolve, reject) => {
     const req = mod.request(u, {
       method: opts.method || "GET",
-      headers: { "Content-Type": "application/json", ...opts.headers }
+      headers: opts.body ? { "Content-Type": "application/json", ...opts.headers } : { ...opts.headers }
     }, (res) => {
       let body = "";
       res.on("data", (chunk) => body += chunk);
