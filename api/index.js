@@ -723,37 +723,39 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
 .mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mention-item .m-bot{color:#b48899;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
-.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1e2228;cursor:pointer;transition:background .15s;border-radius:0}
+.ban-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s}
 .ban-card:last-child{border-bottom:none}
-.ban-card:hover{background:#191d23}
-.ban-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
+.ban-card:hover{background:#252a32}
+.ban-card img{width:36px;height:36px;border-radius:50%;flex-shrink:0}
 .ban-info{flex:1;min-width:0}
-.ban-name{color:#e0dce4;font-size:11px;font-weight:600}
-.ban-name span{color:#5a5260;font-size:10px;font-weight:400}
-.ban-username{color:#5a5260;font-size:10px}
-.ban-reason{color:#d45555;font-size:10px;margin-top:2px;font-weight:600}
-.ban-reason::before{content:"reason: "}
-.ban-unban-btn{padding:4px 12px;font-size:10px;border:1px solid #d45555;border-radius:6px;background:#252a32;color:#d45555;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
-.ban-unban-btn:hover{background:#d45555;color:#e0dce4}
-.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1e2228;cursor:pointer;transition:background .15s;border-radius:0}
+.ban-name{color:#e0dce4;font-size:12px;font-weight:600}
+.ban-name span{color:#5a5260;font-size:10px;font-weight:400;margin-left:4px}
+.ban-username{color:#5a5260;font-size:10px;margin-top:1px}
+.ban-reason{color:#d45555;font-size:10px;margin-top:3px;font-weight:600;padding:2px 6px;background:rgba(212,85,85,.1);border-radius:4px;display:inline-block}
+.ban-unban-btn{padding:5px 14px;font-size:10px;border:1px solid #d45555;border-radius:6px;background:transparent;color:#d45555;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
+.ban-unban-btn:hover{background:#d45555;color:#fff}
+.timeout-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s}
 .timeout-card:last-child{border-bottom:none}
-.timeout-card:hover{background:#191d23}
-.timeout-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
+.timeout-card:hover{background:#252a32}
+.timeout-card img{width:36px;height:36px;border-radius:50%;flex-shrink:0}
 .timeout-info{flex:1;min-width:0}
-.timeout-name{color:#e0dce4;font-size:11px;font-weight:600}
-.timeout-name span{color:#5a5260;font-size:10px;font-weight:400}
-.timeout-username{color:#5a5260;font-size:10px}
-.timeout-detail{font-size:10px;margin-top:2px}
+.timeout-name{color:#e0dce4;font-size:12px;font-weight:600}
+.timeout-name span{color:#5a5260;font-size:10px;font-weight:400;margin-left:4px}
+.timeout-username{color:#5a5260;font-size:10px;margin-top:1px}
+.timeout-detail{font-size:10px;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .timeout-expiry{color:#b48899;font-weight:600}
-.timeout-remaining{color:#6d6572;font-size:9px}
-.timeout-reason{color:#e8a630;font-weight:600}
-.timeout-reason::before{content:"reason: "}
-.timeout-remove{padding:4px 12px;font-size:10px;border:1px solid #b48899;border-radius:6px;background:#252a32;color:#b48899;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
+.timeout-remaining{color:#6d6572;font-size:9px;padding:1px 5px;background:#252a32;border-radius:3px}
+.timeout-reason{color:#e8a630;font-weight:600;padding:1px 5px;background:rgba(232,166,48,.1);border-radius:3px}
+.timeout-remove{padding:5px 14px;font-size:10px;border:1px solid #b48899;border-radius:6px;background:transparent;color:#b48899;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
 .timeout-remove:hover{background:#b48899;color:#13161b}
-.mod-section-title{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px 6px;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
-.mod-section-title .count{color:#5a5260;font-weight:400}
-.mod-section-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.mod-section{margin-bottom:4px;background:#191d23;border:1px solid #252a32;border-radius:8px;overflow:hidden}
+.mod-section-title{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:12px 12px 8px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mod-section-title .count{color:#5a5260;font-weight:400;background:#252a32;padding:1px 6px;border-radius:10px;font-size:9px;margin-left:4px}
+.mod-section-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mod-section{margin-bottom:8px;background:#191d23;border:1px solid #252a32;border-radius:8px;overflow:hidden}
+.mod-empty{padding:16px 12px;color:#5a5260;font-size:10px;text-align:center}
+.mod-search{display:flex;gap:6px;margin-bottom:8px}
+.mod-search input{flex:1}
+.mod-search button{padding:5px 14px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -831,10 +833,9 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 </div>
 <div id="panel-bans" class="panel">
-<input type="text" class="member-search" id="banSearch" placeholder="search timeouts & bans..." oninput="filterBans(this.value)"/>
 <div id="banStats" class="member-stats"></div>
-<div id="banTimeouts" class="mod-section"></div>
-<div id="banBans" class="mod-section"></div>
+<div id="banTimeouts"></div>
+<div id="banBans"></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -925,95 +926,122 @@ function toggleDashRoles(){g("dashRoleList").classList.toggle("show");g("dashRol
 
 var allModData={timeouts:[],bans:[]};
 function loadModerations(){
-  g("banTimeouts").innerHTML="";
+  g("banTimeouts").innerHTML="<p style='color:#6d6572;font-size:10px'>loading...</p>";
   g("banBans").innerHTML="";
   g("banStats").innerHTML="";
-  g("banTimeouts").innerHTML="<p style='color:#6d6572;font-size:10px'>loading...</p>";
   api({action:"moderations"},function(d){
     if(d.error){g("banTimeouts").innerHTML="";g("banBans").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
     var timeouts=d.timeouts||[];
     var bans=d.bans||[];
     allModData={timeouts:timeouts,bans:bans};
     g("banStats").innerHTML="<div class='member-stat'><span>timeout</span><p>"+timeouts.length+"</p></div>"+
-      "<div class='member-stat'><span>banned</span><p>"+bans.length+"</p></div>";
+      "<div class='member-stat'><span>banned</span><p>"+bans.length+"</p></div>"+
+      "<div class='member-stat'><span>total</span><p>"+(timeouts.length+bans.length)+"</p></div>";
     renderTimeouts(timeouts);
     renderBans(bans);
   });
 }
 
 function renderTimeouts(timeouts){
-  var h="";
-  if(timeouts.length){
-    h+="<div class='mod-section-title'><span class='dot' style='background:#d4b455'></span>timed out</div>";
-  }
-  for(var i=0;i<timeouts.length;i++){
-    var m=timeouts[i],u=m.user;
-    var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
-    var name=u.global_name||u.username;
-    var until=new Date(m.communication_disabled_until);
-    var now=new Date();
-    var remaining=until-now;
-    var remStr="";
-    if(remaining<=0){remStr="expired"}
-    else if(remaining>86400000){remStr=Math.floor(remaining/86400000)+"d "+Math.floor((remaining%86400000)/3600000)+"h left"}
-    else if(remaining>3600000){remStr=Math.floor(remaining/3600000)+"h "+Math.floor((remaining%3600000)/60000)+"m left"}
-    else{remStr=Math.floor(remaining/60000)+"m left"}
-    var expiryStr=until.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-    h+="<div class='timeout-card'>";
-    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div class='timeout-info'>";
-    h+="<div class='timeout-name'>"+esc(name)+(u.bot?" <span>bot</span>":"")+"</div>";
-    h+="<div class='timeout-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
-    h+="<div class='timeout-detail'>";
-    h+="<span class='timeout-expiry'>expires: "+expiryStr+"</span> ";
-    h+="<span class='timeout-remaining'>"+remStr+"</span>";
-    h+="</div>";
-    h+="</div>";
-    h+="<button class='timeout-remove' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();removeTimeout(this)'>remove</button>";
+  var h="<div class='mod-section'>";
+  h+="<div class='mod-section-title'><span class='dot' style='background:#b48899'></span>timed out<span class='count'>"+timeouts.length+"</span></div>";
+  if(!timeouts.length){
+    h+="<div class='mod-empty'>no active timeouts</div>";
+  }else{
+    h+="<div class='mod-search'><input type='text' id='banSearchTimeout' placeholder='search timeouts...' oninput='filterTimeouts(this.value)'/></div>";
+    h+="<div id='timeoutList'>";
+    for(var i=0;i<timeouts.length;i++){h+=renderTimeoutCard(timeouts[i])}
     h+="</div>";
   }
-  if(!timeouts.length)h+="<div class='mod-section-title'><span class='dot' style='background:#d4b455'></span>timed out</div><p style='color:#5a5260;font-size:10px;padding:6px 0'>no active timeouts</p>";
+  h+="</div>";
   g("banTimeouts").innerHTML=h;
 }
 
+function renderTimeoutCard(m){
+  var u=m.user;
+  var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+  var name=u.global_name||u.username;
+  var until=new Date(m.communication_disabled_until);
+  var now=new Date();
+  var remaining=until-now;
+  var remStr="";
+  if(remaining<=0){remStr="expired"}
+  else if(remaining>86400000){remStr=Math.floor(remaining/86400000)+"d "+Math.floor((remaining%86400000)/3600000)+"h"}
+  else if(remaining>3600000){remStr=Math.floor(remaining/3600000)+"h "+Math.floor((remaining%3600000)/60000)+"m"}
+  else{remStr=Math.floor(remaining/60000)+"m"}
+  var expiryStr=until.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+  var h="<div class='timeout-card'>";
+  h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+  h+="<div class='timeout-info'>";
+  h+="<div class='timeout-name'>"+esc(name)+(u.bot?"<span>bot</span>":"")+"</div>";
+  h+="<div class='timeout-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
+  h+="<div class='timeout-detail'>";
+  h+="<span class='timeout-expiry'>"+expiryStr+"</span>";
+  h+="<span class='timeout-remaining'>"+remStr+"</span>";
+  if(m.reason)h+="<span class='timeout-reason'>"+esc(m.reason)+"</span>";
+  h+="</div></div>";
+  h+="<button class='timeout-remove' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();removeTimeout(this)'>remove</button>";
+  h+="</div>";
+  return h;
+}
+
 function renderBans(bans){
-  var h="";
-  if(bans.length){
-    h+="<div class='mod-section-title'><span class='dot' style='background:#d45555'></span>banned</div>";
-  }
-  for(var i=0;i<bans.length;i++){
-    var b=bans[i],u=b.user;
-    var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
-    var name=u.global_name||u.username;
-    h+="<div class='ban-card'>";
-    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<div class='ban-info'>";
-    h+="<div class='ban-name'>"+esc(name)+(u.bot?" <span>bot</span>":"")+"</div>";
-    h+="<div class='ban-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
-    if(b.reason)h+="<div class='ban-reason'>"+esc(b.reason)+"</div>";
-    h+="</div>";
-    h+="<button class='ban-unban-btn' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();confirmUnban(this)'>unban</button>";
+  var h="<div class='mod-section'>";
+  h+="<div class='mod-section-title'><span class='dot' style='background:#d45555'></span>banned<span class='count'>"+bans.length+"</span></div>";
+  if(!bans.length){
+    h+="<div class='mod-empty'>no banned users</div>";
+  }else{
+    h+="<div class='mod-search'><input type='text' id='banSearchBan' placeholder='search banned...' oninput='filterBansOnly(this.value)'/></div>";
+    h+="<div id='banList'>";
+    for(var i=0;i<bans.length;i++){h+=renderBanCard(bans[i])}
     h+="</div>";
   }
-  if(!bans.length)h+="<div class='mod-section-title'><span class='dot' style='background:#d45555'></span>banned</div><p style='color:#5a5260;font-size:10px;padding:6px 0'>no banned users</p>";
+  h+="</div>";
   g("banBans").innerHTML=h;
 }
 
-function filterBans(q){
+function renderBanCard(b){
+  var u=b.user;
+  var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+  var name=u.global_name||u.username;
+  var h="<div class='ban-card'>";
+  h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+  h+="<div class='ban-info'>";
+  h+="<div class='ban-name'>"+esc(name)+(u.bot?"<span>bot</span>":"")+"</div>";
+  h+="<div class='ban-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
+  if(b.reason)h+="<div class='ban-reason'>"+esc(b.reason)+"</div>";
+  h+="</div>";
+  h+="<button class='ban-unban-btn' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();confirmUnban(this)'>unban</button>";
+  h+="</div>";
+  return h;
+}
+
+function filterTimeouts(q){
   q=q.toLowerCase();
-  if(!q){renderTimeouts(allModData.timeouts);renderBans(allModData.bans);return}
   var ft=allModData.timeouts.filter(function(m){
     var u=m.user;
     var name=(u.global_name||u.username).toLowerCase();
     return name.indexOf(q)!==-1||u.username.toLowerCase().indexOf(q)!==-1||u.id.indexOf(q)!==-1;
   });
+  var list=g("timeoutList");
+  if(!list)return;
+  if(!ft.length){list.innerHTML="<div class='mod-empty'>no matching timeouts</div>";return}
+  var h="";for(var i=0;i<ft.length;i++)h+=renderTimeoutCard(ft[i]);
+  list.innerHTML=h;
+}
+
+function filterBansOnly(q){
+  q=q.toLowerCase();
   var fb=allModData.bans.filter(function(b){
     var u=b.user;
     var name=(u.global_name||u.username).toLowerCase();
     return name.indexOf(q)!==-1||u.username.toLowerCase().indexOf(q)!==-1||u.id.indexOf(q)!==-1;
   });
-  renderTimeouts(ft);
-  renderBans(fb);
+  var list=g("banList");
+  if(!list)return;
+  if(!fb.length){list.innerHTML="<div class='mod-empty'>no matching bans</div>";return}
+  var h="";for(var i=0;i<fb.length;i++)h+=renderBanCard(fb[i]);
+  list.innerHTML=h;
 }
 
 function confirmUnban(el){
