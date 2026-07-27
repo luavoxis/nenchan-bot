@@ -317,11 +317,11 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sidebar" class="sidebar" style="display:none">
 <h1>nenchan v1.0</h1>
-<button class="active" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
-<button onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
-<button onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;sanctions&nbsp;</span><span class=r>]</span></button>
-<button onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
-<button onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;whispers&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button class="active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class=l>[</span><span class=m>&nbsp;dashboard&nbsp;</span><span class=r>]</span></button>
+<button data-tab="members" onclick="switchTab('members')"><span class=l>[</span><span class=m>&nbsp;members&nbsp;&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button data-tab="bans" onclick="switchTab('bans')"><span class=l>[</span><span class=m>&nbsp;sanctions&nbsp;</span><span class=r>]</span></button>
+<button data-tab="messages" onclick="switchTab('messages')"><span class=l>[</span><span class=m>&nbsp;messages&nbsp;&nbsp;</span><span class=r>]</span></button>
+<button data-tab="dms" onclick="switchTab('dms')"><span class=l>[</span><span class=m>&nbsp;whispers&nbsp;&nbsp;</span><span class=r>]</span></button>
 <button id="logoutBtn" onclick="logout()">logout</button>
 </div>
 <div class="main">
@@ -424,8 +424,8 @@ function switchTab(name){
   var el=g("panel-"+name);
   if(el)el.classList.add("show");
   document.querySelectorAll(".sidebar button").forEach(function(b){b.classList.remove("active")});
-  var btns=document.querySelectorAll(".sidebar button");
-  for(var i=0;i<btns.length;i++){if(btns[i].textContent.includes(name)){btns[i].classList.add("active");break}}
+  var btn=document.querySelector(".sidebar button[data-tab='"+name+"']");
+  if(btn)btn.classList.add("active");
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
