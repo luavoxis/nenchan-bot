@@ -691,9 +691,27 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .ban-username{color:#555;font-size:10px}
 .ban-reason{color:#f44;font-size:10px;margin-top:2px;font-weight:600}
 .ban-reason::before{content:"reason: "}
-.ban-empty{color:#555;padding:20px 0;font-size:11px}
+.ban-empty{color:#555;padding:20px 0;font-size:11px;text-align:center}
 .ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
 .ban-unban-btn:hover{background:#f44;color:#fff}
+.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #2a2200;cursor:pointer;transition:border-color .15s}
+.timeout-card:hover{border-color:#665500}
+.timeout-card img{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.timeout-info{flex:1;min-width:0}
+.timeout-name{color:#ddd;font-size:11px;font-weight:600}
+.timeout-name span{color:#555;font-size:10px;font-weight:400}
+.timeout-username{color:#555;font-size:10px}
+.timeout-detail{font-size:10px;margin-top:2px}
+.timeout-expiry{color:#ff0;font-weight:600}
+.timeout-remaining{color:#aa0;font-size:9px}
+.timeout-reason{color:#fa0;font-weight:600}
+.timeout-reason::before{content:"reason: "}
+.timeout-remove{padding:3px 10px;font-size:10px;border:1px solid #ff0;background:#111;color:#ff0;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
+.timeout-remove:hover{background:#ff0;color:#000}
+.mod-section-title{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:10px 4px 6px;border-bottom:1px solid #1a1a1a;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
+.mod-section-title .count{color:#333;font-weight:400}
+.mod-section-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mod-section{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -769,9 +787,11 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 </div>
 <div id="panel-bans" class="panel">
-<input type="text" class="member-search" id="banSearch" placeholder="search banned users..." oninput="filterBans(this.value)"/>
+<input type="text" class="member-search" id="banSearch" placeholder="search timeouts & bans..." oninput="filterBans(this.value)"/>
 <div id="banStats" class="member-stats"></div>
-<div id="banList" class="member-grid"><p style="color:#666;text-align:center;padding:20px 0">loading...</p></div>
+<div id="banTimeouts" class="mod-section"></div>
+<div id="banBans" class="mod-section"></div>
+<div id="banEmpty" style="display:none" class="ban-empty">/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style="font-size:9px;color:#444'>no active moderations</span></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -813,7 +833,7 @@ function switchTab(name){
   if(name==="messages")loadMsgChannels();
   if(name==="members")loadMembers();
   if(name==="dashboard")loadDashboard();
-  if(name==="bans")loadBans();
+  if(name==="bans")loadModerations();
   if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none";stopDmPoll()}
   if(name!=="dms")stopDmPoll();
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
@@ -857,25 +877,67 @@ function loadDashboard(){
 
 function toggleDashRoles(){g("dashRoleList").classList.toggle("show");g("dashRoleArrow").innerHTML=g("dashRoleList").classList.contains("show")?"&#9650;":"&#9660;"}
 
-var allBans=[];
-function loadBans(){
-  g("banList").innerHTML="<p style='color:#666;padding:20px 0'>loading...</p>";
-  api({action:"bans"},function(d){
-    if(d.error){g("banList").innerHTML="<p style='color:#f44;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    if(!d.bans||!d.bans.length){
-      g("banStats").innerHTML="";
-      g("banList").innerHTML="<div class='ban-empty'>/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style='font-size:9px;color:#444'>no banned users</span></div>";
-      allBans=[];
-      return;
-    }
-    allBans=d.bans;
-    g("banStats").innerHTML="<div class='member-stat'><span>banned</span><p>"+d.bans.length+"</p></div>";
-    renderBans(d.bans);
+var allModData={timeouts:[],bans:[]};
+function loadModerations(){
+  g("banTimeouts").innerHTML="";
+  g("banBans").innerHTML="";
+  g("banStats").innerHTML="";
+  g("banEmpty").style.display="none";
+  g("banTimeouts").innerHTML="<p style='color:#666;font-size:10px'>loading...</p>";
+  g("banBans").innerHTML="<p style='color:#666;font-size:10px'>loading...</p>";
+  api({action:"moderations"},function(d){
+    if(d.error){g("banTimeouts").innerHTML="";g("banBans").innerHTML="<p style='color:#f44;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var timeouts=d.timeouts||[];
+    var bans=d.bans||[];
+    allModData={timeouts:timeouts,bans:bans};
+    g("banStats").innerHTML="<div class='member-stat'><span>timeout</span><p>"+timeouts.length+"</p></div>"+
+      "<div class='member-stat'><span>banned</span><p>"+bans.length+"</p></div>";
+    renderTimeouts(timeouts);
+    renderBans(bans);
+    if(!timeouts.length&&!bans.length)g("banEmpty").style.display="block";
   });
+}
+
+function renderTimeouts(timeouts){
+  var h="";
+  if(timeouts.length){
+    h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out <span class='count'>"+timeouts.length+"</span></div>";
+  }
+  for(var i=0;i<timeouts.length;i++){
+    var m=timeouts[i],u=m.user;
+    var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+    var name=u.global_name||u.username;
+    var until=new Date(m.communication_disabled_until);
+    var now=new Date();
+    var remaining=until-now;
+    var remStr="";
+    if(remaining<=0){remStr="expired"}
+    else if(remaining>86400000){remStr=Math.floor(remaining/86400000)+"d "+Math.floor((remaining%86400000)/3600000)+"h left"}
+    else if(remaining>3600000){remStr=Math.floor(remaining/3600000)+"h "+Math.floor((remaining%3600000)/60000)+"m left"}
+    else{remStr=Math.floor(remaining/60000)+"m left"}
+    var expiryStr=until.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    h+="<div class='timeout-card'>";
+    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
+    h+="<div class='timeout-info'>";
+    h+="<div class='timeout-name'>"+esc(name)+(u.bot?" <span>bot</span>":"")+"</div>";
+    h+="<div class='timeout-username'>"+esc(u.username)+" &middot; "+u.id+"</div>";
+    h+="<div class='timeout-detail'>";
+    h+="<span class='timeout-expiry'>expires: "+expiryStr+"</span> ";
+    h+="<span class='timeout-remaining'>"+remStr+"</span>";
+    h+="</div>";
+    h+="</div>";
+    h+="<button class='timeout-remove' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();removeTimeout(this)'>remove</button>";
+    h+="</div>";
+  }
+  if(!timeouts.length)h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out <span class='count'>0</span></div><p style='color:#555;font-size:10px;padding:6px 0'>no active timeouts</p>";
+  g("banTimeouts").innerHTML=h;
 }
 
 function renderBans(bans){
   var h="";
+  if(bans.length){
+    h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned <span class='count'>"+bans.length+"</span></div>";
+  }
   for(var i=0;i<bans.length;i++){
     var b=bans[i],u=b.user;
     var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
@@ -890,19 +952,26 @@ function renderBans(bans){
     h+="<button class='ban-unban-btn' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();confirmUnban(this)'>unban</button>";
     h+="</div>";
   }
-  if(!bans.length)h="<div class='ban-empty'>no banned users found</div>";
-  g("banList").innerHTML=h;
+  if(!bans.length)h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned <span class='count'>0</span></div><p style='color:#555;font-size:10px;padding:6px 0'>no banned users</p>";
+  g("banBans").innerHTML=h;
 }
 
 function filterBans(q){
-  if(!allBans.length)return;
   q=q.toLowerCase();
-  var filtered=allBans.filter(function(b){
+  if(!q){renderTimeouts(allModData.timeouts);renderBans(allModData.bans);g("banEmpty").style.display=(allModData.timeouts.length||allModData.bans.length)?"none":"block";return}
+  var ft=allModData.timeouts.filter(function(m){
+    var u=m.user;
+    var name=(u.global_name||u.username).toLowerCase();
+    return name.indexOf(q)!==-1||u.username.toLowerCase().indexOf(q)!==-1||u.id.indexOf(q)!==-1;
+  });
+  var fb=allModData.bans.filter(function(b){
     var u=b.user;
     var name=(u.global_name||u.username).toLowerCase();
     return name.indexOf(q)!==-1||u.username.toLowerCase().indexOf(q)!==-1||u.id.indexOf(q)!==-1;
   });
-  renderBans(filtered);
+  renderTimeouts(ft);
+  renderBans(fb);
+  g("banEmpty").style.display=(ft.length||fb.length)?"none":"block";
 }
 
 function confirmUnban(el){
@@ -919,8 +988,27 @@ function confirmUnban(el){
 function executeUnban(uid){
   g("confirmOverlay").classList.remove("show");
   api({action:"unban",userId:uid},function(d){
-    if(d.success){loadBans()}
-    else{alert(d.error||"failed to unban");loadBans()}
+    if(d.success){loadModerations()}
+    else{alert(d.error||"failed to unban");loadModerations()}
+  });
+}
+
+function removeTimeout(el){
+  var uid=el.dataset.uid,name=el.dataset.name;
+  g("confirmTitle").textContent="remove timeout";
+  g("confirmBody").innerHTML="<p style='color:#888;font-size:11px'>remove timeout for <b style='color:#fff'>"+esc(name)+"</b>?</p>";
+  var btn=g("confirmBtn");
+  btn.className="confirm-danger";
+  btn.textContent="remove";
+  btn.onclick=function(){executeRemoveTimeout(uid)};
+  g("confirmOverlay").classList.add("show");
+}
+
+function executeRemoveTimeout(uid){
+  g("confirmOverlay").classList.remove("show");
+  api({action:"timeout",userId:uid,minutes:0},function(d){
+    if(d.success){loadModerations()}
+    else{alert(d.error||"failed to remove timeout");loadModerations()}
   });
 }
 
@@ -1769,18 +1857,33 @@ async function handlePanel(res, body) {
     if (body.action === "timeout") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
-      if (!body.minutes) return res.status(400).json({ error: "No duration specified" });
       try {
-        const until = new Date(Date.now() + body.minutes * 60 * 1e3).toISOString();
+        const timeoutValue = body.minutes > 0 ? new Date(Date.now() + body.minutes * 60 * 1e3).toISOString() : null;
         const timeoutHeaders = { ...headers, "Content-Type": "application/json" };
         if (body.reason) timeoutHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
         await discordFetch3(
           `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
-          { method: "PATCH", headers: timeoutHeaders, body: JSON.stringify({ communication_disabled_until: until }) }
+          { method: "PATCH", headers: timeoutHeaders, body: JSON.stringify({ communication_disabled_until: timeoutValue }) }
         );
         return res.json({ success: true });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to timeout user" });
+      }
+    }
+    if (body.action === "moderations") {
+      try {
+        const [bans, members] = await Promise.all([
+          discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`, { headers }).catch(() => []),
+          discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }).catch(() => [])
+        ]);
+        const now = (/* @__PURE__ */ new Date()).toISOString();
+        const timeouts = (Array.isArray(members) ? members : []).filter((m) => m.communication_disabled_until && m.communication_disabled_until > now);
+        return res.json({
+          bans: Array.isArray(bans) ? bans : [],
+          timeouts: timeouts.map((m) => ({ user: m.user, communication_disabled_until: m.communication_disabled_until, nick: m.nick }))
+        });
+      } catch (e) {
+        return res.json({ bans: [], timeouts: [], error: e.message || "Failed to fetch moderations" });
       }
     }
     if (body.action === "bans") {
