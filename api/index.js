@@ -549,6 +549,7 @@ select option{background:#000;color:#ccc}
 .stat:hover{border-color:#333}
 .stat span{color:#666;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#fff;font-size:14px;margin-top:2px}
+.dash-banner{height:120px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;margin-bottom:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#333;font-size:12px;text-transform:uppercase;letter-spacing:1px}
 .dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:8px;border-radius:8px;transition:border-color .15s}
 .dash-header:hover{border-color:#333}
 .dash-icon{width:64px;height:64px;border-radius:18px;flex-shrink:0;background:#111;border:1px solid #222;overflow:hidden}
@@ -899,7 +900,8 @@ function loadDashboard(){
       var c=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#666";
       return "<div class='role-item'><span class='role-dot' style='background:"+c+"'></span>"+esc(r.name)+"</div>";
     }).join("");
-    var h="<div class='dash-header'>";
+    var h="<div class='dash-banner' id='dashBanner'></div>";
+    h+="<div class='dash-header'>";
     h+=iconHtml;
     h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+esc(d.created)+"</div></div>";
     h+="</div>";
