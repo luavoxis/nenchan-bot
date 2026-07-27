@@ -691,7 +691,6 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .ban-username{color:#555;font-size:10px}
 .ban-reason{color:#f44;font-size:10px;margin-top:2px;font-weight:600}
 .ban-reason::before{content:"reason: "}
-.ban-empty{color:#555;padding:20px 0;font-size:11px;text-align:center}
 .ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
 .ban-unban-btn:hover{background:#f44;color:#fff}
 .timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0a0a0a;border:1px solid #2a2200;cursor:pointer;transition:border-color .15s}
@@ -791,7 +790,6 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="banStats" class="member-stats"></div>
 <div id="banTimeouts" class="mod-section"></div>
 <div id="banBans" class="mod-section"></div>
-<div id="banEmpty" style="display:none" class="ban-empty">/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style="font-size:9px;color:#444">no active moderations</span></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -882,9 +880,7 @@ function loadModerations(){
   g("banTimeouts").innerHTML="";
   g("banBans").innerHTML="";
   g("banStats").innerHTML="";
-  g("banEmpty").style.display="none";
   g("banTimeouts").innerHTML="<p style='color:#666;font-size:10px'>loading...</p>";
-  g("banBans").innerHTML="<p style='color:#666;font-size:10px'>loading...</p>";
   api({action:"moderations"},function(d){
     if(d.error){g("banTimeouts").innerHTML="";g("banBans").innerHTML="<p style='color:#f44;font-size:10px'>"+esc(d.error)+"</p>";return}
     var timeouts=d.timeouts||[];
@@ -894,14 +890,13 @@ function loadModerations(){
       "<div class='member-stat'><span>banned</span><p>"+bans.length+"</p></div>";
     renderTimeouts(timeouts);
     renderBans(bans);
-    if(!timeouts.length&&!bans.length)g("banEmpty").style.display="block";
   });
 }
 
 function renderTimeouts(timeouts){
   var h="";
   if(timeouts.length){
-    h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out <span class='count'>"+timeouts.length+"</span></div>";
+    h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out</div>";
   }
   for(var i=0;i<timeouts.length;i++){
     var m=timeouts[i],u=m.user;
@@ -929,14 +924,14 @@ function renderTimeouts(timeouts){
     h+="<button class='timeout-remove' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();removeTimeout(this)'>remove</button>";
     h+="</div>";
   }
-  if(!timeouts.length)h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out <span class='count'>0</span></div><p style='color:#555;font-size:10px;padding:6px 0'>no active timeouts</p>";
+  if(!timeouts.length)h+="<div class='mod-section-title'><span class='dot' style='background:#ff0'></span>timed out</div><p style='color:#555;font-size:10px;padding:6px 0'>no active timeouts</p>";
   g("banTimeouts").innerHTML=h;
 }
 
 function renderBans(bans){
   var h="";
   if(bans.length){
-    h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned <span class='count'>"+bans.length+"</span></div>";
+    h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned</div>";
   }
   for(var i=0;i<bans.length;i++){
     var b=bans[i],u=b.user;
@@ -952,13 +947,13 @@ function renderBans(bans){
     h+="<button class='ban-unban-btn' data-uid='"+u.id+"' data-name='"+esc(name)+"' onclick='event.stopPropagation();confirmUnban(this)'>unban</button>";
     h+="</div>";
   }
-  if(!bans.length)h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned <span class='count'>0</span></div><p style='color:#555;font-size:10px;padding:6px 0'>no banned users</p>";
+  if(!bans.length)h+="<div class='mod-section-title'><span class='dot' style='background:#f44'></span>banned</div><p style='color:#555;font-size:10px;padding:6px 0'>no banned users</p>";
   g("banBans").innerHTML=h;
 }
 
 function filterBans(q){
   q=q.toLowerCase();
-  if(!q){renderTimeouts(allModData.timeouts);renderBans(allModData.bans);g("banEmpty").style.display=(allModData.timeouts.length||allModData.bans.length)?"none":"block";return}
+  if(!q){renderTimeouts(allModData.timeouts);renderBans(allModData.bans);return}
   var ft=allModData.timeouts.filter(function(m){
     var u=m.user;
     var name=(u.global_name||u.username).toLowerCase();
@@ -971,7 +966,6 @@ function filterBans(q){
   });
   renderTimeouts(ft);
   renderBans(fb);
-  g("banEmpty").style.display=(ft.length||fb.length)?"none":"block";
 }
 
 function confirmUnban(el){
@@ -1080,7 +1074,7 @@ function loadMsgHistory(cid){
   g("msgHistory").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
   api({action:"messages",channelId:cid,limit:30},function(d){
     if(d.error){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>/\u1420 - \u02D5 -\u30DE \u1DBB \u{1D5D3} \u{10C01}<br><span style='font-size:9px;color:#444'>no message found.</span></p>";return}
+    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#555;text-align:center;padding:20px 0'>no message found.</p>";return}
     if(!Array.isArray(d.messages)){g("msgHistory").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>invalid response: messages is not an array</p>";return}
     var h="";
     try{
