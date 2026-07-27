@@ -298,8 +298,9 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
 .mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mention-item .m-bot{color:#b48899;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
-.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s}
-.ban-card:hover{border-color:#3a3340}
+.ban-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1e2228;cursor:pointer;transition:background .15s;border-radius:0}
+.ban-card:last-child{border-bottom:none}
+.ban-card:hover{background:#191d23}
 .ban-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
 .ban-info{flex:1;min-width:0}
 .ban-name{color:#e0dce4;font-size:11px;font-weight:600}
@@ -309,8 +310,9 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .ban-reason::before{content:"reason: "}
 .ban-unban-btn{padding:4px 12px;font-size:10px;border:1px solid #d45555;border-radius:6px;background:#252a32;color:#d45555;cursor:pointer;font-family:'Space Grotesk',monospace;flex-shrink:0;font-weight:600;transition:all .15s}
 .ban-unban-btn:hover{background:#d45555;color:#e0dce4}
-.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s}
-.timeout-card:hover{border-color:#3a3340}
+.timeout-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #1e2228;cursor:pointer;transition:background .15s;border-radius:0}
+.timeout-card:last-child{border-bottom:none}
+.timeout-card:hover{background:#191d23}
 .timeout-card img{width:34px;height:34px;border-radius:50%;flex-shrink:0;border:2px solid #252a32}
 .timeout-info{flex:1;min-width:0}
 .timeout-name{color:#e0dce4;font-size:11px;font-weight:600}
@@ -326,7 +328,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mod-section-title{font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;padding:10px 8px 6px;margin-top:4px;font-weight:600;display:flex;align-items:center;gap:6px}
 .mod-section-title .count{color:#5a5260;font-weight:400}
 .mod-section-title .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.mod-section{margin-bottom:4px}
+.mod-section{margin-bottom:4px;background:#191d23;border:1px solid #252a32;border-radius:8px;overflow:hidden}
 </style>
 </head>
 <body>
@@ -658,6 +660,7 @@ var mentionVisible=false;
 function showMentionList(){
   mentionVisible=true;
   var el=g("mentionList");
+  if(!allMembers.length){loadMembers()}
   if(!el.children.length)filterMentions("");
   el.classList.add("show");
 }
@@ -667,9 +670,14 @@ function filterMentions(q){
   var el=g("mentionList");
   var h="";
   var count=0;
-  for(var i=0;i<allMembers.length&&count<20;i++){
-    var m=allMembers[i],name=m.nick||(m.user.global_name||m.user.username);
-    if(q&&name.toLowerCase().indexOf(q)===-1&&m.user.username.indexOf(q)===-1&&m.user.id.indexOf(q)===-1)continue;
+  var sorted=allMembers.slice().sort(function(a,b){
+    var an=(a.nick||(a.user.global_name||a.user.username)).toLowerCase();
+    var bn=(b.nick||(b.user.global_name||b.user.username)).toLowerCase();
+    return an.localeCompare(bn);
+  });
+  for(var i=0;i<sorted.length&&count<50;i++){
+    var m=sorted[i],name=m.nick||(m.user.global_name||m.user.username);
+    if(q&&name.toLowerCase().indexOf(q)===-1&&m.user.username.toLowerCase().indexOf(q)===-1&&m.user.id.indexOf(q)===-1)continue;
     var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
     h+="<div class='mention-item' data-uid='"+m.user.id+"' data-name='"+esc(name)+"' onclick='pickMention(this)'>";
     h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
@@ -928,11 +936,7 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
-  var bannerColor="#b48899";
-  var userColor=m.roles.length?allRoles.find(function(x){return x.id===m.roles[0]}):null;
-  if(userColor&&userColor.color)bannerColor="#"+userColor.color.toString(16).padStart(6,"0");
-  g("modalBox").innerHTML="<div class='modal-banner' style='background:"+bannerColor+"'></div>"+
-    "<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
+  g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
     "<div id='modalBadges'></div>"+
     "<div class='modal-section'><div class='modal-section-label'>id</div><p style='color:#9a929e;font-size:11px'>"+m.user.id+"</p></div>"+
@@ -956,6 +960,13 @@ function showMember(id){
     }else if(u.accent_color!=null){
       var ac="#"+u.accent_color.toString(16).padStart(6,"0");
       bannerHtml="<div class='modal-banner-color' style='background:"+ac+"'></div>";
+    }else{
+      var rc="#b48899";
+      for(var ri=0;ri<m.roles.length;ri++){
+        var rl=allRoles.find(function(x){return x.id===m.roles[ri]});
+        if(rl&&rl.color){rc="#"+rl.color.toString(16).padStart(6,"0");break}
+      }
+      bannerHtml="<div class='modal-banner-color' style='background:"+rc+"'></div>";
     }
     var box=g("modalBox");
     box.insertAdjacentHTML("afterbegin",bannerHtml);
