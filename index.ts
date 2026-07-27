@@ -274,7 +274,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 .ban-username{color:#555;font-size:10px}
 .ban-reason{color:#f44;font-size:10px;margin-top:2px;font-weight:600}
 .ban-reason::before{content:"reason: "}
-.ban-empty{color:#555;text-align:center;padding:20px 0;font-size:11px}
+.ban-empty{color:#555;padding:20px 0;font-size:11px}
 .ban-unban-btn{padding:3px 10px;font-size:10px;border:1px solid #f44;background:#111;color:#f44;cursor:pointer;font-family:monospace;flex-shrink:0;font-weight:600}
 .ban-unban-btn:hover{background:#f44;color:#fff}
 </style>
@@ -443,9 +443,9 @@ function toggleDashRoles(){g("dashRoleList").classList.toggle("show");g("dashRol
 
 var allBans=[];
 function loadBans(){
-  g("banList").innerHTML="<p style='color:#666;text-align:center;padding:20px 0'>loading...</p>";
+  g("banList").innerHTML="<p style='color:#666;padding:20px 0'>loading...</p>";
   api({action:"bans"},function(d){
-    if(d.error){g("banList").innerHTML="<p style='color:#f44;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    if(d.error){g("banList").innerHTML="<p style='color:#f44;padding:20px 0'>"+esc(d.error)+"</p>";return}
     if(!d.bans||!d.bans.length){
       g("banStats").innerHTML="";
       g("banList").innerHTML="<div class='ban-empty'>/ᐠ - ˕ -マ ᶻ 𝗓 𐰁<br><span style='font-size:9px;color:#444'>no banned users</span></div>";
