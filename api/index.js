@@ -525,7 +525,7 @@ body{font:14px/1.4 'Space Grotesk',monospace;background:#000;color:#ccc;min-heig
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
 .sidebar button:hover img{opacity:.7}
 .sidebar button.active img{opacity:1;filter:none}
-#logoutBtn{color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
+#logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
 #logoutBtn:hover{background:#1a0000!important}
 #logoutBtn img{opacity:.6;filter:none}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
