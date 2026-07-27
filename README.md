@@ -1,111 +1,100 @@
 # nenchan
 
-Discord botu + Vercel'de barındırılan embedded admin paneli. Bot komutları, sunucu yönetimi, DM gönderme, mesaj silme, ban/kick/timeout ve hepsi tek bir serverless function'da.
+Discord bot with an embedded admin panel hosted on Vercel. Bot commands, server management, DMs, message deletion, ban/kick/timeout — all in a single serverless function.
 
-## Ne işe yarıyor
+## Features
 
-### Bot Komutları
+### Bot Commands
 - `/ping` — pong
-- `/chat <prompt>` — Google Gemini AI ile sohbet
-- `/banner [user]` — Kullanıcı banner'ı gösterir
-- `/profile [user]` — Kullanıcı profili (avatar, banner, accent color)
-- `/userinfo [user]` — Kullanıcı bilgileri
+- `/chat <prompt>` — Chat with Google Gemini AI
+- `/banner [user]` — Show user banner
+- `/profile [user]` — User profile (avatar, banner, accent color)
+- `/userinfo [user]` — User info
 
-### Admin Paneli (web)
-`https://nenchan.vercel.app/api` adresinden erişilir. Discord OAuth2 ile giriş yapılır.
+### Admin Panel (web)
+Accessible at `https://nenchan.vercel.app/api`. Login via Discord OAuth2.
 
-- **Dashboard** — Sunucu istatistikleri, rol listesi
-- **Members** — Üye listesi, arama/filtreleme, rol rozetleri, ban/kick/timeout butonları
-- **Sanctions** — Aktif timeout ve ban listesi, kaldırma butonları
-- **Messages** — Kanal seçme, mesaj geçmişi (sadece bot mesajları), dosya ekleme, silme
-- **Whispers** — DM gönderme/alma (kullanıcı ID ile)
+- **Dashboard** — Server stats, role list
+- **Members** — Member list, search/filter, role badges, ban/kick/timeout actions
+- **Sanctions** — Active timeouts and bans, removal buttons
+- **Messages** — Channel selection, message history (bot messages only), file attachments, delete
+- **Whispers** — Send/receive DMs (by user ID)
 
-## Teknoloji
+## Tech Stack
 
-| Katman | Teknoloji |
-|--------|-----------|
+| Layer | Technology |
+|-------|-----------|
 | Runtime | Vercel Serverless (Node.js) |
 | Bot Framework | [Discraft](https://github.com/The-Best-Codes/discraft-js) |
-| Dil | TypeScript |
+| Language | TypeScript |
 | AI | Google Gemini |
 | Auth | HMAC-SHA256 signed token + HttpOnly cookie |
 | API | Discord REST API v10 |
 
-## Kurulum
+## Setup
 
 ### 1. Discord Developer Portal
 
-1. [discord.com/developers/applications](https://discord.com/developers/applications) adresine git
-2. Yeni uygulama oluştur
-3. **Bot** sekmesinden token al
-4. **General Information** sekmesinden App ID ve Public Key al
-5. **OAuth2** sekmesinden Client Secret al
-6. OAuth2 > URL Generator'dan `applications.commands` scope ile davet linki oluştur
-7. Interactions Endpoint URL kısmına `https://nenchan.vercel.app/api` yaz
+1. Go to [discord.com/developers/applications](https://discord.com/developers/applications)
+2. Create a new application
+3. Get the **Bot** token from the Bot tab
+4. Get the **App ID** and **Public Key** from General Information
+5. Get the **Client Secret** from OAuth2
+6. Generate an invite link with `applications.commands` scope via OAuth2 > URL Generator
+7. Set Interactions Endpoint URL to `https://nenchan.vercel.app/api`
 
-### 2. Ortam Değişkenleri
+### 2. Environment Variables
 
-`.env` dosyasını oluştur:
+Create a `.env` file:
 
 ```env
 DISCORD_PUBLIC_KEY='...'
 DISCORD_APP_ID='...'
 DISCORD_TOKEN='...'
 DISCORD_CLIENT_SECRET='...'
-DISCORD_OWNER_ID='...'          # Sadece senin Discord user ID'n
-GUILD_ID='...'                  # Botun olacağı sunucu ID'si
+DISCORD_OWNER_ID='...'          # Your Discord user ID (only you can access the panel)
+GUILD_ID='...'                  # Server ID where the bot operates
 GOOGLE_AI_API_KEY='...'
 GOOGLE_AI_MODEL='gemini-2.0-flash'
 ```
 
-### 3. Vercel'e Deploy
+### 3. Deploy to Vercel
 
 ```bash
-# Bağımlılıkları kur
 npm install
-
-# Build et (bot komutlarını Discord'a register eder + api/index.js üretir)
 npm run build
-
-# Deploy et
 vercel deploy --prod
 ```
 
-Vercel dashboard'undan da environment variable'ları ayarla.
+Also set the environment variables in the Vercel dashboard.
 
 ### 4. Git Push = Auto Deploy
 
-Repo `luavoxis/nenchan-bot` GitHub'a bağlı. `main` branch'ine push atınca Vercel otomatik deploy eder.
+The repo is connected to `luavoxis/nenchan-bot` on GitHub. Pushing to `main` triggers automatic Vercel deployment.
 
-## Proje Yapısı
+## Project Structure
 
 ```
 nenchan/
-├── index.ts              # Ana handler: Discord interactions + admin panel HTML/JS
+├── index.ts              # Main handler: Discord interactions + admin panel HTML/JS
 ├── commands/
-│   ├── chat.ts           # /chat — Gemini AI sohbet
+│   ├── chat.ts           # /chat — Gemini AI chat
 │   ├── ping.ts           # /ping
 │   ├── banner.ts         # /banner
 │   ├── profile.ts        # /profile
 │   └── userinfo.ts       # /userinfo
-├── public/icons/         # Dashboard ikonları
-├── api/index.js          # Build çıktısı (esbuild, deploy edilen dosya)
+├── public/icons/         # Dashboard icons
+├── api/index.js          # Build output (esbuild, deployed file)
 ├── vercel.json           # Route rewrite + security headers
 ├── package.json
 └── .env.example
 ```
 
-## Güvenlik
+## Security
 
-- Auth token: `HMAC-SHA256(userId, DISCORD_CLIENT_SECRET)` ile imzalanmış
+- Auth token: HMAC-SHA256 signed with `DISCORD_CLIENT_SECRET`
 - Cookie: `HttpOnly`, `Secure`, `SameSite=Strict`
-- Tüm user/channel ID'leri snowflake regex ile doğrulanıyor
-- Stack trace client'a döndürülmüyor
-- CSP, X-Frame-Options, HSTS, nosniff header'ları aktif
-- Request body 1MB ile sınırlı
-
-## Komutlar
-
-```bash
-npm run build    # discraft vercel build — bot komutlarını register eder + api/index.js üretir
-```
+- All user/channel IDs validated with snowflake regex
+- Stack traces never exposed to client
+- CSP, X-Frame-Options, HSTS, nosniff headers enabled
+- Request body limited to 1MB
