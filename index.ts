@@ -118,26 +118,31 @@ button:hover{background:#888}
 .success{color:#4f4;font-size:11px;margin-bottom:4px}
 textarea{resize:vertical;min-height:50px;font:12px 'Space Grotesk',monospace}
 select option{background:#000;color:#ccc}
-.stat{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;margin-bottom:4px}
+.stat{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;margin-bottom:4px;border-radius:4px;transition:border-color .15s}
+.stat:hover{border-color:#333}
 .stat span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .stat p{color:#fff;font-size:13px;margin-top:2px}
-.dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px}
-.dash-icon{width:64px;height:64px;border-radius:50%;flex-shrink:0;background:#111}
+.dash-header{display:flex;align-items:center;gap:14px;padding:16px;background:#0a0a0a;border:1px solid #1a1a1a;margin-bottom:6px;border-radius:6px;transition:border-color .15s}
+.dash-header:hover{border-color:#333}
+.dash-icon{width:64px;height:64px;border-radius:16px;flex-shrink:0;background:#111;border:1px solid #222;overflow:hidden}
+.dash-icon img{width:100%;height:100%;object-fit:cover}
 .dash-info{flex:1;min-width:0}
 .dash-name{color:#fff;font-size:16px;font-weight:600;margin:0}
 .dash-id{color:#555;font-size:10px;margin-top:2px;font-weight:600}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 @media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
-.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px}
-.dash-card-icon{width:32px;height:32px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:4px}
-.dash-card-icon img{width:18px;height:18px}
+.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;padding:10px;display:flex;align-items:center;gap:10px;border-radius:4px;transition:border-color .15s}
+.dash-card:hover{border-color:#333}
+.dash-card-icon{width:32px;height:32px;background:#111;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:6px;border:1px solid #222}
+.dash-card-icon img{width:16px;height:16px;opacity:.6}
 .dash-card-label{color:#666;font-size:9px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-card-val{color:#fff;font-size:14px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:9px;margin-top:1px;font-weight:600}
-.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0}
+.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;cursor:pointer;margin-bottom:0;border-radius:4px 4px 0 0;transition:background .15s}
+.dash-roles-header:hover{background:#0f0f0f}
 .dash-roles-header span{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-roles-header .role-arrow{color:#555;font-size:9px;transition:transform .15s}
-.dash-roles-list{display:none;background:#0a0a0a;border:1px solid #1a1a1a;border-top:none;padding:4px 6px;max-height:200px;overflow-y:auto;scrollbar-width:none;margin-bottom:6px}
+.dash-roles-list{display:none;background:#0a0a0a;border:1px solid #1a1a1a;border-top:none;padding:4px 6px;max-height:200px;overflow-y:auto;scrollbar-width:none;margin-bottom:6px;border-radius:0 0 4px 4px}
 .dash-roles-list.show{display:block}
 .dash-roles-list::-webkit-scrollbar{display:none}
 table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
