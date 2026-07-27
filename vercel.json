@@ -24,15 +24,7 @@
   ],
   "rewrites": [
     {
-      "source": "/icons/(.*)",
-      "destination": "/icons/$1"
-    },
-    {
-      "source": "/fonts/(.*)",
-      "destination": "/fonts/$1"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/",
       "destination": "/api"
     }
   ]
