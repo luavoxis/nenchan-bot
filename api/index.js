@@ -1737,36 +1737,51 @@ async function handlePanel(res, body) {
     if (body.action === "ban") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
-      const banBody = {};
-      if (body.reason) banBody.reason = body.reason;
-      if (body.deleteDays) banBody.delete_message_days = body.deleteDays;
-      await discordFetch3(
-        `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
-        { method: "PUT", headers, body: JSON.stringify(banBody) }
-      );
-      return res.json({ success: true });
+      try {
+        const banHeaders = { ...headers, "Content-Type": "application/json" };
+        if (body.reason) banHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        const banBody = {};
+        if (body.deleteDays) banBody.delete_message_seconds = (body.deleteDays || 1) * 86400;
+        await discordFetch3(
+          `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
+          { method: "PUT", headers: banHeaders, body: JSON.stringify(banBody) }
+        );
+        return res.json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || "Failed to ban user" });
+      }
     }
     if (body.action === "kick") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
-      const kickHeaders = { ...headers };
-      if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
-      await discordFetch3(
-        `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
-        { method: "DELETE", headers: kickHeaders }
-      );
-      return res.json({ success: true });
+      try {
+        const kickHeaders = { ...headers };
+        if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        await discordFetch3(
+          `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
+          { method: "DELETE", headers: kickHeaders }
+        );
+        return res.json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || "Failed to kick user" });
+      }
     }
     if (body.action === "timeout") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
       if (!body.minutes) return res.status(400).json({ error: "No duration specified" });
-      const until = new Date(Date.now() + body.minutes * 60 * 1e3).toISOString();
-      await discordFetch3(
-        `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
-        { method: "PATCH", headers, body: JSON.stringify({ communication_disabled_until: until }) }
-      );
-      return res.json({ success: true });
+      try {
+        const until = new Date(Date.now() + body.minutes * 60 * 1e3).toISOString();
+        const timeoutHeaders = { ...headers, "Content-Type": "application/json" };
+        if (body.reason) timeoutHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        await discordFetch3(
+          `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
+          { method: "PATCH", headers: timeoutHeaders, body: JSON.stringify({ communication_disabled_until: until }) }
+        );
+        return res.json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || "Failed to timeout user" });
+      }
     }
     if (body.action === "bans") {
       try {
