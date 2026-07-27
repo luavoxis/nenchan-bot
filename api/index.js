@@ -526,6 +526,7 @@ body{font:12px/1.4 monospace;background:#000;color:#ccc;min-height:100vh;display
 .sidebar button.active img{opacity:1;filter:none}
 #logoutBtn{margin-top:auto;color:#f44!important;border-top:1px solid #222;padding-top:8px!important;padding-left:10px!important;border-radius:4px}
 #logoutBtn:hover{background:#1a0000!important}
+#logoutBtn img{opacity:.6;filter:none}
 .main{flex:1;padding:16px;max-width:800px}
 .panel{display:none}
 .panel.show{display:block}
@@ -752,7 +753,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="bans" onclick="switchTab('bans')"><img src="/icons/sanctions.png" alt="">sanctions</button>
 <button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
 <button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
-<button id="logoutBtn" onclick="logout()">logout</button>
+<button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
 </div>
 <div class="main">
 <div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;justify-content:center;align-items:center">
