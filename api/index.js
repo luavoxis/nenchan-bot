@@ -773,7 +773,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <h2 style="margin-bottom:4px;color:#eee;font-size:14px;letter-spacing:1px;font-weight:500">nenchan</h2>
 <p style="color:#5a5260;font-size:10px;margin-bottom:20px;text-transform:uppercase;letter-spacing:1.5px">admin panel</p>
 <div id="loginError" style="color:#d45555;font-size:11px;margin-bottom:8px;min-height:16px"></div>
-<button onclick="loginDiscord()" style="width:100%;padding:10px 12px;background:#b48899;color:#e0dce4;border:none;border-radius:4px;font:12px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s" onmouseover="this.style.background='#4752c4'" onmouseout="this.style.background='#5865F2'"><img src="/icons/discord.png" alt="" style="width:18px;height:18px"/>Login with Discord</button>
+<button onclick="loginDiscord()" style="width:100%;padding:10px 12px;background:#b48899;color:#13161b;border:none;border-radius:4px;font:12px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;font-weight:600" onmouseover="this.style.background='#c9a0ae'" onmouseout="this.style.background='#b48899'"><img src="/icons/discord.png" alt="" style="width:18px;height:18px;filter:brightness(0) saturate(100%)"/>Login with Discord</button>
 <p style="color:#3a3340;font-size:9px;margin-top:12px">authorized users only</p>
 </div>
 </div>
