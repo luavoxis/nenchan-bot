@@ -475,7 +475,8 @@ function loadDashboard(){
       var c=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#666";
       return "<div class='role-item'><span class='role-dot' style='background:"+c+"'></span>"+esc(r.name)+"</div>";
     }).join("");
-    var h="<div class='dash-banner' id='dashBanner' style=\"background-image:url('/icons/headers/header"+(Math.floor(Math.random()*3)+1)+".png')\"></div>";
+    var hdrIdx=Math.floor(Math.random()*3)+1;
+    var h="<div class='dash-banner' id='dashBanner' data-hdr='/icons/headers/header"+hdrIdx+".png'></div>";
     h+="<div class='dash-header'>";
     h+=iconHtml;
     h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+esc(d.created)+"</div></div>";
@@ -491,6 +492,7 @@ function loadDashboard(){
     h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
     h+="</div>";
     g("dashContent").innerHTML=h;
+    var b=g("dashBanner");if(b&&b.dataset.hdr)b.style.backgroundImage="url('"+b.dataset.hdr+"')";
   });
 }
 
