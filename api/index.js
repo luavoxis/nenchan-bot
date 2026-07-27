@@ -757,11 +757,16 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
 </div>
 <div class="main">
-<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;justify-content:center;align-items:center">
-<div style="background:#0a0a0a;border:1px solid #222;padding:24px;width:100%;max-width:280px;text-align:center">
-<h2 style="margin-bottom:16px;color:#fff;font-size:13px;letter-spacing:2px;font-weight:400">nenchan v1.0</h2>
-<div id="loginError" style="color:#f44;font-size:11px;margin-bottom:6px;min-height:16px"></div>
-<button onclick="loginDiscord()" style="width:100%;padding:8px 10px;background:#5865F2;color:#fff;border:none;border-radius:0;font:12px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="14" viewBox="0 0 71 55" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M60.1045 4.8978C55.5792 2.8214 50.7265 1.2916 45.6527 0.41542C45.5603 0.39851 45.468 0.440769 45.4204 0.525289C44.7963 1.6353 44.105 3.0834 43.6209 4.2216C38.1637 3.4046 32.7345 3.4046 27.3892 4.2216C26.9048 3.0581 26.1885 1.6353 25.5617 0.525289C25.5141 0.443589 25.4218 0.40133 25.4218 0.384528C20.3584 1.2916 15.5057 2.8214 10.9776 4.8978C10.9384 4.9147 10.9048 4.9429 10.8825 4.9795C1.57795 18.7309 -0.143566 32.1443 0.0634574 45.3916C0.0665884 45.4562 0.112098 45.5182 0.178348 45.5477C6.45866 50.1432 12.3413 52.9005 18.1105 54.6698C18.1853 54.7047 18.2723 54.6929 18.3373 54.6448C19.7468 52.7248 20.9917 50.72 22.0603 48.6493C22.1217 48.5282 22.076 48.3822 21.9537 48.3014C18.488 47.0774 15.1632 45.2637 11.9822 42.9226C11.7211 42.7424 11.6658 42.3689 11.8429 42.1275C12.3622 41.4599 12.8867 40.7605 13.3636 40.0481C13.4187 39.9667 13.5316 39.9389 13.6177 39.9713C26.135 45.707 39.6821 45.707 52.1169 39.7713C52.203 39.7389 52.3159 39.7667 52.371 39.8481C52.8479 40.5605 53.3724 41.2599 53.8917 41.9275C54.0688 42.1689 54.0263 42.5424 53.7652 42.7224C50.5842 45.2637 47.2594 47.0774 43.7937 48.3014C43.6714 48.3822 43.628 48.5282 43.6893 48.6493C44.758 50.72 46.0029 52.7248 47.4124 54.6448C47.4774 54.6929 47.5644 54.7047 47.6392 54.6698C53.4121 52.9005 59.2949 50.1432 65.5752 45.5551C65.6428 45.5256 65.6897 45.4616 65.6911 45.3968C65.9378 30.0424 62.7177 16.6909 53.4859 4.9829C53.4627 4.9442 53.4283 4.9167 53.3898 4.8998L60.1045 4.8978Z" fill="white"/></svg> Login with Discord</button>
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99;justify-content:center;align-items:center">
+<div style="background:#0d0d0d;border:1px solid #1a1a1a;padding:32px 28px;width:100%;max-width:300px;text-align:center;border-radius:6px">
+<div style="width:48px;height:48px;margin:0 auto 16px;background:#181818;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #222">
+<img src="/icons/dashboard.png" alt="" style="width:22px;height:22px;opacity:.5"/>
+</div>
+<h2 style="margin-bottom:4px;color:#eee;font-size:14px;letter-spacing:1px;font-weight:500">nenchan</h2>
+<p style="color:#555;font-size:10px;margin-bottom:20px;text-transform:uppercase;letter-spacing:1.5px">admin panel</p>
+<div id="loginError" style="color:#f44;font-size:11px;margin-bottom:8px;min-height:16px"></div>
+<button onclick="loginDiscord()" style="width:100%;padding:10px 12px;background:#5865F2;color:#fff;border:none;border-radius:4px;font:12px 'Space Grotesk',monospace;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s" onmouseover="this.style.background='#4752c4'" onmouseout="this.style.background='#5865F2'"><img src="/icons/discord.png" alt="" style="width:18px;height:18px"/>Login with Discord</button>
+<p style="color:#333;font-size:9px;margin-top:12px">authorized users only</p>
 </div>
 </div>
 <div id="panel-dashboard" class="panel">
