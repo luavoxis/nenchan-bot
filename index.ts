@@ -351,7 +351,6 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
 </div>
 </div>
-</div>
 <div id="panel-bans" class="panel">
 <input type="text" class="member-search" id="banSearch" placeholder="search banned users..." oninput="filterBans(this.value)"/>
 <div id="banStats" class="member-stats"></div>
