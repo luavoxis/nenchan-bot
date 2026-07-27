@@ -330,7 +330,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">&#9776;</button>
 <div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sidebar" class="sidebar" style="display:none">
-<h1>nenchan v1.0</h1>
 <button class="active" data-tab="dashboard" onclick="switchTab('dashboard')"><img src="/icons/dashboard.png" alt="">dashboard</button>
 <button data-tab="members" onclick="switchTab('members')"><img src="/icons/members.png" alt="">members</button>
 <button data-tab="bans" onclick="switchTab('bans')"><img src="/icons/sanctions.png" alt="">sanctions</button>
