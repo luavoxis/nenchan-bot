@@ -565,14 +565,12 @@ select option{background:#000;color:#ccc}
 .dash-card-label{color:#666;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
 .dash-card-val{color:#fff;font-size:15px;margin-top:1px}
 .dash-card-sub{color:#555;font-size:10px;margin-top:1px;font-weight:600}
-.dash-roles-wrap{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;margin-bottom:8px;transition:border-color .15s}
-.dash-roles-wrap:hover{border-color:#333}
-.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;transition:background .15s}
-.dash-roles-header:hover{background:#0f0f0f}
+.dash-roles-wrap{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.dash-roles-header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer}
 .dash-roles-header span{color:#666;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-.dash-roles-header .role-arrow{color:#555;font-size:10px;transition:transform .15s}
-.dash-roles-list{max-height:0;overflow:hidden;transition:max-height .25s ease;border-top:0 solid #1a1a1a}
-.dash-roles-list.show{max-height:300px;border-top-width:1px;padding:6px 8px}
+.dash-roles-header .role-arrow{color:#555;font-size:10px;transition:transform .2s}
+.dash-roles-list{display:none;border-top:1px solid #1a1a1a;padding:6px 8px}
+.dash-roles-list.show{display:block}
 .dash-roles-list::-webkit-scrollbar{width:4px}
 .dash-roles-list::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
@@ -591,8 +589,7 @@ th{color:#666;font-size:11px;text-transform:uppercase;font-weight:600}
 .role-toggle:hover{color:#fff}
 .role-list{display:none;max-height:200px;overflow-y:auto;margin-top:4px;padding:4px 0;border-top:1px solid #222}
 .role-list.show{display:block}
-.role-item{display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:11px;color:#aaa;border-radius:4px;transition:background .1s}
-.role-item:hover{background:#111}
+.role-item{display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:11px;color:#aaa;border-radius:4px}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.05)}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
