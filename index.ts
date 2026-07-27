@@ -869,14 +869,13 @@ function renderMemberCard(m){
     }
   }
   if(m.roles.length>3)roleBadges+="<span class='role-badge'>+"+(m.roles.length-3)+"</span>";
-  var p=m.profile||{};
+  var p=m.profile||m.user||{};
   var badges="";
   if(m.premium_since)badges+="<span class='member-badge badge-boost'>boost</span>";
   if(p.premium_type&&p.premium_type>0)badges+="<span class='member-badge badge-nitro'>nitro</span>";
-  if(p.bio&&p.bio.length>0){
-    var bioPreview=esc(p.bio);
-    if(bioPreview.length>60)bioPreview=bioPreview.substring(0,60)+"...";
-  }else{var bioPreview=""}
+  var bioText=p.bio||"";
+  var bioPreview=bioText?esc(bioText):"";
+  if(bioPreview.length>60)bioPreview=bioPreview.substring(0,60)+"...";
   var h="<div class='member-card' data-mid='"+m.user.id+"' onclick='showMember(this.dataset.mid)'>";
   h+="<img class='member-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
   h+="<div class='member-info'><div class='member-name'>"+esc(name)+(m.user.bot?" <span>bot</span>":"")+"</div>";
@@ -913,9 +912,9 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
-  var p=m.profile||{};
+  var p=m.profile||m.user||{};
   var flagsList=[];
-  var f=p.public_flags||0;
+  var f=p.public_flags||p.flags||0;
   if(f&1)flagsList.push("Discord Staff");
   if(f&2)flagsList.push("Discord Partner");
   if(f&4)flagsList.push("HypeSquad Events");
