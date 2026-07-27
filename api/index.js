@@ -1,6 +1,7 @@
 // index.ts
 import { InteractionResponseType, MessageFlags as MessageFlags5 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
+import crypto from "crypto";
 
 // commands/userinfo.ts
 import {
@@ -435,6 +436,7 @@ import "discord-interactions";
 var DISCORD_OWNER_ID = process.env.DISCORD_OWNER_ID || "";
 var DISCORD_APP_ID = process.env.DISCORD_APP_ID || "";
 var DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
+var HMAC_SECRET = process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_TOKEN || "";
 var OAUTH_REDIRECT = "https://nenchan.vercel.app/api";
 async function discordFetch3(url, opts = {}) {
   const u = new URL(url);
@@ -472,15 +474,37 @@ async function discordFetch3(url, opts = {}) {
     req.end();
   });
 }
-function authToken() {
-  return Buffer.from(DISCORD_OWNER_ID).toString("base64");
+function signToken(userId) {
+  const sig = crypto.createHmac("sha256", HMAC_SECRET).update(userId).digest("hex");
+  return Buffer.from(userId).toString("base64") + "." + sig;
 }
 function verifyToken(token) {
   try {
-    return Buffer.from(token, "base64").toString() === DISCORD_OWNER_ID;
+    const parts = token.split(".");
+    if (parts.length !== 2) return false;
+    const userId = Buffer.from(parts[0], "base64").toString();
+    const expectedSig = crypto.createHmac("sha256", HMAC_SECRET).update(userId).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(parts[1], "hex"), Buffer.from(expectedSig, "hex"));
   } catch {
     return false;
   }
+}
+function getTokenFromRequest(req) {
+  const cookie = req.headers.cookie;
+  if (cookie) {
+    const match = cookie.match(/token=([^;]+)/);
+    if (match) return match[1];
+  }
+  const auth = req.headers.authorization;
+  if (auth?.startsWith("Bearer ")) return auth.slice(7);
+  return null;
+}
+var SNOWFLAKE_RE = /^\d{17,20}$/;
+function isValidSnowflake(id) {
+  return typeof id === "string" && SNOWFLAKE_RE.test(id);
+}
+function htmlEscape(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 function html() {
   return `<!doctype html>
@@ -804,8 +828,7 @@ th{color:#666;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <script>
 function g(i){return document.getElementById(i)}
-function getCookie(n){const m=document.cookie.match(new RegExp("(^| )"+n+"=([^;]+)"));return m?decodeURIComponent(m[2]):null}
-var token=getCookie("token"),allMembers=[],allRoles=[];
+var allMembers=[],allRoles=[];
 
 function loginDiscord(){
   api({action:"oauth_url"},function(d){
@@ -843,7 +866,6 @@ function api(body,cb){
   x.setRequestHeader("Content-Type","application/json");
   x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){cb({error:"parse error"})}};
   x.onerror=function(){cb({error:"connection error"})};
-  body.token=token;
   x.send(JSON.stringify(body));
 }
 
@@ -1063,10 +1085,6 @@ function pickMention(el){
   input.focus();
   g("mentionSearch").value="";
   g("mentionList").classList.remove("show");
-}
-function insertMention(){
-  var sel=g("msgMention");
-  if(sel.value){g("msgInput").value+=sel.value+" ";sel.value=""}
 }
 
 function loadMsgHistory(cid){
@@ -1345,7 +1363,7 @@ function fmt(s){
     .replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>")
     .replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
 }
-function logout(){document.cookie="token=;path=/;max-age=0";location.reload()}
+function logout(){fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"logout"})}).finally(function(){location.reload()})}
 function updateFileLabel(el){
   var label=g("dropLabel");
   if(el.files&&el.files.length){label.textContent=el.files[0].name;g("dropZone").classList.add("has-file")}
@@ -1518,7 +1536,7 @@ async function handler(req, res) {
       if (oauthError) {
         const desc = req.query.error_description || "Login was denied.";
         res.setHeader("Content-Type", "text/html; charset=utf-8");
-        return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>" + desc.replace(/[<>"']/g, "") + "</p><a href='/api' style='color:#59f'>&larr; back</a></div></body></html>");
+        return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>" + htmlEscape(desc) + "</p><a href='/api' style='color:#59f'>&larr; back</a></div></body></html>");
       }
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(200).send(html());
@@ -1532,22 +1550,30 @@ async function handler(req, res) {
     if (!body) {
       try {
         const chunks = [];
-        for await (const chunk of req) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        let totalSize = 0;
+        const MAX_BODY_SIZE = 1024 * 1024;
+        for await (const chunk of req) {
+          totalSize += chunk.length;
+          if (totalSize > MAX_BODY_SIZE) {
+            return res.status(413).json({ error: "Request body too large" });
+          }
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        }
         const raw = Buffer.concat(chunks).toString();
         if (raw) body = JSON.parse(raw);
       } catch {
       }
     }
     if (!body || typeof body !== "object") {
-      return res.status(400).json({ error: "Invalid body", bodyType: typeof body, hasReqBody: "req.body" in req });
+      return res.status(400).json({ error: "Invalid body" });
     }
     if (typeof signature === "string" && typeof timestamp === "string") {
       return await handleDiscord(req, res, JSON.stringify(body), signature, timestamp);
     }
-    return await handlePanel(res, body);
+    return await handlePanel(res, body, req);
   } catch (error) {
     console.error("Handler error", error);
-    return res.status(500).json({ error: "Internal error", message: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : void 0 });
+    return res.status(500).json({ error: "Internal error" });
   }
 }
 async function handleDiscord(req, res, rawBody, signature, timestamp) {
@@ -1646,21 +1672,25 @@ async function handleOAuthCallback(req, res, code) {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(403).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#888'>This account is not authorized.</p><a href='/api' style='color:#59f'>\u2190 back</a></div></body></html>");
     }
-    res.setHeader("Set-Cookie", `token=${authToken()}; Path=/; Max-Age=86400; SameSite=Lax`);
+    res.setHeader("Set-Cookie", `token=${signToken(userRes.id)}; Path=/; Max-Age=86400; SameSite=Strict; HttpOnly; Secure`);
     res.setHeader("Location", "/api");
     return res.status(302).end();
   } catch (err) {
     console.error("OAuth callback error:", err.message);
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    return res.status(500).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>OAuth Error</h1><p style='color:#888'>" + (err.message || "Unknown error") + "</p><a href='/api' style='color:#59f'>\u2190 back</a></div></body></html>");
+    return res.status(500).send("<html><body style='background:#000;color:#f44;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>OAuth Error</h1><p style='color:#888'>" + htmlEscape(err.message || "Unknown error") + "</p><a href='/api' style='color:#59f'>\u2190 back</a></div></body></html>");
   }
 }
-async function handlePanel(res, body) {
+async function handlePanel(res, body, req) {
   if (body.action === "oauth_url") {
     const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify`;
     return res.json({ url });
   }
-  const reqToken = body.token || "";
+  if (body.action === "logout") {
+    res.setHeader("Set-Cookie", "token=; Path=/; Max-Age=0; SameSite=Strict; HttpOnly; Secure");
+    return res.json({ success: true });
+  }
+  const reqToken = getTokenFromRequest(req) || "";
   if (!verifyToken(reqToken)) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -1720,6 +1750,7 @@ async function handlePanel(res, body) {
       return res.json({ channels });
     }
     if (body.action === "send") {
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       const form = new FormData();
       form.append("content", body.content || "");
       if (body.fileData && body.fileName) {
@@ -1744,20 +1775,20 @@ async function handlePanel(res, body) {
       return res.json({ success: true });
     }
     if (body.action === "messages") {
-      console.log("Fetching messages for channel:", body.channelId, "limit:", body.limit || 30);
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       try {
         const messages = await discordFetch3(
           `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
           { headers }
         );
-        console.log("Messages result type:", typeof messages, "isArray:", Array.isArray(messages), "length:", Array.isArray(messages) ? messages.length : "N/A");
         return res.json({ messages });
       } catch (e) {
-        console.error("Messages fetch error:", e.message);
         throw e;
       }
     }
     if (body.action === "delete") {
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
+      if (!isValidSnowflake(body.messageId)) return res.status(400).json({ error: "Invalid message ID" });
       await discordFetch3(
         `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
         { method: "DELETE", headers }
@@ -1772,6 +1803,7 @@ async function handlePanel(res, body) {
       return res.json({ members: memberRes, roles: rolesRes });
     }
     if (body.action === "userinfo") {
+      if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
       const userRes = await discordFetch3(`https://discord.com/api/v10/users/${body.userId}`, { headers });
       return res.json(userRes);
     }
@@ -1780,6 +1812,7 @@ async function handlePanel(res, body) {
       return res.json({ channels });
     }
     if (body.action === "dm_messages") {
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       const messages = await discordFetch3(
         `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 50}`,
         { headers }
@@ -1789,6 +1822,7 @@ async function handlePanel(res, body) {
     if (body.action === "dm_send") {
       let channelId = body.channelId;
       if (!channelId && body.userId) {
+        if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
         const ch = await discordFetch3(`https://discord.com/api/v10/users/@me/channels`, {
           method: "POST",
           headers,
@@ -1797,6 +1831,7 @@ async function handlePanel(res, body) {
         channelId = ch.id;
       }
       if (!channelId) return res.status(400).json({ error: "No channel or user specified" });
+      if (channelId && !isValidSnowflake(channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       if (body.content || body.fileData) {
         const form = new FormData();
         form.append("content", body.content || "");
@@ -1825,6 +1860,7 @@ async function handlePanel(res, body) {
     if (body.action === "ban") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
+      if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         const banHeaders = { ...headers, "Content-Type": "application/json" };
         if (body.reason) banHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
@@ -1842,6 +1878,7 @@ async function handlePanel(res, body) {
     if (body.action === "kick") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
+      if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         const kickHeaders = { ...headers };
         if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
@@ -1857,6 +1894,7 @@ async function handlePanel(res, body) {
     if (body.action === "timeout") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
+      if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         const timeoutValue = body.minutes > 0 ? new Date(Date.now() + body.minutes * 60 * 1e3).toISOString() : null;
         const timeoutHeaders = { ...headers, "Content-Type": "application/json" };
@@ -1900,6 +1938,7 @@ async function handlePanel(res, body) {
     if (body.action === "unban") {
       const userId = body.userId;
       if (!userId) return res.status(400).json({ error: "No user specified" });
+      if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         await discordFetch3(
           `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
