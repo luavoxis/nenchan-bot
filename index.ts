@@ -15,6 +15,92 @@ const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
 const HMAC_SECRET = process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_TOKEN || "";
 const OAUTH_REDIRECT = "https://nenchan.vercel.app/api";
 
+if (!HMAC_SECRET) {
+  console.error("FATAL: HMAC_SECRET is empty — set DISCORD_CLIENT_SECRET or DISCORD_TOKEN");
+}
+
+// --- Rate Limiter (per-IP, sliding window) ---
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW = 60_000;
+const RATE_LIMIT_MAX = 60;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW);
+  if (recent.length >= RATE_LIMIT_MAX) return false;
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+  if (rateLimitMap.size > 10_000) {
+    const cutoff = now - RATE_LIMIT_WINDOW;
+    for (const [key, vals] of rateLimitMap) {
+      const filtered = vals.filter((t) => t > cutoff);
+      if (filtered.length === 0) rateLimitMap.delete(key);
+      else rateLimitMap.set(key, filtered);
+    }
+  }
+  return true;
+}
+
+// --- Validation helpers ---
+function parseLimit(val: unknown, fallback: number, max: number): number {
+  const n = parseInt(String(val), 10);
+  if (isNaN(n) || n < 1) return fallback;
+  return Math.min(n, max);
+}
+
+function clampMinutes(val: unknown): number {
+  const n = parseInt(String(val), 10);
+  if (isNaN(n) || n < 0) return 0;
+  return Math.min(n, 40320);
+}
+
+const MAX_CONTENT_LENGTH = 2000;
+const MAX_FILE_SIZE = 8 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = /^(image|video|audio|text)\//;
+
+function validateContent(content: unknown): string | null {
+  if (content === undefined || content === null) return "";
+  if (typeof content !== "string") return null;
+  if (content.length > MAX_CONTENT_LENGTH) return null;
+  return content;
+}
+
+function validateFileUpload(fileData: unknown, fileName: unknown, fileType: unknown): { buf: Buffer; blob: Blob; name: string } | null {
+  if (!fileData || !fileName) return null;
+  if (typeof fileData !== "string" || typeof fileName !== "string") return null;
+  let buf: Buffer;
+  try { buf = Buffer.from(fileData, "base64"); } catch { return null; }
+  if (buf.length > MAX_FILE_SIZE) return null;
+  const safeName = fileName.replace(/[^\w.\-]/g, "_").slice(0, 100);
+  const type = typeof fileType === "string" && ALLOWED_FILE_TYPES.test(fileType) ? fileType : "application/octet-stream";
+  return { buf, blob: new Blob([buf], { type }), name: safeName };
+}
+
+// --- OAuth state (CSRF) ---
+function signState(state: string): string {
+  const sig = crypto.createHmac("sha256", HMAC_SECRET).update(state).digest("hex");
+  return state + "." + sig;
+}
+
+function verifyState(signed: string): boolean {
+  try {
+    const idx = signed.lastIndexOf(".");
+    if (idx === -1) return false;
+    const state = signed.slice(0, idx);
+    const sig = signed.slice(idx + 1);
+    const expected = crypto.createHmac("sha256", HMAC_SECRET).update(state).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(sig, "hex"), Buffer.from(expected, "hex"));
+  } catch {
+    return false;
+  }
+}
+
+// --- Request logger ---
+function logRequest(method: string, path: string, action: string | undefined, ip: string, status: number) {
+  console.log(JSON.stringify({ ts: new Date().toISOString(), method, path, action: action || "-", ip, status }));
+}
+
 async function discordFetch(url: string, opts: any = {}): Promise<any> {
   const u = new URL(url);
   const mod = u.protocol === "https:" ? await import("https") : await import("http");
@@ -823,13 +909,13 @@ function loadMsgHistory(cid){
           for(var j=0;j<msg.attachments.length;j++){
             var a=msg.attachments[j];
             if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-              h+="<img class='msg-img' src='"+a.url+"' alt='' loading='lazy'/>";
+              h+="<img class='msg-img' src='"+escUrl(a.url)+"' alt='' loading='lazy'/>";
             }else if(a.content_type&&a.content_type.startsWith("video/")){
-              h+="<video class='msg-video' src='"+a.url+"' controls></video>";
+              h+="<video class='msg-video' src='"+escUrl(a.url)+"' controls></video>";
             }else if(a.content_type&&a.content_type.startsWith("audio/")){
-              h+="<audio class='msg-audio' src='"+a.url+"' controls></audio>";
+              h+="<audio class='msg-audio' src='"+escUrl(a.url)+"' controls></audio>";
             }else{
-              h+="<a class='msg-file-link' href='"+a.url+"'>&#128206; "+esc(a.filename)+"</a>"
+              h+="<a class='msg-file-link' href='"+escUrl(a.url)+"'>&#128206; "+esc(a.filename)+"</a>"
             }
           }
         }
@@ -837,14 +923,14 @@ function loadMsgHistory(cid){
           for(var j=0;j<msg.embeds.length;j++){
             var e=msg.embeds[j];
             if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
-              h+="<img class='msg-img' src='"+e.thumbnail.url+"' alt='' loading='lazy'/>";
+              h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy'/>";
               continue;
             }
             var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"";
             h+="<div class='msg-embed'"+(bg?" style='border-left-color:"+bg+"'":"")+">";
             if(e.author&&e.author.name) h+="<div class='msg-embed-author'>"+esc(e.author.name)+"</div>";
             if(e.title){
-              if(e.url) h+="<a class='msg-embed-title' href='"+e.url+"' style='text-decoration:none'>"+esc(e.title)+"</a>";
+              if(e.url) h+="<a class='msg-embed-title' href='"+escUrl(e.url)+"' style='text-decoration:none'>"+esc(e.title)+"</a>";
               else h+="<div class='msg-embed-title'>"+esc(e.title)+"</div>";
             }
             if(e.description) h+="<div class='msg-embed-desc'>"+fmt(e.description||"")+"</div>";
@@ -854,8 +940,8 @@ function loadMsgHistory(cid){
                 h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"")+"</div></div>";
               }
             }
-            if(e.image&&e.image.url) h+="<img class='msg-img' src='"+e.image.url+"' alt='' loading='lazy'/>";
-            if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image")) h+="<img class='msg-img' src='"+e.thumbnail.url+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
+            if(e.image&&e.image.url) h+="<img class='msg-img' src='"+escUrl(e.image.url)+"' alt='' loading='lazy'/>";
+            if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image")) h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
             if(e.footer&&e.footer.text) h+="<div style='color:#5a5260;font-size:8px;margin-top:3px'>"+esc(e.footer.text)+"</div>";
             h+="</div>";
           }
@@ -1094,6 +1180,7 @@ function showMember(id){
 }
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
+function escUrl(s){return String(s).replace(/[^a-zA-Z0-9\-._~:/?#@[!$&'()*+,;=%]/g,encodeURIComponent)}
 function fmt(s){
   var r=esc(s);
   r=r.replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
@@ -1187,13 +1274,13 @@ function loadDmHistory(cid){
         for(var j=0;j<msg.attachments.length;j++){
           var a=msg.attachments[j];
           if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-            h+="<img class='msg-img' src='"+a.url+"' alt='' loading='lazy'/>";
+            h+="<img class='msg-img' src='"+escUrl(a.url)+"' alt='' loading='lazy'/>";
           }else if(a.content_type&&a.content_type.startsWith("video/")){
-            h+="<video class='msg-video' src='"+a.url+"' controls></video>";
+            h+="<video class='msg-video' src='"+escUrl(a.url)+"' controls></video>";
           }else if(a.content_type&&a.content_type.startsWith("audio/")){
-            h+="<audio class='msg-audio' src='"+a.url+"' controls></audio>";
+            h+="<audio class='msg-audio' src='"+escUrl(a.url)+"' controls></audio>";
           }else{
-            h+="<div><a class='msg-file-link' href='"+a.url+"'>"+esc(a.filename)+"</a></div>"
+            h+="<div><a class='msg-file-link' href='"+escUrl(a.url)+"'>"+esc(a.filename)+"</a></div>"
           }
         }
       }
@@ -1275,6 +1362,13 @@ api({action:"guildinfo"},function(d){
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || "unknown";
+
+  if (!checkRateLimit(clientIp)) {
+    logRequest(req.method || "?", "/api", undefined, clientIp, 429);
+    return res.status(429).json({ error: "Too many requests" });
+  }
+
   try {
     if (req.method === "GET") {
       const code = req.query.code as string | undefined;
@@ -1323,9 +1417,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return await handleDiscord(req, res, JSON.stringify(body), signature, timestamp);
     }
 
-    return await handlePanel(res, body, req);
+    const panelResult = await handlePanel(res, body, req);
+    logRequest("POST", "/api", body.action, clientIp, res.statusCode || 200);
+    return panelResult;
   } catch (error) {
     console.error("Handler error", error);
+    logRequest(req.method || "?", "/api", undefined, clientIp, 500);
     return res.status(500).json({ error: "Internal error" });
   }
 }
@@ -1415,6 +1512,13 @@ async function handleDiscord(req: VercelRequest, res: VercelResponse, rawBody: s
 
 async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, code: string) {
   try {
+    const stateCookie = (req.headers.cookie || "").match(/oauth_state=([^;]+)/)?.[1] || "";
+    const stateParam = (req.query.state as string) || "";
+    if (!stateParam || !stateCookie || !verifyState(stateParam) || stateParam !== stateCookie) {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.status(403).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Invalid State</h1><p style='color:#7d7582'>CSRF validation failed.</p><a href='/api' style='color:#b48899'>&larr; back</a></div></body></html>");
+    }
+    res.setHeader("Set-Cookie", "oauth_state=; Path=/; Max-Age=0; SameSite=Strict; HttpOnly; Secure");
     const params = new URLSearchParams({
       client_id: DISCORD_APP_ID,
       client_secret: DISCORD_CLIENT_SECRET,
@@ -1450,7 +1554,10 @@ async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, code
 
 async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
   if (body.action === "oauth_url") {
-    const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify`;
+    const state = crypto.randomBytes(16).toString("hex");
+    const signedState = signState(state);
+    res.setHeader("Set-Cookie", `oauth_state=${signedState}; Path=/; Max-Age=600; SameSite=Strict; HttpOnly; Secure`);
+    const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify&state=${encodeURIComponent(signedState)}`;
     return res.json({ url });
   }
 
@@ -1525,13 +1632,12 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
 
     if (body.action === "send") {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
+      const content = validateContent(body.content);
+      if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
       const form = new FormData();
-      form.append("content", body.content || "");
-      if (body.fileData && body.fileName) {
-        const buf = Buffer.from(body.fileData, "base64");
-        const blob = new Blob([buf], { type: body.fileType || "application/octet-stream" });
-        form.append("file", blob, body.fileName);
-      }
+      form.append("content", content);
+      const file = validateFileUpload(body.fileData, body.fileName, body.fileType);
+      if (file) form.append("file", file.blob, file.name);
       const response = await fetch(`https://discord.com/api/v10/channels/${body.channelId}/messages`, {
         method: "POST",
         headers: { ...headers },
@@ -1549,7 +1655,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       try {
         const messages = await discordFetch(
-          `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 30}`,
+          `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${parseLimit(body.limit, 30, 100)}`,
           { headers },
         );
         return res.json({ messages });
@@ -1591,7 +1697,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     if (body.action === "dm_messages") {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       const messages = await discordFetch(
-        `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${body.limit || 50}`,
+        `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${parseLimit(body.limit, 50, 100)}`,
         { headers },
       );
       return res.json({ messages });
@@ -1611,13 +1717,12 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!channelId) return res.status(400).json({ error: "No channel or user specified" });
       if (channelId && !isValidSnowflake(channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       if (body.content || body.fileData) {
+        const content = validateContent(body.content);
+        if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
         const form = new FormData();
-        form.append("content", body.content || "");
-        if (body.fileData && body.fileName) {
-          const buf = Buffer.from(body.fileData, "base64");
-          const blob = new Blob([buf], { type: body.fileType || "application/octet-stream" });
-          form.append("file", blob, body.fileName);
-        }
+        form.append("content", content);
+        const file = validateFileUpload(body.fileData, body.fileName, body.fileType);
+        if (file) form.append("file", file.blob, file.name);
         const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
           method: "POST",
           headers: { ...headers },
@@ -1638,9 +1743,9 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         const banHeaders: any = { ...headers, "Content-Type": "application/json" };
-        if (body.reason) banHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        if (body.reason) banHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
         const banBody: any = {};
-        if (body.deleteDays) banBody.delete_message_seconds = (body.deleteDays || 1) * 86400;
+        if (body.deleteDays) banBody.delete_message_seconds = Math.min(Math.max(parseInt(String(body.deleteDays), 10) || 1, 0), 7) * 86400;
         await discordFetch(
           `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
           { method: "PUT", headers: banHeaders, body: JSON.stringify(banBody) },
@@ -1657,7 +1762,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
         const kickHeaders: any = { ...headers };
-        if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
         await discordFetch(
           `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
           { method: "DELETE", headers: kickHeaders },
@@ -1673,9 +1778,10 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!userId) return res.status(400).json({ error: "No user specified" });
       if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
-        const timeoutValue = body.minutes > 0 ? new Date(Date.now() + body.minutes * 60 * 1000).toISOString() : null;
+        const clampedMinutes = clampMinutes(body.minutes);
+        const timeoutValue = clampedMinutes > 0 ? new Date(Date.now() + clampedMinutes * 60 * 1000).toISOString() : null;
         const timeoutHeaders: any = { ...headers, "Content-Type": "application/json" };
-        if (body.reason) timeoutHeaders["X-Audit-Log-Reason"] = encodeURIComponent(body.reason);
+        if (body.reason) timeoutHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
         await discordFetch(
           `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
           { method: "PATCH", headers: timeoutHeaders, body: JSON.stringify({ communication_disabled_until: timeoutValue }) },
