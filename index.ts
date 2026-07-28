@@ -330,6 +330,9 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .msg-topbar-mention{flex:1;position:relative}
 .msg-topbar-mention input{width:100%;padding:8px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none}
 .msg-topbar-mention input:focus{border-color:#b48899}
+.msg-topbar-channel{flex:1;max-width:220px;position:relative}
+.msg-topbar-channel input{width:100%;padding:8px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none;margin:0}
+.msg-topbar-channel input:focus{border-color:#b48899}
 .msg-history-box{flex:1;min-height:0;overflow-y:auto;background:#13161b;border:1px solid #1e2228;border-radius:8px;padding:8px;font-size:11px;line-height:1.55;margin-bottom:8px;max-height:calc(100vh - 260px)}
 .msg-history-box::-webkit-scrollbar{width:6px}
 .msg-history-box::-webkit-scrollbar-track{background:#13161b}
@@ -431,6 +434,16 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mention-item img{width:20px;height:20px;border-radius:50%;flex-shrink:0}
 .mention-item .m-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mention-item .m-bot{color:#b48899;font-size:8px;text-transform:uppercase;font-weight:600;margin-left:4px}
+.channel-list{display:none;position:absolute;top:100%;left:0;right:0;background:#1e2228;border:1px solid #2e343c;border-top:none;max-height:200px;overflow-y:auto;z-index:10;scrollbar-width:none;border-radius:0 0 8px 8px}
+.channel-list::-webkit-scrollbar{display:none}
+.channel-list.show{display:block}
+.channel-item{display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;font-size:11px;color:#c0bcc4;transition:background .15s}
+.channel-item:hover{background:#252a32}
+.channel-item .ch-hash{color:#5a5260;font-weight:600;flex-shrink:0}
+.channel-item .ch-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.channel-item .ch-topic{color:#5a5260;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.channel-item.selected{background:#232830;color:#e0dce4}
+.channel-item.selected .ch-hash{color:#b48899}
 .ban-card{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s}
 .ban-card:last-child{border-bottom:none}
 .ban-card:hover{background:#252a32}
@@ -596,7 +609,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <div id="panel-messages" class="panel">
 <div class="msg-topbar">
-<select id="msgChannel" onchange="loadMsgHistory(this.value)"><option value="">select channel</option></select>
+<div class="msg-topbar-channel" id="channelPicker">
+<input type="text" id="channelSearch" placeholder="#channel" oninput="filterChannels(this.value)" onfocus="showChannelList()" style="margin:0"/>
+<div id="channelList" class="channel-list"></div>
+</div>
 <div class="msg-topbar-mention">
 <input type="text" id="mentionSearch" placeholder="@mention" oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0"/>
 <div id="mentionList" class="mention-list"></div>
@@ -946,18 +962,26 @@ function executeRemoveTimeout(uid){
   });
 }
 
+var selectedChannelId=null;
+var allChannelData=[];
 function loadMsgChannels(){
   api({action:"channels"},function(d){
-    if(d.error){g("msgChannel").innerHTML="<option value=''>error: "+esc(d.error)+"</option>";return}
-    var s=g("msgChannel");
-    s.innerHTML="<option value=''>select channel</option>";
-    var count=0;
+    if(d.error){g("channelSearch").placeholder="error: "+esc(d.error);return}
+    var list=g("channelList");
+    list.innerHTML="";
+    allChannelData=[];
     for(var i=0;i<d.channels.length;i++){
       if(d.channels[i].type===0){
-        var o=document.createElement("option");o.value=d.channels[i].id;o.textContent="#"+d.channels[i].name;s.appendChild(o);count++;
+        var item=document.createElement("div");
+        item.className="channel-item";
+        item.dataset.cid=d.channels[i].id;
+        item.dataset.name=d.channels[i].name;
+        item.innerHTML="<span class='ch-hash'>#</span><span class='ch-name'>"+esc(d.channels[i].name)+"</span>"+(d.channels[i].topic?"<span class='ch-topic'>"+esc(d.channels[i].topic)+"</span>":"");
+        item.onclick=function(){pickChannel(this.dataset.cid,this.dataset.name)};
+        list.appendChild(item);
+        allChannelData.push({id:d.channels[i].id,name:d.channels[i].name,topic:d.channels[i].topic||""});
       }
     }
-    if(!count){s.innerHTML="<option value=''>no text channels</option>";return}
     api({action:"members"},function(md){
       if(md.error)return;
       var seen={};
@@ -968,6 +992,39 @@ function loadMsgChannels(){
       }
     });
   });
+}
+function showChannelList(){
+  var el=g("channelList");
+  if(!el.children.length&&allChannelData.length){
+    allChannelData.forEach(function(c){
+      var item=document.createElement("div");
+      item.className="channel-item";
+      item.dataset.cid=c.id;
+      item.dataset.name=c.name;
+      item.innerHTML="<span class='ch-hash'>#</span><span class='ch-name'>"+esc(c.name)+"</span>"+(c.topic?"<span class='ch-topic'>"+esc(c.topic)+"</span>":"");
+      item.onclick=function(){pickChannel(c.id,c.name)};
+      el.appendChild(item);
+    });
+  }
+  el.classList.add("show");
+}
+function hideChannelList(){
+  setTimeout(function(){g("channelList").classList.remove("show")},150);
+}
+function filterChannels(q){
+  q=q.toLowerCase();
+  var items=g("channelList").children;
+  for(var i=0;i<items.length;i++){
+    var name=items[i].dataset.name||"";
+    items[i].style.display=name.toLowerCase().indexOf(q)===-1?"none":"";
+  }
+}
+function pickChannel(cid,name){
+  selectedChannelId=cid;
+  g("channelSearch").value="#"+name;
+  g("channelList").classList.remove("show");
+  g("channelSearch").focus();
+  loadMsgHistory(cid);
 }
 
 var mentionVisible=false;
@@ -1012,7 +1069,7 @@ function pickMention(el){
 }
 
 function sendMsg(){
-  var c=g("msgChannel").value,m=g("msgInput").value.trim(),file=g("msgFile").files[0];
+  var c=selectedChannelId,m=g("msgInput").value.trim(),file=g("msgFile").files[0];
   if(!c){g("msgStatus").textContent="select a channel";g("msgStatus").style.color="#d45555";return}
   if(!m&&!file){g("msgStatus").textContent="enter a message or pick a file";g("msgStatus").style.color="#d45555";return}
   var status=g("msgStatus");
@@ -1919,7 +1976,7 @@ function executeConfirm(){
     }
   });
 }
-document.addEventListener("click",function(e){if(!e.target.closest("#mentionSearch")&&!e.target.closest("#mentionList"))hideMentionList()});
+document.addEventListener("click",function(e){if(!e.target.closest("#mentionSearch")&&!e.target.closest("#mentionList"))hideMentionList();if(!e.target.closest("#channelPicker")&&!e.target.closest("#channelList"))hideChannelList()});
 api({action:"guildinfo"},function(d){
   if(d.error&&d.error==="Unauthorized"){g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
   else{initPanel()}
