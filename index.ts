@@ -1189,7 +1189,7 @@ function editMsg(cid,mid){
   editingMsgId=mid;
   var area=document.createElement("div");
   area.className="msg-edit-area";
-  area.innerHTML="<textarea id='editTextarea'>"+esc(oldText)+"</textarea><div class='msg-edit-actions'><button class='msg-edit-save' onclick='saveEdit(\""+cid+"\",\""+mid+"\")'>save</button><button class='msg-edit-cancel' onclick='cancelEdit()'>cancel</button></div>";
+  area.innerHTML="<textarea id='editTextarea'>"+esc(oldText)+"</textarea><div class='msg-edit-actions'><button class='msg-edit-save' onclick='saveEdit(&quot;"+cid+"&quot;,&quot;"+mid+"&quot;)'>save</button><button class='msg-edit-cancel' onclick='cancelEdit()'>cancel</button></div>";
   content.style.display="none";
   content.parentNode.insertBefore(area,content.nextSibling);
   var ta=g("editTextarea");if(ta){ta.focus();ta.selectionStart=ta.value.length}
@@ -1351,7 +1351,7 @@ function toggleEmojiPicker(){
   if(picker.classList.contains("show")){picker.classList.remove("show");return}
   if(!picker.innerHTML){
     var h="<div class='emoji-picker-grid'>";
-    for(var i=0;i<emojiList.length;i++){h+="<button onclick='insertEmoji(\""+emojiList[i]+"\")'>"+emojiList[i]+"</button>"}
+    for(var i=0;i<emojiList.length;i++){h+="<button onclick='insertEmoji(&quot;"+emojiList[i]+"&quot;)'>"+emojiList[i]+"</button>"}
     h+="</div>";
     picker.innerHTML=h;
   }
@@ -1391,7 +1391,7 @@ function loadChannels(){
         h+="<span class='channel-icon'>"+icon+"</span>";
         h+="<span class='channel-name'>"+esc(c.name)+"</span>";
         h+="<span class='channel-type'>"+typeLabel+"</span>";
-        if(c.type!==4)h+="<button class='channel-del' onclick='deleteChannel(\""+c.id+"\",\""+esc(c.name)+"\")'>delete</button>";
+        if(c.type!==4)h+="<button class='channel-del' onclick='deleteChannel(&quot;"+c.id+"&quot;,&quot;"+esc(c.name)+"&quot;)'>delete</button>";
         h+="</div>";
       }
     }
@@ -1435,7 +1435,7 @@ function loadInvites(){
       h+="<div class='invite-info'><div class='invite-code'>"+esc(inv.code)+"</div>";
       h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" · #"+esc(inv.channel.name||""):"")+"</div>";
       h+="<div class='invite-uses'>"+(inv.uses||0)+" uses"+(inv.max_uses?" / "+inv.max_uses+" max":"")+"</div></div>";
-      h+="<button class='invite-del' onclick='deleteInvite(\""+esc(inv.code)+"\")'>delete</button>";
+      h+="<button class='invite-del' onclick='deleteInvite(&quot;"+esc(inv.code)+"&quot;)'>delete</button>";
       h+="</div>";
     }
     g("inviteList").innerHTML=h;
@@ -1485,7 +1485,7 @@ function loadEvents(){
       h+="<div><span class='event-name'>"+esc(ev.name)+"</span><span class='event-status "+statusClass+"'>"+statusText+"</span></div>";
       h+="<div class='event-time'>"+startStr+"</div>";
       if(ev.description)h+="<div class='event-desc'>"+esc(ev.description.substring(0,200))+"</div>";
-      h+="<button class='event-del' onclick='deleteEvent(\""+ev.id+"\")'>delete</button>";
+      h+="<button class='event-del' onclick='deleteEvent(&quot;"+ev.id+"&quot;)'>delete</button>";
       h+="</div>";
     }
     g("eventList").innerHTML=h;
@@ -1711,7 +1711,7 @@ function editGuildName(){
   var current=g("guildNameDisplay");
   if(!current)return;
   var oldName=current.textContent;
-  current.outerHTML="<input type='text' id='guildNameInput' value='"+esc(oldName)+"' style='font-size:16px;color:#e0dce4;background:#191d23;border:1px solid #b48899;padding:2px 6px;border-radius:4px;font-weight:600;font-family:Space Grotesk,monospace;width:200px' onkeydown='if(event.key===\"Enter\")saveGuildName();if(event.key===\"Escape\")cancelGuildEdit(\""+esc(oldName)+"\")'/>";
+  current.outerHTML="<input type='text' id='guildNameInput' value='"+esc(oldName)+"' style='font-size:16px;color:#e0dce4;background:#191d23;border:1px solid #b48899;padding:2px 6px;border-radius:4px;font-weight:600;font-family:Space Grotesk,monospace;width:200px' onkeydown='if(event.key===&quot;Enter&quot;)saveGuildName();if(event.key===&quot;Escape&quot;)cancelGuildEdit(&quot;"+esc(oldName)+"&quot;)'/>";
   g("guildNameInput").focus();g("guildNameInput").select();
 }
 function saveGuildName(){
