@@ -733,7 +733,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <select id="newChannelCategory"><option value="">no category</option></select>
 <button onclick="createChannel()" style="background:#b48899;color:#13161b;border:none">create</button>
 </div>
-<div id="channelList"></div>
+<div id="channelManageList"></div>
 </div>
 <div id="panel-invites" class="panel">
 <div id="inviteList"></div>
@@ -808,7 +808,7 @@ function api(body,cb){
   var x=new XMLHttpRequest();
   x.open("POST","/api",true);
   x.setRequestHeader("Content-Type","application/json");
-  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){cb({error:"parse error"})}};
+  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){console.error("API parse error:",x.responseText.slice(0,500));cb({error:"parse error"})}};
   x.onerror=function(){cb({error:"connection error"})};
   x.send(JSON.stringify(body));
 }
@@ -1518,7 +1518,7 @@ document.addEventListener("click",function(e){if(!e.target.closest(".emoji-picke
 // --- Channel management ---
 function loadChannels(){
   api({action:"channels"},function(d){
-    if(d.error){g("channelList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    if(d.error){g("channelManageList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
     var channels=d.channels||[];
     var categories=channels.filter(function(c){return c.type===4}).sort(function(a,b){return a.position-b.position});
     var catSel=g("newChannelCategory");
@@ -1547,7 +1547,7 @@ function loadChannels(){
       }
     }
     if(!channels.length)h="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no channels</p>";
-    g("channelList").innerHTML=h;
+    g("channelManageList").innerHTML=h;
   });
 }
 function createChannel(){
@@ -2724,7 +2724,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     return res.status(400).json({ error: "Unknown action" });
   } catch (err: any) {
     return res.status(500).json({
-      error: err.message || "Request failed",
+      error: (err?.message) || "Request failed",
     });
   }
 }
