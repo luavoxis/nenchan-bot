@@ -174,6 +174,7 @@ function html(): string {
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>nenchan v1.0</title>
+<link rel="icon" href="/favicon.ico" type="image/x-icon"/>
 <style>
 @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;src:url('/fonts/space-grotesk-latin.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
