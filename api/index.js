@@ -2473,7 +2473,7 @@ async function handlePanel(res, body, req) {
   if (body.action === "oauth_url") {
     const state = crypto.randomBytes(16).toString("hex");
     const signedState = signState(state);
-    res.setHeader("Set-Cookie", `oauth_state=${signedState}; Path=/; Max-Age=600; SameSite=Strict; HttpOnly; Secure`);
+    res.setHeader("Set-Cookie", `oauth_state=${signedState}; Path=/; Max-Age=600; SameSite=Lax; HttpOnly; Secure`);
     const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_APP_ID}&redirect_uri=${encodeURIComponent(OAUTH_REDIRECT)}&response_type=code&scope=identify&state=${encodeURIComponent(signedState)}`;
     return res.json({ url });
   }
