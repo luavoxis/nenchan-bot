@@ -177,10 +177,10 @@ function html(): string {
 <style>
 @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;src:url('/fonts/space-grotesk-latin.woff2') format('woff2')}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;min-height:100vh;display:flex}
+body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;height:100vh;overflow:hidden}
 *::-webkit-scrollbar{width:0;height:0}
 *{scrollbar-width:none;-ms-overflow-style:none}
-.sidebar{width:160px;background:#191d23;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:1px;height:100vh;overflow:hidden}
+.sidebar{width:160px;background:#191d23;border-right:1px solid #222;padding:12px;display:flex;flex-direction:column;gap:1px;height:100vh;overflow:hidden;position:fixed;top:0;left:0;z-index:10}
 .sidebar-nav{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
 .sidebar h1{font-size:11px;color:#6d6572;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;padding:0;text-align:center}
 .sidebar button{background:none;border:none;color:#6d6572;font:11px 'Space Grotesk',monospace;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;transition:all .15s;display:flex;align-items:center;gap:8px}
@@ -194,7 +194,7 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;mi
 #logoutBtn img{opacity:.6;filter:none}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
-.main{flex:1;padding:16px;max-width:680px}
+.main{flex:1;padding:16px;max-width:680px;margin-left:160px;height:100vh;overflow-y:auto}
 .panel{display:none}
 .panel.show{display:block}
 #panel-messages.show{display:flex;flex-direction:column;height:calc(100vh - 80px)}
@@ -344,7 +344,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
   .sidebar.open{transform:translateX(0)}
   .sidebar-overlay.show{display:block}
   .menu-toggle{display:block}
-  .main{padding:16px 12px 16px 48px}
+  .main{margin-left:0;padding:16px 12px 16px 48px}
 }
 .member-grid{display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 180px);overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .member-grid::-webkit-scrollbar{display:none}
