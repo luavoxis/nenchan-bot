@@ -1375,24 +1375,20 @@ function emojiToCodepoint(e){
   for(var i=0;i<e.length;i++){
     var code=e.codePointAt(i);
     if(code>0xFFFF)i++;
-    cp.push(code.toString(16));
+    if(code!==0xFE0F)cp.push(code.toString(16));
   }
   return cp.join("-");
 }
+function emojiImg(e,size){return "<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' width='"+(size||22)+"' height='"+(size||22)+"' alt='' style='display:inline-block' loading='lazy'/>"}
 function renderEmojiGrid(catId,filter){
   var grid=g("emojiGrid");
   var cats=catId?[emojiCategories.find(function(c){return c.id===catId})].filter(Boolean):emojiCategories;
   var h="";
   cats.forEach(function(cat){
-    if(filter){
-      cat.emojis.forEach(function(e){
-        if(e.toLowerCase().includes(filter.toLowerCase()))h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
-      });
-    }else{
-      cat.emojis.forEach(function(e){
-        h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
-      });
-    }
+    cat.emojis.forEach(function(e){
+      if(filter&&!e.toLowerCase().includes(filter.toLowerCase()))return;
+      h+="<span onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"' style='cursor:pointer;border-radius:4px;padding:2px;display:inline-flex;align-items:center;justify-content:center;transition:background .1s'>"+emojiImg(e)+"</span>";
+    });
   });
   grid.innerHTML=h;
 }
@@ -1403,7 +1399,7 @@ function toggleEmojiPicker(){
     var tabs=g("emojiTabs");
     var th="";
     emojiCategories.forEach(function(cat,i){
-      th+="<button data-cat='"+cat.id+"' onclick='switchEmojiTab(this,&quot;"+cat.id+"&quot;)'"+(i===0?" class='active'":"")+">"+cat.name+"</button>";
+      th+="<button data-cat='"+cat.id+"' onclick='switchEmojiTab(this,&quot;"+cat.id+"&quot;)'"+(i===0?" class='active'":"")+">"+emojiImg(cat.name,18)+"</button>";
     });
     tabs.innerHTML=th;
     renderEmojiGrid("smileys");
