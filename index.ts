@@ -532,11 +532,16 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .toast-error{background:#3a1e1e;border:1px solid #d45555;color:#d45555}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .emoji-picker-wrap{position:relative;display:inline-block}
-.emoji-picker-dropdown{display:none;position:absolute;bottom:100%;left:0;background:#1e2228;border:1px solid #3a424c;border-radius:8px;padding:8px;width:280px;max-height:240px;z-index:80;overflow-y:auto;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
-.emoji-picker-dropdown.show{display:block}
-.emoji-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
-.emoji-picker-grid button{background:none;border:none;padding:4px;cursor:pointer;border-radius:4px;font-size:18px;line-height:1}
-.emoji-picker-grid button:hover{background:#252a32}
+.emoji-picker-dropdown{display:none;position:absolute;bottom:100%;left:0;background:#1e2228;border:1px solid #3a424c;border-radius:8px;width:320px;max-height:360px;z-index:80;overflow:hidden;box-shadow:0 -8px 24px rgba(0,0,0,.4);display:none;flex-direction:column}
+.emoji-picker-dropdown.show{display:flex}
+.emoji-picker-tabs{display:flex;border-bottom:1px solid #2e343c;padding:4px 4px 0;gap:2px}
+.emoji-picker-tabs button{background:none;border:none;padding:6px 8px;cursor:pointer;border-radius:4px;font-size:16px;opacity:.5;transition:opacity .1s}
+.emoji-picker-tabs button:hover,.emoji-picker-tabs button.active{opacity:1;background:#252a32}
+.emoji-picker-search{margin:6px 8px;padding:5px 8px;background:#13161b;border:1px solid #2e343c;border-radius:6px;color:#c0bcc4;font:12px 'Space Grotesk',monospace;width:calc(100% - 16px);outline:none}
+.emoji-picker-search:focus{border-color:#b48899}
+.emoji-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:4px 8px 8px;overflow-y:auto;flex:1}
+.emoji-picker-grid img{width:22px;height:22px;cursor:pointer;border-radius:4px;padding:2px;transition:background .1s}
+.emoji-picker-grid img:hover{background:#252a32}
 .role-manager{max-height:200px;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:#252a32 transparent}
 .role-manager::-webkit-scrollbar{width:4px}
 .role-manager::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
@@ -614,7 +619,11 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div class="msg-input-row" style="align-items:flex-end">
 <div class="emoji-picker-wrap">
 <button onclick="toggleEmojiPicker()" style="padding:6px 8px;font-size:16px;background:none;border:none;cursor:pointer" title="emoji">&#128578;</button>
-<div class="emoji-picker-dropdown" id="emojiPicker"></div>
+<div class="emoji-picker-dropdown" id="emojiPicker">
+<input class="emoji-picker-search" id="emojiSearch" placeholder="search emoji..." oninput="filterEmojis(this.value)"/>
+<div class="emoji-picker-tabs" id="emojiTabs"></div>
+<div class="emoji-picker-grid" id="emojiGrid"></div>
+</div>
 </div>
 <textarea id="msgInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
 <button onclick="sendMsg()">send</button>
@@ -1349,18 +1358,68 @@ function renderMsgHistory(messages,cid){
   g("msgHistory").scrollTop=g("msgHistory").scrollHeight;
 }
 
-// --- Emoji picker ---
-var emojiList=["😀","😂","😍","🥰","😎","🤩","🥳","😢","😡","🤔","👍","👎","❤️","🔥","⭐","🎉","✅","❌","👀","💀","😭","🫡","🤣","😊","🙌","💪","🎵","📸","💀","🤝","💎","🌙","🌸","🎮","😈","🦊","🐱","🐸","🌈","🍕","🍰","☕","🍩","🎀","👑","🦋","🔮","🎪","🏆"];
+// --- Emoji picker (Discord/Twemoji) ---
+var emojiCategories=[
+  {name:"😀",id:"smileys",emojis:["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😙","🥲","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🫢","🫣","🤫","🤔","🫡","🤐","🤨","😐","😑","😶","🫥","😏","😒","🙄","😬","🤥","😌","😔","😪","🤤","😴","😷","🤒","🤕","🤢","🤮","🥵","🥶","🥴","😵","🤯","🥳","🥸","😎","🤓","🧐","😕","🫤","😟","🙁","😮","😯","😲","😳","🥺","🥹","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖","😺","😸","😹","😻","😼","沈","😽","🙀","😿","😾","🫶","👐","🤲","🤝","🙏","✌️","🤞","🫰","🤟","🤘","👌","🤌","🤏","👈","👉","👆","🖕","👇","☝️","🫵","👍","👎","✊","👊","🤛","🤜","👏","🙌","🫶","👐","🤲","🤝","🙏","💪","🦾","🖕","🖐️","✋","🖖","🫱","🫲","🫳","🫴","🫷","🫸","👌","🤌","🤏","✌️","🤞","🫰","🤟","🤘","🤙","👈","👉","👆","🖕","👇","☝️","🫵","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🧠","🫀","🫁","🦷","🦴","👀","👁️","👅","👄","🫦","💋"]},
+  {name:"🐶",id:"animals",emojis:["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐻‍❄️","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈","🙉","🙊","🐒","🐔","🐧","🐦","🐤","🐣","🐥","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🪱","🐛","🦋","🐌","🐞","🐜","🪰","🪲","🪳","🦟","🦗","🕷️","🕸️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐡","🐠","🐟","🐬","🐳","🐋","🦈","🦭","🐊","🐅","🐆","🦓","🦍","🦧","🐘","🦣","🦛","🦏","🐪","🐫","🦒","🦘","🦬","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌","🐕","🐩","🦮","🐕‍🦺","🐱","🐈","🐈‍⬛","🪶","🐓","🦃","🦤","🦚","🦜","🦢","🪿","🦩","🕊️","🐇","🦝","🦨","🦡","🦫","🦦","🦥","🐁","🐀","🐿️","🦔","🐾","🐉","🐲","🌵","🎄","🌲","🌳","🌴","🪵","🌱","🌿","☘️","🍀","🎍","🪴","🎋","🍃","🍂","🍁","🪺","🪹","🍄","🐚","🪸","🪨","🌊","🫧","🔥","🌪️","🌈"]},
+  {name:"🍔",id:"food",emojis:["🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🫑","🌽","🥕","🫒","🧄","🧅","🥔","🍠","🫘","🥐","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🦴","🌭","🍔","🍟","🍕","🫓","🥪","🥙","🧆","🌮","🌯","🫔","🥗","🥘","🫕","🥫","🍝","🍜","🍲","🍛","🍣","🍱","🥟","🦪","🍤","🍙","🍚","🍘","🍥","🥮","🍢","🍡","🍧","🍨","🍦","🥧","🧁","🍰","🎂","🍮","🍭","🍬","🍫","🍿","🍩","🍪","🌰","🥜","🍯","🥛","🍼","🫖","☕","🍵","🧃","🥤","🧋","🍶","🍺","🍻","🥂","🍷","🥃","🍸","🍹","🧉","🍾","🧊","🥄","🍴","🍽️","🥣","🥡","🥢","🧂","⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓","🏸","🏒","🥍","🏏","🪃","🥅","⛳","🪁","🏹","🎣","🤿","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🥌","🎿","🎯","🪀","🪁","🎮","🕹️","🎰"]},
+  {name:"🚗",id:"travel",emojis:["🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🏍️","🛵","🚲","🛴","🛺","🚍","🚘","🚖","🛞","🚡","🚠","🚟","🚃","🚋","🚞","🚝","🚄","🚅","🚈","🚂","🚆","🚇","🚊","🚉","✈️","🛫","🛬","🛩️","💺","🛰️","🚀","🛸","🚁","🛶","⛵","🚤","🛥️","🛳️","⛴️","🚢","🗼","🏰","🏯","🏟️","🎡","🎢","🎠","⛲","⛱️","🏖️","🏝️","🏜️","🌋","⛰️","🏔️","🗻","🏕️","🛖","🏠","🏡","🏘️","🏚️","🏗️","🏭","🏢","🏬","🏣","🏤","🏥","🏦","🏨","🏪","🏫","🏩","💒","🏛️","⛪","🕌","🛕","🕍","⛩️","🕋","⛲","⛺","🌁","🌃","🏙️","🌄","🌅","🌆","🌇","🌉","🌌","🎠","🛝","🎡","🎢","🚂","🚃","🎢","🎪","🖌️","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🪘","🎷","🎺","🪗","🎸","🪕","🎻","🎲","♟️","🎯","🎳","🎮","🎰","🧩"]},
+  {name:"⚽",id:"activities",emojis:["⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓","🏸","🏒","🥍","🏏","🪃","🥅","⛳","🪁","🏹","🎣","🤿","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🥌","🎿","🎯","🪀","🪁","🎮","🕹️","🎰","🧩","🎪","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🪘","🎷","🎺","🪗","🎸","🪕","🎻","🎲","♟️","🎭","🪅","🪩","🪆","🃏","🀄","🎴","📯","🪇","🪈"]},
+  {name:"💡",id:"objects",emojis:["⌚","📱","📲","💻","⌨️","🖥️","🖨️","🖱️","🖲️","🕹️","🗜️","💽","💾","💿","📀","📼","📷","📸","📹","🎥","📽️","🎞️","📞","☎️","📟","📠","📺","📻","🎙️","🎚️","🎛️","🧭","⏱️","⏲️","⏰","🕰️","⌛","⏳","📡","🔋","🪫","🔌","💡","🔦","🕯️","🪔","🧯","🛢️","💸","💵","💴","💶","💷","🪙","💰","💳","🪪","🧾","📧","📨","📩","📤","📥","📦","🏷️","🪧","📪","📫","📬","📭","📮","📯","📜","📃","📄","📑","🧾","📊","📈","📉","🗒️","🗓️","📆","📅","🗑️","📇","购置","📂","📁","🗂️","🗞️","📰","📓","📔","📒","📕","📖","📗","📘","📙","📚","📚","🔬","🔭","📡","💉","🩸","💊","🩹","🩼","🩻","🩺","🚪","🛗","🪞","🪟","🛏️","🛋️","🪑","🚽","🪠","🚿","🛁","🪤","🪒","🧴","🧷","🧹","🧺","🧻","🪣","🧼","🪥","🧽","🧯","🛒","🚬","⚰️","🪦","⚱️","🗿","🪧","🪪","🕹️","🎮","🎰","🧩","🧸","🪆","🪅","🪩","🪘","🪇","🪈","🪗","🪕","🪔","🪔"]},
+  {name:"❤️",id:"symbols",emojis:["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❤️‍🔥","❤️‍🩹","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⛎","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","🆔","⚛️","🉑","☢️","☣️","📴","📳","🈶","🈚","🈸","🈺","🈷️","✴️","🆚","💮","🉐","㊙️","㊗️","🈴","🈵","🈹","🈲","🅰️","🅱️","🆎","🆑","🅾️","🆘","❌","⭕","🛑","⛔","📛","🚫","💯","💢","♨️","🚷","🚯","🚳","🚱","🔞","📵","🚭","❗","❕","❓","❔","‼️","⁉️","🔅","🔆","〽️","⚠️","🚸","🔱","⚜️","🔰","♻️","✅","🈯","💹","❇️","✳️","❎","🌐","💠","Ⓜ️","🌀","💤","🏧","🚾","♿","🅿️","🛗","🈳","🈂️","🛂","🛃","🛄","🛅","🚹","🚺","🚼","⚧️","🚻","🚮","🎦","📶","🈁","🔣","ℹ️","🔤","🔡","🔠","🆖","🆗","🆙","🆒","🆕","🆓","0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟","🔢","#️⃣","*️⃣","⏏️","▶️","⏸️","⏯️","⏹️","⏺️","⏭️","⏮️","⏩","⏪","⏫","⏬","◀️","🔼","🔽","➡️","⬅️","⬆️","⬇️","↗️","↘️","↙️","↖️","↕️","↔️","↪️","↩️","⤴️","⤵️","🔀","🔁","🔂","🔄","🔃","🎵","🎶","➕","➖","➗","✖️","🟰","♾️","💲","💱","™️","©️","®️","〰️","➰","➿","🔚","🔙","🔛","🔝","🔜","✔️","☑️","🔘","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔸","🔹","🔶","🔷","🔳","🔲","▪️","▫️","◾","◽","◼️","◻️","🟥","🟧","🟨","🟩","🟦","🟪","⬛","⬜","🟫","🔈","🔇","🔉","🔊","🔔","🔕","📣","📢","💬","💭","🗯️","♠️","♣️","♥️","♦️","🃏","🎴","🀄","🕐","🕑","🕒","🕓","🕔","🕕","🕖","🕗","🕘","🕙","🕚","🕛","🕜","🕝","🕞","🕟","🕠","🕡","🕢","🕣","🕤","🕥","🕦","🕧"]},
+  {name:"🏳️",id:"flags",emojis:["🏳️","🏴","🏁","🚩","🎌","🏴‍☠️","🇺🇸","🇬🇧","🇫🇷","🇩🇪","🇪🇸","🇮🇹","🇯🇵","🇰🇷","🇨🇳","🇷🇺","🇧🇷","🇮🇳","🇦🇺","🇨🇦","🇲🇽","🇦🇷","🇹🇷","🇸🇦","🇦🇪","🇿🇦","🇳🇬","🇪🇬","🇰🇪","🇹🇭","🇻🇳","🇮🇩","🇵🇭","🇲🇾","🇸🇬","🇳🇿","🇨🇭","🇸🇪","🇳🇴","🇩🇰","🇫🇮","🇮🇪","🇵🇹","🇳🇱","🇧🇪","🇦🇹","🇵🇱","🇨🇿","🇷🇴","🇭🇺","🇬🇷","🇺🇦","🇮🇱","🇵🇰","🇧🇩","🇱🇰","🇲🇲","🇰🇭","🇳🇵","🇲🇳","🇨🇴","🇨🇱","🇵🇪","🇪🇨","🇻🇪","🇵🇦","🇨🇷","🇺🇾","🇵🇾","🇧🇴","🇭🇳","🇸🇻","🇳🇮","🇬🇹","🇨🇺","🇯🇲","🇭🇹","🇩🇴","🇹🇹","🇧🇧","🇦🇬","🇩🇲","🇬🇩","🇰🇳","🇱🇨","🇻🇨","🇧🇸","🇯🇴","🇱🇧","🇮🇶","🇮🇷","🇦🇫","🇵🇸","🇸🇾","🇾🇪","🇴🇲","🇶🇦","🇰🇼","🇧🇭","🇦🇿","🇬🇪","🇦🇲","🇰🇿","🇺🇿","🇹🇲","🇰🇬","🇹🇯","🇦🇱","🇷🇸","🇭🇷","🇧🇦","🇲🇪","🇲🇰","🇸🇮","🇧🇬","🇱🇹","🇱🇻","🇪🇪","🇨🇾","🇲🇹","🇱🇺","🇮🇸","🇦🇩","🇲🇨","🇸🇲","🇻🇦","🇱🇮","🇧🇲","🇰🇾","🇻🇮","🇬🇺","🇦🇸","🇲🇵","🇵🇼","🇫🇲","🇲🇭","🇰🇮","🇳🇷","🇹🇻","🇼🇸","🇹🇴","🇫🇯","🇵🇬","🇸🇧","🇻🇺","🇳🇨","🇹🇭","🇰🇭","🇱🇦","🇧🇳"]}
+];
+var twemojiBase="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/";
+function emojiToCodepoint(e){
+  var cp=[];
+  for(var i=0;i<e.length;i++){
+    var code=e.codePointAt(i);
+    if(code>0xFFFF)i++;
+    cp.push(code.toString(16));
+  }
+  return cp.join("-");
+}
+function renderEmojiGrid(catId,filter){
+  var grid=g("emojiGrid");
+  var cats=catId?[emojiCategories.find(function(c){return c.id===catId})].filter(Boolean):emojiCategories;
+  var h="";
+  cats.forEach(function(cat){
+    if(filter){
+      cat.emojis.forEach(function(e){
+        if(e.includes(filter))h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".png' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
+      });
+    }else{
+      cat.emojis.forEach(function(e){
+        h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".png' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
+      });
+    }
+  });
+  grid.innerHTML=h;
+}
 function toggleEmojiPicker(){
   var picker=g("emojiPicker");
   if(picker.classList.contains("show")){picker.classList.remove("show");return}
-  if(!picker.innerHTML){
-    var h="<div class='emoji-picker-grid'>";
-    for(var i=0;i<emojiList.length;i++){h+="<button onclick='insertEmoji(&quot;"+emojiList[i]+"&quot;)'>"+emojiList[i]+"</button>"}
-    h+="</div>";
-    picker.innerHTML=h;
+  if(!g("emojiTabs").innerHTML){
+    var tabs=g("emojiTabs");
+    var th="";
+    emojiCategories.forEach(function(cat,i){
+      th+="<button data-cat='"+cat.id+"' onclick='switchEmojiTab(this,&quot;"+cat.id+"&quot;)'"+(i===0?" class='active'":"")+">"+cat.name+"</button>";
+    });
+    tabs.innerHTML=th;
+    renderEmojiGrid("smileys");
   }
   picker.classList.add("show");
+}
+function switchEmojiTab(btn,catId){
+  g("emojiSearch").value="";
+  g("emojiTabs").querySelectorAll("button").forEach(function(b){b.classList.remove("active")});
+  btn.classList.add("active");
+  renderEmojiGrid(catId);
+}
+function filterEmojis(q){
+  var q=(q||"").toLowerCase();
+  if(!q){var activeTab=g("emojiTabs").querySelector(".active");if(activeTab)renderEmojiGrid(activeTab.dataset.cat);else renderEmojiGrid("smileys");return}
+  renderEmojiGrid(null,q);
 }
 function insertEmoji(e){
   var ta=g("msgInput");
