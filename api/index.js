@@ -1523,7 +1523,7 @@ function fmt(s){
   var r=esc(s);
   r=r.replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
   r=r.replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
-  r=r.replace(new RegExp("\\|\\|([^|]+)\\|\\|","g"),"<span class='spoiler' onclick='this.classList.toggle(\"revealed\")'>$1</span>");
+  r=r.replace(new RegExp("\\|\\|([^|]+)\\|\\|","g"),"<span class='spoiler' onclick='this.classList.toggle(&quot;revealed&quot;)'>$1</span>");
   r=r.replace(new RegExp("\\*\\*(.+?)\\*\\*","g"),"<b>$1</b>");
   r=r.replace(new RegExp("\\*(.+?)\\*","g"),"<i>$1</i>");
   r=r.replace(new RegExp("__(.+?)__","g"),"<u>$1</u>");
