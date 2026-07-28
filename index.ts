@@ -460,6 +460,100 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mod-search{display:flex;gap:6px;margin-bottom:8px}
 .mod-search input{flex:1}
 .mod-search button{padding:5px 14px;white-space:nowrap}
+.msg-edit-btn{position:absolute;top:8px;right:32px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;color:#6d6572;background:#191d23;border:1px solid #252a32;font-size:10px;transition:all .15s}
+.msg-row:hover .msg-edit-btn{opacity:1}
+.msg-edit-btn:hover{color:#b48899;border-color:#b48899;background:rgba(180,136,153,0.1)}
+.msg-edit-area{margin-top:4px}
+.msg-edit-area textarea{width:100%;padding:6px 8px;border:1px solid #b48899;border-radius:6px;background:#13161b;color:#c0bcc4;font:11px 'Space Grotesk',monospace;resize:none;min-height:36px;outline:none}
+.msg-edit-actions{display:flex;gap:4px;margin-top:4px}
+.msg-edit-actions button{padding:3px 10px;font-size:10px;border-radius:4px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace}
+.msg-edit-save{background:#b48899;color:#13161b}
+.msg-edit-cancel{background:#252a32;color:#7d7582}
+.msg-search-bar{display:flex;gap:6px;margin-bottom:8px}
+.msg-search-bar input{flex:1;padding:6px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none}
+.msg-search-bar input:focus{border-color:#b48899}
+.msg-search-bar button{padding:5px 12px}
+.msg-load-more{text-align:center;padding:8px;cursor:pointer;color:#b48899;font-size:10px;border:1px solid #252a32;border-radius:6px;background:#191d23;transition:all .15s;margin-bottom:8px}
+.msg-load-more:hover{border-color:#b48899;background:#1e2228}
+.audit-entry{display:flex;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s;font-size:11px}
+.audit-entry:hover{background:#1e2228}
+.audit-entry:last-child{border-bottom:none}
+.audit-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.audit-info{flex:1;min-width:0}
+.audit-action{color:#c0bcc4;line-height:1.4}
+.audit-action b{color:#e0dce4;font-weight:600}
+.audit-action .hl{color:#b48899}
+.audit-time{color:#5a5260;font-size:9px;flex-shrink:0;margin-left:auto;font-weight:600}
+.invite-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s}
+.invite-card:last-child{border-bottom:none}
+.invite-card:hover{background:#1e2228}
+.invite-code{color:#b48899;font-family:monospace;font-size:11px;font-weight:600}
+.invite-info{flex:1;min-width:0}
+.invite-meta{color:#5a5260;font-size:9px;margin-top:2px}
+.invite-uses{color:#6d6572;font-size:10px}
+.invite-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
+.invite-del:hover{background:#d45555;color:#fff}
+.emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;max-height:300px;overflow-y:auto;padding:4px}
+.emoji-grid::-webkit-scrollbar{width:4px}
+.emoji-grid::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
+.emoji-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;border-radius:6px;cursor:pointer;transition:background .15s}
+.emoji-item:hover{background:#252a32}
+.emoji-item img{width:32px;height:32px}
+.emoji-item span{font-size:8px;color:#5a5260;text-align:center;word-break:break-all;max-width:48px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.event-card{padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s}
+.event-card:last-child{border-bottom:none}
+.event-card:hover{background:#1e2228}
+.event-name{color:#e0dce4;font-size:12px;font-weight:600}
+.event-time{color:#b48899;font-size:10px;margin-top:2px}
+.event-desc{color:#6d6572;font-size:10px;margin-top:3px}
+.event-status{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;margin-left:6px}
+.event-active{background:rgba(85,180,136,.15);color:#55b488}
+.event-scheduled{background:rgba(180,136,153,.15);color:#b48899}
+.event-completed{background:rgba(90,82,96,.15);color:#5a5260}
+.event-cancelled{background:rgba(212,85,85,.15);color:#d45555}
+.event-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0;margin-top:4px}
+.event-del:hover{background:#d45555;color:#fff}
+.channel-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s}
+.channel-card:last-child{border-bottom:none}
+.channel-card:hover{background:#1e2228}
+.channel-icon{color:#6d6572;font-size:14px;flex-shrink:0}
+.channel-name{color:#e0dce4;font-size:11px;font-weight:600;flex:1}
+.channel-type{color:#5a5260;font-size:9px;padding:2px 6px;background:#252a32;border-radius:3px;flex-shrink:0}
+.channel-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
+.channel-del:hover{background:#d45555;color:#fff}
+.create-form{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.create-form input,.create-form select{flex:1;min-width:100px}
+.create-form button{white-space:nowrap}
+.toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;font:11px 'Space Grotesk',monospace;z-index:300;animation:toastIn .2s ease;max-width:320px}
+.toast-success{background:#1e3a2a;border:1px solid #55b488;color:#55b488}
+.toast-error{background:#3a1e1e;border:1px solid #d45555;color:#d45555}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.emoji-picker-wrap{position:relative;display:inline-block}
+.emoji-picker-dropdown{display:none;position:absolute;bottom:100%;left:0;background:#1e2228;border:1px solid #3a424c;border-radius:8px;padding:8px;width:280px;max-height:240px;z-index:80;overflow-y:auto;box-shadow:0 -8px 24px rgba(0,0,0,.4)}
+.emoji-picker-dropdown.show{display:block}
+.emoji-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.emoji-picker-grid button{background:none;border:none;padding:4px;cursor:pointer;border-radius:4px;font-size:18px;line-height:1}
+.emoji-picker-grid button:hover{background:#252a32}
+.role-manager{max-height:200px;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:#252a32 transparent}
+.role-manager::-webkit-scrollbar{width:4px}
+.role-manager::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
+.role-manage-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:4px;cursor:pointer;transition:background .1s;font-size:10px;color:#9a929e}
+.role-manage-item:hover{background:#252a32}
+.role-manage-item .role-check{width:14px;height:14px;border:1px solid #3a424c;border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .15s}
+.role-manage-item.has-role .role-check{background:#b48899;border-color:#b48899;color:#13161b}
+.role-manage-item.has-role{color:#e0dce4}
+.activity-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32}
+.activity-item:last-child{border-bottom:none}
+.activity-item img{width:28px;height:28px;border-radius:50%;flex-shrink:0}
+.activity-text{flex:1;font-size:11px;color:#c0bcc4}
+.activity-text b{color:#e0dce4;font-weight:600}
+.activity-time{color:#5a5260;font-size:9px;flex-shrink:0;font-weight:600}
+.activity-badge{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;margin-left:4px}
+.badge-join{background:rgba(85,180,136,.15);color:#55b488}
+.badge-ban{background:rgba(212,85,85,.15);color:#d45555}
+.badge-boost{background:rgba(180,136,153,.15);color:#b48899}
+.dash-edit-btn{background:none;border:none;color:#5a5260;cursor:pointer;font-size:10px;padding:2px 6px;border-radius:4px;transition:all .15s}
+.dash-edit-btn:hover{color:#b48899;background:rgba(180,136,153,.1)}
 </style>
 </head>
 <body>
@@ -471,6 +565,11 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="bans" onclick="switchTab('bans')"><img src="/icons/sanctions.png" alt="">sanctions</button>
 <button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
 <button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
+<button data-tab="channels" onclick="switchTab('channels')"><img src="/icons/channels.png" alt="">channels</button>
+<button data-tab="invites" onclick="switchTab('invites')"><img src="/icons/members.png" alt="">invites</button>
+<button data-tab="emojis" onclick="switchTab('emojis')"><img src="/icons/dashboard.png" alt="">emojis</button>
+<button data-tab="events" onclick="switchTab('events')"><img src="/icons/dashboard.png" alt="">events</button>
+<button data-tab="audit" onclick="switchTab('audit')"><img src="/icons/sanctions.png" alt="">audit log</button>
 <div class="bocchi-wrap"><img src="/icons/bocchi-rotate.gif" alt=""/></div>
 <button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
 </div>
@@ -495,6 +594,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="mentionList" class="mention-list"></div>
 </div>
 </div>
+<div class="msg-search-bar">
+<input type="text" id="msgSearchInput" placeholder="search messages..." oninput="filterMsgHistory(this.value)"/>
+</div>
+<div id="msgLoadMore" class="msg-load-more" style="display:none" onclick="loadMoreMessages()">load older messages</div>
 <div id="msgHistory" class="msg-history-box">
 <p style="color:#5a5260;text-align:center;padding:20px 0">select a channel</p>
 </div>
@@ -503,7 +606,11 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <span id="dropLabel">drop file or click to attach</span>
 </div>
 <input type="file" id="msgFile" style="display:none" onchange="updateDropLabel(this)"/>
-<div class="msg-input-row">
+<div class="msg-input-row" style="align-items:flex-end">
+<div class="emoji-picker-wrap">
+<button onclick="toggleEmojiPicker()" style="padding:6px 8px;font-size:16px;background:none;border:none;cursor:pointer" title="emoji">&#128578;</button>
+<div class="emoji-picker-dropdown" id="emojiPicker"></div>
+</div>
 <textarea id="msgInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
 <button onclick="sendMsg()">send</button>
 </div>
@@ -542,6 +649,38 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="banStats" class="member-stats"></div>
 <div id="banTimeouts"></div>
 <div id="banBans"></div>
+</div>
+<div id="panel-channels" class="panel">
+<h2>channel management</h2>
+<div class="create-form" id="channelCreateForm">
+<input type="text" id="newChannelName" placeholder="channel name"/>
+<select id="newChannelType"><option value="0">Text</option><option value="2">Voice</option></select>
+<select id="newChannelCategory"><option value="">no category</option></select>
+<button onclick="createChannel()" style="background:#b48899;color:#13161b;border:none">create</button>
+</div>
+<div id="channelList"></div>
+</div>
+<div id="panel-invites" class="panel">
+<h2>invites</h2>
+<div id="inviteList"></div>
+</div>
+<div id="panel-emojis" class="panel">
+<h2>emojis & stickers</h2>
+<div id="emojiContent"></div>
+</div>
+<div id="panel-events" class="panel">
+<h2>scheduled events</h2>
+<div class="create-form">
+<input type="text" id="newEventName" placeholder="event name"/>
+<input type="datetime-local" id="newEventStart"/>
+<input type="datetime-local" id="newEventEnd"/>
+<button onclick="createEvent()" style="background:#b48899;color:#13161b;border:none">create</button>
+</div>
+<div id="eventList"></div>
+</div>
+<div id="panel-audit" class="panel">
+<h2>audit log</h2>
+<div id="auditList"></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
 <div id="confirmOverlay" class="confirm-overlay">
@@ -585,6 +724,11 @@ function switchTab(name){
   if(name==="bans")loadModerations();
   if(name==="dms"){g("dmStart").style.display="block";g("dmChat").style.display="none";stopDmPoll()}
   if(name!=="dms")stopDmPoll();
+  if(name==="channels")loadChannels();
+  if(name==="invites")loadInvites();
+  if(name==="emojis")loadEmojis();
+  if(name==="events")loadEvents();
+  if(name==="audit")loadAuditLog();
   if(window.innerWidth<=600&&g("sidebar").classList.contains("open"))toggleMenu();
 }
 
@@ -611,7 +755,7 @@ function loadDashboard(){
     var h="<div class='dash-banner' id='dashBanner' data-hdr='/icons/headers/header"+hdrIdx+".png'></div>";
     h+="<div class='dash-header'>";
     h+=iconHtml;
-    h+="<div class='dash-info'><p class='dash-name'>"+esc(d.name)+"</p><div class='dash-id'>"+esc(d.created)+"</div></div>";
+    h+="<div class='dash-info'><p class='dash-name'><span id='guildNameDisplay' style='cursor:pointer' onclick='editGuildName()' title='click to edit'>"+esc(d.name)+"</span> <button class='dash-edit-btn' onclick='editGuildName()' title='edit server name'>&#9998;</button></p><div class='dash-id'>"+esc(d.created)+"</div></div>";
     h+="</div>";
     h+="<div class='dash-grid'>";
     h+="<div class='dash-card'><div class='dash-card-icon'><img src='/icons/users.png' alt=''/></div><div><div class='dash-card-label'>members</div><div class='dash-card-val'>"+d.totalMembers+"</div><div class='dash-card-sub'>"+d.humans+" humans &middot; "+d.bots+" bots</div></div></div>";
@@ -623,8 +767,10 @@ function loadDashboard(){
     h+="<div class='dash-roles-header' onclick='toggleDashRoles()'><span>roles ("+d.roleCount+")</span><span class='role-arrow' id='dashRoleArrow'>&#9660;</span></div>";
     h+="<div id='dashRoleList' class='dash-roles-list'>"+roleItems+"</div>";
     h+="</div>";
+    h+="<div id='dashActivity' style='background:#191d23;border:1px solid #252a32;border-radius:8px;padding:10px;margin-bottom:8px'></div>";
     g("dashContent").innerHTML=h;
     var b=g("dashBanner");if(b&&b.dataset.hdr)b.style.backgroundImage="url('"+b.dataset.hdr+"')";
+    loadDashboardActivity();
   });
 }
 
@@ -853,125 +999,6 @@ function pickMention(el){
   g("mentionList").classList.remove("show");
 }
 
-function loadMsgHistory(cid){
-  if(!cid){g("msgHistory").innerHTML="<p style='color:#5a5260;text-align:center;padding:20px 0'>select a channel</p>";return}
-  g("msgHistory").innerHTML="<p style='color:#6d6572;text-align:center;padding:20px 0'>loading...</p>";
-  api({action:"messages",channelId:cid,limit:50},function(d){
-    if(d.error){g("msgHistory").innerHTML="<p style='color:#d45555;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
-    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#5a5260;text-align:center;padding:20px 0'>no messages found.</p>";return}
-    if(!Array.isArray(d.messages)){g("msgHistory").innerHTML="<p style='color:#d45555;text-align:center;padding:20px 0'>invalid response</p>";return}
-    var h="";
-    var prevDate="";
-    var prevAuthor=null;
-    var prevTime=0;
-    try{
-      for(var i=d.messages.length-1;i>=0;i--){
-        var msg=d.messages[i],u=msg.author;
-        if(!u||!u.bot)continue;
-        var ts=new Date(msg.timestamp);
-        var dayStr=ts.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
-        var timeStr=ts.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
-        var tsVal=ts.getTime();
-        if(dayStr!==prevDate){
-          h+="<div class='msg-day-divider'><span>"+dayStr+"</span></div>";
-          prevDate=dayStr;
-          prevAuthor=null;
-        }
-        var sameUser=prevAuthor&&prevAuthor===u.id;
-        var sameGroup=sameUser&&(tsVal-prevTime)<420000;
-        var name=u.global_name||u.username;
-        var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
-        h+="<div class='msg-row"+(sameGroup?"":" msg-group-start")+"'>";
-        if(sameGroup){
-          h+="<div class='msg-avatar' style='visibility:hidden;width:34px'></div>";
-        }else{
-          h+="<img class='msg-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
-        }
-        h+="<div class='msg-body'>";
-        if(!sameGroup){
-          h+="<div><span class='msg-author'>"+esc(name)+"</span>"+(u.bot?"<span style='font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:5px;font-weight:700;text-transform:uppercase;vertical-align:middle'>bot</span>":"")+"<span class='msg-time'>"+timeStr+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>";
-        }else{
-          h+="<div class='msg-time-inline'>"+timeStr+"</div>";
-        }
-        if(msg.referenced_message&&msg.referenced_message.author){
-          var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-          var ra=ru.avatar?"https://cdn.discordapp.com/avatars/"+ru.id+"/"+ru.avatar+(ru.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(ru.discriminator||"0")%5)+".png";
-          h+="<div class='msg-ref'><img src='"+ra+"' style='width:14px;height:14px;border-radius:50%;vertical-align:middle' alt=''/> <b>"+esc(rn)+"</b> "+fmt(msg.referenced_message.content||"(attachment)").substring(0,120)+"</div>";
-        }
-        h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
-        if(msg.sticker_items&&msg.sticker_items.length){
-          for(var j=0;j<msg.sticker_items.length;j++){
-            var s=msg.sticker_items[j];
-            h+="<img class='msg-sticker' src='https://cdn.discordapp.com/stickers/"+s.id+".png' alt='' loading='lazy'/>";
-          }
-        }
-        if(msg.attachments&&msg.attachments.length){
-          for(var j=0;j<msg.attachments.length;j++){
-            var a=msg.attachments[j];
-            if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
-              h+="<img class='msg-img' src='"+escUrl(a.url)+"' alt='' loading='lazy'/>";
-            }else if(a.content_type&&a.content_type.startsWith("video/")){
-              h+="<video class='msg-video' src='"+escUrl(a.url)+"' controls></video>";
-            }else if(a.content_type&&a.content_type.startsWith("audio/")){
-              h+="<audio class='msg-audio' src='"+escUrl(a.url)+"' controls></audio>";
-            }else{
-              h+="<a class='msg-file-link' href='"+escUrl(a.url)+"'>&#128206; "+esc(a.filename)+"</a>"
-            }
-          }
-        }
-        if(msg.embeds&&msg.embeds.length){
-          for(var j=0;j<msg.embeds.length;j++){
-            var e=msg.embeds[j];
-            if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){
-              h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy'/>";
-              continue;
-            }
-            var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"";
-            h+="<div class='msg-embed'"+(bg?" style='border-left-color:"+bg+"'":"")+">";
-            if(e.author&&e.author.name) h+="<div class='msg-embed-author'>"+esc(e.author.name)+"</div>";
-            if(e.title){
-              if(e.url) h+="<a class='msg-embed-title' href='"+escUrl(e.url)+"' style='text-decoration:none'>"+esc(e.title)+"</a>";
-              else h+="<div class='msg-embed-title'>"+esc(e.title)+"</div>";
-            }
-            if(e.description) h+="<div class='msg-embed-desc'>"+fmt(e.description||"")+"</div>";
-            if(e.fields&&e.fields.length){
-              for(var k=0;k<e.fields.length;k++){
-                var f=e.fields[k];
-                h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"")+"</div></div>";
-              }
-            }
-            if(e.image&&e.image.url) h+="<img class='msg-img' src='"+escUrl(e.image.url)+"' alt='' loading='lazy'/>";
-            if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image")) h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
-            if(e.footer&&e.footer.text) h+="<div style='color:#5a5260;font-size:8px;margin-top:3px'>"+esc(e.footer.text)+"</div>";
-            h+="</div>";
-          }
-        }
-        if(msg.reactions&&msg.reactions.length){
-          h+="<div class='msg-reactions'>";
-          for(var j=0;j<msg.reactions.length;j++){
-            var r=msg.reactions[j],emo=r.emoji;
-            if(emo.id){
-              h+="<span class='msg-reaction'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:14px;height:14px' alt=''/> <span class='msg-reaction-count'>"+r.count+"</span></span>";
-            }else{
-              h+="<span class='msg-reaction'>"+esc(emo.name)+" <span class='msg-reaction-count'>"+r.count+"</span></span>";
-            }
-          }
-          h+="</div>";
-        }
-        h+="</div>";
-        h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
-        h+="</div>";
-        prevAuthor=u.id;
-        prevTime=tsVal;
-      }
-    }catch(e){
-      h+="<p style='color:#d45555;font-size:10px;margin-top:8px'>render error: "+esc(e.message)+"</p>";
-    }
-    g("msgHistory").innerHTML=h;
-    g("msgHistory").scrollTop=g("msgHistory").scrollHeight;
-  });
-}
-
 function sendMsg(){
   var c=g("msgChannel").value,m=g("msgInput").value.trim(),file=g("msgFile").files[0];
   if(!c){g("msgStatus").textContent="select a channel";g("msgStatus").style.color="#d45555";return}
@@ -1110,6 +1137,439 @@ function filterMembers(q){
   renderMembers(filtered);
 }
 
+function c(){g("userModal").classList.remove("show")}
+function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
+function escUrl(s){return String(s).replace(/[^a-zA-Z0-9\-._~:/?#@[!$&'()*+,;=%]/g,encodeURIComponent)}
+function fmt(s){
+  var r=esc(s);
+  r=r.replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
+  r=r.replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
+  r=r.replace(new RegExp("\\|\\|([^|]+)\\|\\|","g"),"<span class='spoiler' onclick='this.classList.toggle(&quot;revealed&quot;)'>$1</span>");
+  r=r.replace(new RegExp("\\*\\*(.+?)\\*\\*","g"),"<b>$1</b>");
+  r=r.replace(new RegExp("\\*(.+?)\\*","g"),"<i>$1</i>");
+  r=r.replace(new RegExp("__(.+?)__","g"),"<u>$1</u>");
+  r=r.replace(new RegExp("~~(.+?)~~","g"),"<s>$1</s>");
+  r=r.replace(new RegExp("\x60\x60\x60([\\s\\S]+?)\x60\x60\x60","g"),"<pre><code>$1</code></pre>");
+  r=r.replace(new RegExp("\x60([^\x60]+)\x60","g"),"<code>$1</code>");
+  r=r.replace(new RegExp("&lt;@(\\\\d+)&gt;","g"),"<span class='mention'>@$1</span>");
+  return r;
+}
+function logout(){fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"logout"})}).finally(function(){location.reload()})}
+function updateFileLabel(el){
+  var label=g("dropLabel");
+  if(el.files&&el.files.length){label.textContent=el.files[0].name;g("dropZone").classList.add("has-file")}
+  else{label.textContent="drop file or click to attach";g("dropZone").classList.remove("has-file")}
+}
+function updateDropLabel(el){updateFileLabel(el)}
+function handleDrop(e){
+  e.preventDefault();
+  var dz=g("dropZone");dz.classList.remove("dragover");
+  var files=e.dataTransfer.files;
+  if(files.length){g("msgFile").files=files;updateFileLabel(g("msgFile"))}
+}
+function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
+
+// --- Toast notifications ---
+function showToast(msg,type){
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"success");
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},3000);
+}
+
+// --- Message editing ---
+var editingMsgId=null;
+function editMsg(cid,mid){
+  var row=document.querySelector('[data-mid="'+mid+'"]');
+  if(!row)return;
+  var content=row.querySelector(".msg-content");
+  if(!content)return;
+  var oldText=content.textContent||"";
+  editingMsgId=mid;
+  var area=document.createElement("div");
+  area.className="msg-edit-area";
+  area.innerHTML="<textarea id='editTextarea'>"+esc(oldText)+"</textarea><div class='msg-edit-actions'><button class='msg-edit-save' onclick='saveEdit(\""+cid+"\",\""+mid+"\")'>save</button><button class='msg-edit-cancel' onclick='cancelEdit()'>cancel</button></div>";
+  content.style.display="none";
+  content.parentNode.insertBefore(area,content.nextSibling);
+  var ta=g("editTextarea");if(ta){ta.focus();ta.selectionStart=ta.value.length}
+}
+function saveEdit(cid,mid){
+  var ta=g("editTextarea");
+  if(!ta)return;
+  var newContent=ta.value.trim();
+  if(!newContent){showToast("message cannot be empty","error");return}
+  api({action:"edit",channelId:cid,messageId:mid,content:newContent},function(d){
+    if(d.success){showToast("message edited");cancelEdit();loadMsgHistory(cid)}
+    else{showToast(d.error||"failed to edit","error")}
+  });
+}
+function cancelEdit(){
+  var area=g("editTextarea");
+  if(area&&area.parentNode)area.parentNode.remove();
+  var rows=document.querySelectorAll(".msg-content");
+  rows.forEach(function(r){r.style.display=""});
+  editingMsgId=null;
+}
+
+// --- Message search (client-side filter) ---
+function filterMsgHistory(q){
+  q=q.toLowerCase();
+  var rows=document.querySelectorAll("#msgHistory .msg-row");
+  rows.forEach(function(r){
+    var content=r.querySelector(".msg-content");
+    var author=r.querySelector(".msg-author");
+    var text=(content?content.textContent:"")+(author?author.textContent:"");
+    if(!q||text.toLowerCase().indexOf(q)!==-1){r.style.display=""}
+    else{r.style.display="none"}
+  });
+}
+
+// --- Message pagination ---
+var msgPagination={before:null,channelId:null,loading:false};
+function loadMsgHistory(cid){
+  if(!cid){g("msgHistory").innerHTML="<p style='color:#5a5260;text-align:center;padding:20px 0'>select a channel</p>";g("msgLoadMore").style.display="none";return}
+  g("msgHistory").innerHTML="<p style='color:#6d6572;text-align:center;padding:20px 0'>loading...</p>";
+  g("msgLoadMore").style.display="none";
+  msgPagination={before:null,channelId:cid,loading:false};
+  g("msgSearchInput").value="";
+  api({action:"messages",channelId:cid,limit:50},function(d){
+    if(d.error){g("msgHistory").innerHTML="<p style='color:#d45555;text-align:center;padding:20px 0'>"+esc(d.error)+"</p>";return}
+    if(!d.messages||!d.messages.length){g("msgHistory").innerHTML="<p style='color:#5a5260;text-align:center;padding:20px 0'>no messages found.</p>";return}
+    if(!Array.isArray(d.messages)){g("msgHistory").innerHTML="<p style='color:#d45555;text-align:center;padding:20px 0'>invalid response</p>";return}
+    if(d.messages.length>=50){g("msgLoadMore").style.display="block";msgPagination.before=d.messages[d.messages.length-1].id}
+    renderMsgHistory(d.messages,cid);
+  });
+}
+function loadMoreMessages(){
+  if(msgPagination.loading||!msgPagination.before||!msgPagination.channelId)return;
+  msgPagination.loading=true;
+  g("msgLoadMore").textContent="loading...";
+  api({action:"messages",channelId:msgPagination.channelId,limit:50,before:msgPagination.before},function(d){
+    msgPagination.loading=false;
+    g("msgLoadMore").textContent="load older messages";
+    if(d.error||!d.messages||!d.messages.length){g("msgLoadMore").style.display="none";return}
+    var existing=g("msgHistory");
+    var newHtml="";
+    if(d.messages.length>=50){msgPagination.before=d.messages[d.messages.length-1].id;g("msgLoadMore").style.display="block"}
+    else{g("msgLoadMore").style.display="none";msgPagination.before=null}
+    var tmp=document.createElement("div");
+    tmp.innerHTML=renderMsgRows(d.messages,msgPagination.channelId);
+    var first=existing.querySelector(".msg-day-divider");
+    if(first)existing.insertBefore(tmp,first);
+    else existing.innerHTML=tmp.innerHTML+existing.innerHTML;
+  });
+}
+function renderMsgRows(messages,cid){
+  var h="";var prevDate="";var prevAuthor=null;var prevTime=0;
+  for(var i=messages.length-1;i>=0;i--){
+    var msg=messages[i],u=msg.author;
+    if(!u)continue;
+    var ts=new Date(msg.timestamp);
+    var dayStr=ts.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+    var timeStr=ts.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+    var tsVal=ts.getTime();
+    if(dayStr!==prevDate){h+="<div class='msg-day-divider'><span>"+dayStr+"</span></div>";prevDate=dayStr;prevAuthor=null}
+    var sameUser=prevAuthor&&prevAuthor===u.id;
+    var sameGroup=sameUser&&(tsVal-prevTime)<420000;
+    var name=u.global_name||u.username;
+    var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+    h+="<div class='msg-row"+(sameGroup?" msg-group-start":"")+"'>";
+    if(sameGroup){h+="<div class='msg-avatar' style='visibility:hidden;width:34px'></div>"}
+    else{h+="<img class='msg-avatar' src='"+avatar+"' alt='' loading='lazy'/>"}
+    h+="<div class='msg-body'>";
+    if(!sameGroup){h+="<div><span class='msg-author'>"+esc(name)+"</span>"+(u.bot?"<span style='font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:5px;font-weight:700;text-transform:uppercase;vertical-align:middle'>bot</span>":"")+"<span class='msg-time'>"+timeStr+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>"}
+    else{h+="<div class='msg-time-inline'>"+timeStr+"</div>"}
+    if(msg.referenced_message&&msg.referenced_message.author){
+      var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
+      var ra=ru.avatar?"https://cdn.discordapp.com/avatars/"+ru.id+"/"+ru.avatar+(ru.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(ru.discriminator||"0")%5)+".png";
+      h+="<div class='msg-ref'><img src='"+ra+"' style='width:14px;height:14px;border-radius:50%;vertical-align:middle' alt=''/> <b>"+esc(rn)+"</b> "+fmt(msg.referenced_message.content||"(attachment)").substring(0,120)+"</div>";
+    }
+    h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
+    if(msg.sticker_items&&msg.sticker_items.length){
+      for(var j=0;j<msg.sticker_items.length;j++){
+        var s=msg.sticker_items[j];
+        h+="<img class='msg-sticker' src='https://cdn.discordapp.com/stickers/"+s.id+".png' alt='' loading='lazy'/>";
+      }
+    }
+    if(msg.attachments&&msg.attachments.length){
+      for(var j=0;j<msg.attachments.length;j++){
+        var a=msg.attachments[j];
+        if(a.content_type&&(a.content_type.startsWith("image/")||a.width)){
+          h+="<img class='msg-img' src='"+escUrl(a.url)+"' alt='' loading='lazy'/>";
+        }else if(a.content_type&&a.content_type.startsWith("video/")){
+          h+="<video class='msg-video' src='"+escUrl(a.url)+"' controls></video>";
+        }else if(a.content_type&&a.content_type.startsWith("audio/")){
+          h+="<audio class='msg-audio' src='"+escUrl(a.url)+"' controls></audio>";
+        }else{
+          h+="<a class='msg-file-link' href='"+escUrl(a.url)+"'>&#128206; "+esc(a.filename)+"</a>";
+        }
+      }
+    }
+    if(msg.embeds&&msg.embeds.length){
+      for(var j=0;j<msg.embeds.length;j++){
+        var e=msg.embeds[j];
+        if(e.type=="image"&&e.thumbnail&&e.thumbnail.url){h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy'/>";continue}
+        var bg=e.color?"#"+("000000"+e.color.toString(16)).slice(-6):"";
+        h+="<div class='msg-embed'"+(bg?" style='border-left-color:"+bg+"'":"")+">";
+        if(e.author&&e.author.name)h+="<div class='msg-embed-author'>"+esc(e.author.name)+"</div>";
+        if(e.title){if(e.url)h+="<a class='msg-embed-title' href='"+escUrl(e.url)+"' style='text-decoration:none'>"+esc(e.title)+"</a>";else h+="<div class='msg-embed-title'>"+esc(e.title)+"</div>"}
+        if(e.description)h+="<div class='msg-embed-desc'>"+fmt(e.description||"")+"</div>";
+        if(e.fields&&e.fields.length){for(var k=0;k<e.fields.length;k++){var f=e.fields[k];h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"")+"</div></div>"}}
+        if(e.image&&e.image.url)h+="<img class='msg-img' src='"+escUrl(e.image.url)+"' alt='' loading='lazy'/>";
+        if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image"))h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
+        if(e.footer&&e.footer.text)h+="<div style='color:#5a5260;font-size:8px;margin-top:3px'>"+esc(e.footer.text)+"</div>";
+        h+="</div>";
+      }
+    }
+    if(msg.reactions&&msg.reactions.length){
+      h+="<div class='msg-reactions'>";
+      for(var j=0;j<msg.reactions.length;j++){
+        var r=msg.reactions[j],emo=r.emoji;
+        if(emo.id){h+="<span class='msg-reaction'><img src='https://cdn.discordapp.com/emojis/"+emo.id+".png' style='width:14px;height:14px' alt=''/> <span class='msg-reaction-count'>"+r.count+"</span></span>"}
+        else{h+="<span class='msg-reaction'>"+esc(emo.name)+" <span class='msg-reaction-count'>"+r.count+"</span></span>"}
+      }
+      h+="</div>";
+    }
+    h+="</div>";
+    h+="<span class='msg-edit-btn' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='editMsg(this.dataset.cid,this.dataset.mid)' title='edit'>&#9998;</span>";
+    h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
+    h+="</div>";
+    prevAuthor=u.id;prevTime=tsVal;
+  }
+  return h;
+}
+function renderMsgHistory(messages,cid){
+  g("msgHistory").innerHTML=renderMsgRows(messages,cid);
+  g("msgHistory").scrollTop=g("msgHistory").scrollHeight;
+}
+
+// --- Emoji picker ---
+var emojiList=["😀","😂","😍","🥰","😎","🤩","🥳","😢","😡","🤔","👍","👎","❤️","🔥","⭐","🎉","✅","❌","👀","💀","😭","🫡","🤣","😊","🙌","💪","🎵","📸","💀","🤝","💎","🌙","🌸","🎮","😈","🦊","🐱","🐸","🌈","🍕","🍰","☕","🍩","🎀","👑","🦋","🔮","🎪","🏆"];
+function toggleEmojiPicker(){
+  var picker=g("emojiPicker");
+  if(picker.classList.contains("show")){picker.classList.remove("show");return}
+  if(!picker.innerHTML){
+    var h="<div class='emoji-picker-grid'>";
+    for(var i=0;i<emojiList.length;i++){h+="<button onclick='insertEmoji(\""+emojiList[i]+"\")'>"+emojiList[i]+"</button>"}
+    h+="</div>";
+    picker.innerHTML=h;
+  }
+  picker.classList.add("show");
+}
+function insertEmoji(e){
+  var ta=g("msgInput");
+  ta.value+=e;ta.focus();
+  g("emojiPicker").classList.remove("show");
+}
+document.addEventListener("click",function(e){if(!e.target.closest(".emoji-picker-wrap")){var p=g("emojiPicker");if(p)p.classList.remove("show")}});
+
+// --- Channel management ---
+function loadChannels(){
+  api({action:"channels"},function(d){
+    if(d.error){g("channelList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var channels=d.channels||[];
+    var categories=channels.filter(function(c){return c.type===4}).sort(function(a,b){return a.position-b.position});
+    var catSel=g("newChannelCategory");
+    catSel.innerHTML="<option value=''>no category</option>";
+    for(var i=0;i<categories.length;i++){catSel.innerHTML+="<option value='"+categories[i].id+"'>"+esc(categories[i].name)+"</option>"}
+    var h="";
+    var grouped={};
+    for(var i=0;i<channels.length;i++){
+      var c=channels[i];
+      var pid=c.parent_id||"_root";
+      if(!grouped[pid])grouped[pid]=[];
+      grouped[pid].push(c);
+    }
+    for(var pid in grouped){
+      var items=grouped[pid].sort(function(a,b){return a.position-b.position});
+      for(var i=0;i<items.length;i++){
+        var c=items[i];
+        var icon=c.type===0?"#":c.type===2?"🔊":c.type===4?"📂":"#";
+        var typeLabel=c.type===0?"text":c.type===2?"voice":c.type===4?"category":"type "+c.type;
+        h+="<div class='channel-card'>";
+        h+="<span class='channel-icon'>"+icon+"</span>";
+        h+="<span class='channel-name'>"+esc(c.name)+"</span>";
+        h+="<span class='channel-type'>"+typeLabel+"</span>";
+        if(c.type!==4)h+="<button class='channel-del' onclick='deleteChannel(\""+c.id+"\",\""+esc(c.name)+"\")'>delete</button>";
+        h+="</div>";
+      }
+    }
+    if(!channels.length)h="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no channels</p>";
+    g("channelList").innerHTML=h;
+  });
+}
+function createChannel(){
+  var name=g("newChannelName").value.trim();
+  var type=g("newChannelType").value;
+  var catId=g("newChannelCategory").value;
+  if(!name){showToast("enter a channel name","error");return}
+  var body={action:"create_channel",name:name,type:type};
+  if(catId)body.categoryId=catId;
+  api(body,function(d){
+    if(d.success){showToast("channel created");g("newChannelName").value="";loadChannels()}
+    else{showToast(d.error||"failed","error")}
+  });
+}
+function deleteChannel(id,name){
+  g("confirmTitle").textContent="delete #"+name;
+  g("confirmBody").innerHTML="<p style='color:#7d7582;font-size:11px'>delete channel <b style='color:#e0dce4'>#"+esc(name)+"</b>? This cannot be undone.</p>";
+  var btn=g("confirmBtn");btn.className="confirm-danger";btn.textContent="delete";
+  btn.onclick=function(){api({action:"delete_channel",channelId:id},function(d){closeConfirm();if(d.success){showToast("channel deleted");loadChannels()}else{showToast(d.error||"failed","error")}})};
+  g("confirmOverlay").classList.add("show");
+}
+
+// --- Invite management ---
+function loadInvites(){
+  g("inviteList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
+  api({action:"invites"},function(d){
+    if(d.error){g("inviteList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var invites=d.invites||[];
+    if(!invites.length){g("inviteList").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no invites</p>";return}
+    var h="";
+    for(var i=0;i<invites.length;i++){
+      var inv=invites[i];
+      var inviter=inv.inviter;
+      var inviterName=inviter?(inviter.global_name||inviter.username):"unknown";
+      h+="<div class='invite-card'>";
+      h+="<div class='invite-info'><div class='invite-code'>"+esc(inv.code)+"</div>";
+      h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" · #"+esc(inv.channel.name||""):"")+"</div>";
+      h+="<div class='invite-uses'>"+(inv.uses||0)+" uses"+(inv.max_uses?" / "+inv.max_uses+" max":"")+"</div></div>";
+      h+="<button class='invite-del' onclick='deleteInvite(\""+esc(inv.code)+"\")'>delete</button>";
+      h+="</div>";
+    }
+    g("inviteList").innerHTML=h;
+  });
+}
+function deleteInvite(code){
+  api({action:"delete_invite",inviteCode:code},function(d){
+    if(d.success){showToast("invite deleted");loadInvites()}
+    else{showToast(d.error||"failed","error")}
+  });
+}
+
+// --- Emoji/Sticker list ---
+function loadEmojis(){
+  g("emojiContent").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
+  api({action:"emojis"},function(d){
+    if(d.error){g("emojiContent").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var emojis=d.emojis||[];
+    if(!emojis.length){g("emojiContent").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no custom emojis</p>";return}
+    var h="<div class='emoji-grid'>";
+    for(var i=0;i<emojis.length;i++){
+      var e=emojis[i];
+      var ext=e.animated?".gif":".png";
+      var url="https://cdn.discordapp.com/emojis/"+e.id+ext;
+      h+="<div class='emoji-item' title=':"+esc(e.name)+":'>"+((e.animated||ext===".gif")?"<img src='"+url+"' alt='' loading='lazy'/>":"<img src='"+url+"' alt='' loading='lazy'/>")+"<span>:"+esc(e.name)+":</span></div>";
+    }
+    h+="</div>";
+    g("emojiContent").innerHTML=h;
+  });
+}
+
+// --- Scheduled Events ---
+function loadEvents(){
+  g("eventList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
+  api({action:"events"},function(d){
+    if(d.error){g("eventList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var events=d.events||[];
+    if(!events.length){g("eventList").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no scheduled events</p>";return}
+    var h="";
+    for(var i=0;i<events.length;i++){
+      var ev=events[i];
+      var start=new Date(ev.scheduled_start_time);
+      var startStr=start.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+      var statusClass=ev.status===1?"event-scheduled":ev.status===2?"event-active":ev.status===3?"event-completed":"event-cancelled";
+      var statusText=ev.status===1?"scheduled":ev.status===2?"active":ev.status===3?"ended":"cancelled";
+      h+="<div class='event-card'>";
+      h+="<div><span class='event-name'>"+esc(ev.name)+"</span><span class='event-status "+statusClass+"'>"+statusText+"</span></div>";
+      h+="<div class='event-time'>"+startStr+"</div>";
+      if(ev.description)h+="<div class='event-desc'>"+esc(ev.description.substring(0,200))+"</div>";
+      h+="<button class='event-del' onclick='deleteEvent(\""+ev.id+"\")'>delete</button>";
+      h+="</div>";
+    }
+    g("eventList").innerHTML=h;
+  });
+}
+function createEvent(){
+  var name=g("newEventName").value.trim();
+  var start=g("newEventStart").value;
+  var end=g("newEventEnd").value;
+  if(!name){showToast("enter event name","error");return}
+  if(!start){showToast("select start time","error");return}
+  var body={action:"create_event",name:name,startTime:new Date(start).toISOString()};
+  if(end)body.endTime=new Date(end).toISOString();
+  api(body,function(d){
+    if(d.success){showToast("event created");g("newEventName").value="";g("newEventStart").value="";g("newEventEnd").value="";loadEvents()}
+    else{showToast(d.error||"failed","error")}
+  });
+}
+function deleteEvent(id){
+  g("confirmTitle").textContent="delete event";
+  g("confirmBody").innerHTML="<p style='color:#7d7582;font-size:11px'>delete this event?</p>";
+  var btn=g("confirmBtn");btn.className="confirm-danger";btn.textContent="delete";
+  btn.onclick=function(){api({action:"delete_event",eventId:id},function(d){closeConfirm();if(d.success){showToast("event deleted");loadEvents()}else{showToast(d.error||"failed","error")}})};
+  g("confirmOverlay").classList.add("show");
+}
+
+// --- Audit Log ---
+function loadAuditLog(){
+  g("auditList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
+  api({action:"audit_log",limit:50},function(d){
+    if(d.error){g("auditList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+    var entries=d.entries||[];
+    var users=d.users||[];
+    if(!entries.length){g("auditList").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no audit log entries</p>";return}
+    var userMap={};for(var i=0;i<users.length;i++)userMap[users[i].id]=users[i];
+    var h="";
+    for(var i=0;i<entries.length;i++){
+      var e=entries[i];
+      var user=userMap[e.user_id];
+      var userName=user?(user.global_name||user.username):e.user_id;
+      var avatar=user&&user.avatar?"https://cdn.discordapp.com/avatars/"+user.id+"/"+user.avatar+(user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+((user?user.discriminator:"0")%5||0)+".png";
+      var ts=new Date(e.id?String(BigInt(e.id)>>22n+1420070400000):Date.now());
+      var timeStr=ts.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+      var actionText=formatAuditAction(e,userName);
+      h+="<div class='audit-entry'>";
+      h+="<img class='audit-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+      h+="<div class='audit-info'><div class='audit-action'>"+actionText+"</div></div>";
+      h+="<span class='audit-time'>"+timeStr+"</span>";
+      h+="</div>";
+    }
+    g("auditList").innerHTML=h;
+  });
+}
+function formatAuditAction(e,userName){
+  var d=e.changes||[];
+  var target=e.target_id;
+  var actions={
+    1:"created",2:"updated",3:"deleted",10:"kick",11:"prune",12:"ban",13:"unban",
+    14:"role update",15:"role create",16:"role delete",20:"invite create",21:"invite delete",
+    22:"webhook create",23:"webhook update",24:"webhook delete",25:"emoji create",26:"emoji update",27:"emoji delete",
+    28:"message delete",29:"bulk delete",30:"channel create",31:"channel update",32:"channel overwrite create",
+    33:"channel overwrite update",34:"channel overwrite delete",35:"member role update",36:"member move",
+    37:"member disconnect",38:"bot add",39:"role update",40:"role move",42:"members prune",
+    43:"connection create",44:"connection update",45:"connection delete",46:"bot remove",47:"integration create",
+    48:"integration update",49:"integration delete",50:"stage create",51:"stage update",52:"stage delete",
+    53:"sticker create",54:"sticker update",55:"sticker delete",56:"scheduled event create",
+    57:"scheduled event update",58:"scheduled event delete",61:"thread create",62:"thread update",63:"thread delete",
+    64:"permission create",65:"permission update",66:"permission delete",67:"auto moderation rule create",
+    68:"auto moderation rule update",69:"auto moderation rule delete",70:"auto moderation block message",
+    71:"auto moderation flag to channel",72:"auto moderation member communication disabled"
+  };
+  var actionStr=actions[e.action_type]||"action #"+e.action_type;
+  var result="<b>"+esc(userName)+"</b> <span class='hl'>"+esc(actionStr)+"</span>";
+  if(target)result+=" <span class='hl'>"+esc(target)+"</span>";
+  if(d.length){
+    for(var i=0;i<Math.min(d.length,2);i++){
+      var c=d[i];
+      if(c.name)result+=" · "+esc(c.name);
+    }
+  }
+  return result;
+}
+
+// --- Role management in member modal ---
 function showMember(id){
   var m=allMembers.find(function(x){return x.user.id===id});if(!m)return;
   var name=m.nick||(m.user.global_name||m.user.username);
@@ -1123,6 +1583,18 @@ function showMember(id){
       rolesHtml+="<div class='modal-role'><span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(role.name)+"</div>";
     }
   }
+  var roleManagerHtml="<div class='role-manager'>";
+  for(var i=0;i<allRoles.length;i++){
+    var r=allRoles[i];
+    if(r.id===m.guild_id)continue;
+    var hasRole=m.roles.indexOf(r.id)!==-1;
+    var rc=r.color?"#"+r.color.toString(16).padStart(6,"0"):"#555";
+    roleManagerHtml+="<div class='role-manage-item"+(hasRole?" has-role":"")+"' data-roleid='"+r.id+"' data-uid='"+m.user.id+"' onclick='toggleMemberRole(this)'>";
+    roleManagerHtml+="<span class='role-check'>"+(hasRole?"&#10003;":"")+"</span>";
+    roleManagerHtml+="<span class='modal-role-dot' style='background:"+rc+"'></span>"+esc(r.name);
+    roleManagerHtml+="</div>";
+  }
+  roleManagerHtml+="</div>";
   g("modalBox").innerHTML="<div class='modal-header'><img src='"+avatar+"' alt='' /><div class='modal-header-info'><h3>"+esc(name)+"</h3><p>"+esc(m.user.username)+(m.user.bot?" &middot; bot":"")+"</p></div></div>"+
     "<div class='modal-body'>"+
     "<div id='modalBadges'></div>"+
@@ -1130,6 +1602,7 @@ function showMember(id){
     "<div class='modal-section'><div class='modal-section-label'>joined</div><p style='color:#9a929e;font-size:11px'>"+joined+"</p></div>"+
     (m.premium_since?"<div class='modal-section'><div class='modal-section-label'>boosting since</div><p style='color:#9a929e;font-size:11px'>"+new Date(m.premium_since).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})+"</p></div>":"")+
     "<div class='modal-section'><div class='modal-section-label'>roles</div><div class='modal-roles'>"+(rolesHtml||"<span style='color:#5a5260;font-size:10px'>no roles</span>")+"</div></div>"+
+    "<div class='modal-section'><div class='modal-section-label'>manage roles</div>"+roleManagerHtml+"</div>"+
     "</div>"+
     "<div class='modal-actions'>"+
     "<button class='btn-timeout' data-action='timeout' data-uid='"+m.user.id+"' data-uname='"+esc(name)+"' onclick='openConfirm(this)'>timeout</button>"+
@@ -1178,37 +1651,83 @@ function showMember(id){
     if(badgesEl&&flagsList.length)badgesEl.innerHTML="<div class='modal-section'><div class='modal-section-label'>badges</div><div style='display:flex;flex-wrap:wrap;gap:3px'>"+flagsList.map(function(fl){return "<span style='font-size:9px;padding:2px 6px;background:#252a32;border:1px solid #2e343c;border-radius:2px;color:#7d7582'>"+fl+"</span>"}).join("")+"</div></div>";
   });
 }
-function c(){g("userModal").classList.remove("show")}
-function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
-function escUrl(s){return String(s).replace(/[^a-zA-Z0-9\-._~:/?#@[!$&'()*+,;=%]/g,encodeURIComponent)}
-function fmt(s){
-  var r=esc(s);
-  r=r.replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
-  r=r.replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
-  r=r.replace(new RegExp("\\|\\|([^|]+)\\|\\|","g"),"<span class='spoiler' onclick='this.classList.toggle(&quot;revealed&quot;)'>$1</span>");
-  r=r.replace(new RegExp("\\*\\*(.+?)\\*\\*","g"),"<b>$1</b>");
-  r=r.replace(new RegExp("\\*(.+?)\\*","g"),"<i>$1</i>");
-  r=r.replace(new RegExp("__(.+?)__","g"),"<u>$1</u>");
-  r=r.replace(new RegExp("~~(.+?)~~","g"),"<s>$1</s>");
-  r=r.replace(new RegExp("\x60\x60\x60([\\s\\S]+?)\x60\x60\x60","g"),"<pre><code>$1</code></pre>");
-  r=r.replace(new RegExp("\x60([^\x60]+)\x60","g"),"<code>$1</code>");
-  r=r.replace(new RegExp("&lt;@(\\\\d+)&gt;","g"),"<span class='mention'>@$1</span>");
-  return r;
+function toggleMemberRole(el){
+  var roleId=el.dataset.roleid,userId=el.dataset.uid;
+  var hasRole=el.classList.contains("has-role");
+  var action=hasRole?"remove_role":"add_role";
+  el.style.opacity="0.5";
+  api({action:action,userId:userId,roleId:roleId},function(d){
+    el.style.opacity="1";
+    if(d.success){
+      el.classList.toggle("has-role");
+      var check=el.querySelector(".role-check");
+      if(check)check.innerHTML=el.classList.contains("has-role")?"&#10003;":"";
+      loadMembers();
+    }else{showToast(d.error||"failed","error")}
+  });
 }
-function logout(){fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"logout"})}).finally(function(){location.reload()})}
-function updateFileLabel(el){
-  var label=g("dropLabel");
-  if(el.files&&el.files.length){label.textContent=el.files[0].name;g("dropZone").classList.add("has-file")}
-  else{label.textContent="drop file or click to attach";g("dropZone").classList.remove("has-file")}
+
+// --- Dashboard activity ---
+function loadDashboardActivity(){
+  api({action:"guild_activity"},function(d){
+    if(d.error)return;
+    var el=g("dashActivity");
+    if(!el)return;
+    var h="";
+    if(d.recentJoins&&d.recentJoins.length){
+      h+="<div style='margin-bottom:8px'><span style='font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;font-weight:600'>recent joins ("+d.totalJoins7d+" this week)</span></div>";
+      for(var i=0;i<Math.min(d.recentJoins.length,10);i++){
+        var j=d.recentJoins[i];
+        var u=j.user;
+        var name=u.global_name||u.username;
+        var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+        var ago=timeAgo(new Date(j.joined_at));
+        h+="<div class='activity-item'><img src='"+avatar+"' alt='' loading='lazy'/><div class='activity-text'><b>"+esc(name)+"</b> joined<span class='activity-badge badge-join'>join</span></div><span class='activity-time'>"+ago+"</span></div>";
+      }
+    }
+    if(d.bans&&d.bans.length){
+      h+="<div style='margin:12px 0 8px'><span style='font-size:10px;color:#6d6572;text-transform:uppercase;letter-spacing:.5px;font-weight:600'>recent bans</span></div>";
+      for(var i=0;i<Math.min(d.bans.length,5);i++){
+        var b=d.bans[i];var u=b.user;
+        var name=u.global_name||u.username;
+        var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+        h+="<div class='activity-item'><img src='"+avatar+"' alt='' loading='lazy'/><div class='activity-text'><b>"+esc(name)+"</b>"+(b.reason?" · "+esc(b.reason):"")+"<span class='activity-badge badge-ban'>ban</span></div></div>";
+      }
+    }
+    if(!h)h="<p style='color:#5a5260;font-size:10px;text-align:center;padding:12px'>no recent activity</p>";
+    el.innerHTML=h;
+  });
 }
-function updateDropLabel(el){updateFileLabel(el)}
-function handleDrop(e){
-  e.preventDefault();
-  var dz=g("dropZone");dz.classList.remove("dragover");
-  var files=e.dataTransfer.files;
-  if(files.length){g("msgFile").files=files;updateFileLabel(g("msgFile"))}
+function timeAgo(date){
+  var s=Math.floor((Date.now()-date.getTime())/1000);
+  if(s<60)return s+"s ago";
+  if(s<3600)return Math.floor(s/60)+"m ago";
+  if(s<86400)return Math.floor(s/3600)+"h ago";
+  return Math.floor(s/86400)+"d ago";
 }
-function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
+
+// --- Guild edit ---
+function editGuildName(){
+  var current=g("guildNameDisplay");
+  if(!current)return;
+  var oldName=current.textContent;
+  current.outerHTML="<input type='text' id='guildNameInput' value='"+esc(oldName)+"' style='font-size:16px;color:#e0dce4;background:#191d23;border:1px solid #b48899;padding:2px 6px;border-radius:4px;font-weight:600;font-family:Space Grotesk,monospace;width:200px' onkeydown='if(event.key===\"Enter\")saveGuildName();if(event.key===\"Escape\")cancelGuildEdit(\""+esc(oldName)+"\")'/>";
+  g("guildNameInput").focus();g("guildNameInput").select();
+}
+function saveGuildName(){
+  var input=g("guildNameInput");
+  if(!input)return;
+  var name=input.value.trim();
+  if(!name||name.length>100){showToast("invalid name","error");return}
+  api({action:"edit_guild",name:name},function(d){
+    if(d.success){showToast("server name updated");loadDashboard()}
+    else{showToast(d.error||"failed","error")}
+  });
+}
+function cancelGuildEdit(name){
+  var input=g("guildNameInput");
+  if(input)input.outerHTML="<span id='guildNameDisplay' style='cursor:pointer' onclick='editGuildName()' title='click to edit'>"+esc(name)+"</span>";
+}
 var currentDmChannel=null;
 var dmPollTimer=null;
 function startDmPoll(){
@@ -1654,10 +2173,10 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     if (body.action === "messages") {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       try {
-        const messages = await discordFetch(
-          `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${parseLimit(body.limit, 30, 100)}`,
-          { headers },
-        );
+        const limit = parseLimit(body.limit, 30, 100);
+        let url = `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${limit}`;
+        if (body.before && isValidSnowflake(body.before)) url += `&before=${body.before}`;
+        const messages = await discordFetch(url, { headers });
         return res.json({ messages });
       } catch (e: any) {
         throw e;
@@ -1833,6 +2352,220 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         return res.json({ success: true });
       } catch (e: any) {
         return res.status(500).json({ error: e.message || "Failed to unban" });
+      }
+    }
+
+    if (body.action === "edit") {
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
+      if (!isValidSnowflake(body.messageId)) return res.status(400).json({ error: "Invalid message ID" });
+      const content = validateContent(body.content);
+      if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
+          { method: "PATCH", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify({ content }) },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to edit message" });
+      }
+    }
+
+    if (body.action === "audit_log") {
+      try {
+        const limit = parseLimit(body.limit, 25, 100);
+        const log = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=${limit}`,
+          { headers },
+        );
+        return res.json({ entries: log.audit_log_entries || [], users: log.users || [], roles: log.roles || [] });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to fetch audit log" });
+      }
+    }
+
+    if (body.action === "invites") {
+      try {
+        const invites = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/invites`,
+          { headers },
+        );
+        return res.json({ invites: Array.isArray(invites) ? invites : [] });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to fetch invites" });
+      }
+    }
+
+    if (body.action === "delete_invite") {
+      if (!body.inviteCode) return res.status(400).json({ error: "No invite code" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/invites/${encodeURIComponent(body.inviteCode)}`,
+          { method: "DELETE", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to delete invite" });
+      }
+    }
+
+    if (body.action === "emojis") {
+      try {
+        const emojis = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/emojis`,
+          { headers },
+        );
+        return res.json({ emojis: Array.isArray(emojis) ? emojis : [] });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to fetch emojis" });
+      }
+    }
+
+    if (body.action === "events") {
+      try {
+        const events = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events?with_user_count=true`,
+          { headers },
+        );
+        return res.json({ events: Array.isArray(events) ? events : [] });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to fetch events" });
+      }
+    }
+
+    if (body.action === "create_event") {
+      try {
+        const name = typeof body.name === "string" ? body.name.trim().slice(0, 100) : "";
+        if (!name) return res.status(400).json({ error: "Event name required" });
+        const eventBody: any = { name, scheduled_start_time: body.startTime || new Date(Date.now() + 3600000).toISOString() };
+        if (body.endTime) eventBody.scheduled_end_time = body.endTime;
+        if (body.description) eventBody.description = String(body.description).slice(0, 1000);
+        if (body.channelId && isValidSnowflake(body.channelId)) eventBody.channel_id = body.channelId;
+        const event = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events`,
+          { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(eventBody) },
+        );
+        return res.json({ success: true, event });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to create event" });
+      }
+    }
+
+    if (body.action === "delete_event") {
+      if (!body.eventId) return res.status(400).json({ error: "No event ID" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events/${body.eventId}`,
+          { method: "DELETE", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to delete event" });
+      }
+    }
+
+    if (body.action === "create_channel") {
+      try {
+        const chName = typeof body.name === "string" ? body.name.trim().replace(/[^\w\-]/g, "-").slice(0, 100) : "";
+        if (!chName) return res.status(400).json({ error: "Channel name required" });
+        const chBody: any = { name: chName, type: parseInt(String(body.type), 10) || 0 };
+        if (body.topic) chBody.topic = String(body.topic).slice(0, 1024);
+        if (body.categoryId && isValidSnowflake(body.categoryId)) chBody.parent_id = body.categoryId;
+        const ch = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/channels`,
+          { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(chBody) },
+        );
+        return res.json({ success: true, channel: ch });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to create channel" });
+      }
+    }
+
+    if (body.action === "delete_channel") {
+      if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/channels/${body.channelId}`,
+          { method: "DELETE", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to delete channel" });
+      }
+    }
+
+    if (body.action === "add_role") {
+      if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
+      if (!isValidSnowflake(body.roleId)) return res.status(400).json({ error: "Invalid role ID" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members/${body.userId}/roles/${body.roleId}`,
+          { method: "PUT", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to add role" });
+      }
+    }
+
+    if (body.action === "remove_role") {
+      if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
+      if (!isValidSnowflake(body.roleId)) return res.status(400).json({ error: "Invalid role ID" });
+      try {
+        await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members/${body.userId}/roles/${body.roleId}`,
+          { method: "DELETE", headers },
+        );
+        return res.json({ success: true });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to remove role" });
+      }
+    }
+
+    if (body.action === "edit_guild") {
+      try {
+        const patchBody: any = {};
+        if (body.name && typeof body.name === "string") {
+          const n = body.name.trim().slice(0, 100);
+          if (n) patchBody.name = n;
+        }
+        if (body.icon && typeof body.icon === "string") {
+          patchBody.icon = body.icon;
+        }
+        if (!Object.keys(patchBody).length) return res.status(400).json({ error: "Nothing to update" });
+        const guild = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}`,
+          { method: "PATCH", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(patchBody) },
+        );
+        return res.json({ success: true, guild });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to update guild" });
+      }
+    }
+
+    if (body.action === "guild_activity") {
+      try {
+        const members = await discordFetch(
+          `https://discord.com/api/v10/guilds/${guildId}/members?limit=1000&sort=joined_at&desc=true`,
+          { headers },
+        ).catch(() => []);
+        const now = Date.now();
+        const day = 86400000;
+        const last7d = (Array.isArray(members) ? members : []).filter((m: any) => {
+          const joined = new Date(m.joined_at).getTime();
+          return now - joined < 7 * day;
+        });
+        const recentJoins = last7d.slice(0, 20).map((m: any) => ({
+          user: m.user, joined_at: m.joined_at, nick: m.nick,
+        }));
+        let bans: any[] = [];
+        try {
+          const banList = await discordFetch(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=100`, { headers });
+          bans = Array.isArray(banList) ? banList.slice(0, 20) : [];
+        } catch {}
+        return res.json({ recentJoins, bans, totalJoins7d: last7d.length });
+      } catch (e: any) {
+        return res.json({ recentJoins: [], bans: [], totalJoins7d: 0, error: e.message });
       }
     }
 
