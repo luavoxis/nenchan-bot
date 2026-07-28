@@ -1843,13 +1843,15 @@ function parseTwemoji(el){
   var nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
   nodes.forEach(function(node){
     if(!node.nodeValue||!emojiRegex.test(node.nodeValue))return;
+    var p=node.parentNode;
+    if(p&&(p.tagName==="SCRIPT"||p.tagName==="STYLE"))return;
     emojiRegex.lastIndex=0;
     var span=document.createElement("span");
     span.innerHTML=node.nodeValue.replace(emojiRegex,function(m){
       if(m.charCodeAt(0)===0xFE0F)return"";
       return emojiImg(m,16);
     });
-    node.parentNode.replaceChild(span,node);
+    p.replaceChild(span,node);
   });
 }
 function renderEmojiGrid(filter){
