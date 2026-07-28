@@ -603,7 +603,8 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;he
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
 .sidebar button:hover img{opacity:.7}
 .sidebar button.active img{opacity:1;filter:none}
-#logoutBtn{border-top:1px solid #252a32;margin-top:auto;padding:7px 10px;border-radius:0;flex-shrink:0}
+#logoutBtn{margin-top:auto;padding:7px 10px;border-radius:4px;flex-shrink:0}
+#logoutBtn img{opacity:1;filter:none}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
 .main{flex:1;padding:16px;max-width:680px;margin-left:160px;height:100vh;overflow-y:auto}
