@@ -1133,6 +1133,7 @@ function initPanel(){
   g("loginOverlay").style.display="none";
   g("panel-dashboard").classList.add("show");
   loadDashboard();loadMembers();loadMsgChannels();
+  parseTwemoji();
 }
 
 function switchTab(name){
@@ -1682,6 +1683,7 @@ function loadMoreMessages(){
     var first=existing.querySelector(".msg-day-divider");
     if(first)existing.insertBefore(tmp,first);
     else existing.innerHTML=tmp.innerHTML+existing.innerHTML;
+    parseTwemoji(existing);
   });
 }
 function renderMsgRows(messages,cid){
@@ -1765,6 +1767,7 @@ function renderMsgRows(messages,cid){
 }
 function renderMsgHistory(messages,cid){
   g("msgHistory").innerHTML=renderMsgRows(messages,cid);
+  parseTwemoji(g("msgHistory"));
   g("msgHistory").scrollTop=g("msgHistory").scrollHeight;
 }
 
@@ -1781,6 +1784,22 @@ function emojiToCodepoint(e){
   return cp.join("-");
 }
 function emojiImg(e,size){return "<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' width='"+(size||22)+"' height='"+(size||22)+"' alt='' style='display:inline-block' loading='lazy'/>"}
+var emojiRegex=/(\uD83C[\uDF00-\uDFFF]|\uD83D[\uDE00-\uDE4F\uDD00-\uDE7F\uDE80-\uDEFF\uDC00-\uDFFF]|[\u2600-\u27BF]|\uD83E[\uDD00-\uDDFF\uDDB0-\uDDBF\uDE00-\uDE6F\uDE70-\uDEFF\uFE0F]|\uFE0F|\u200D|\u20E3|[\u2B50\u2B55\u231A\u231B\u2328\u23CF\u23E9\u23EA\u23EB\u23EC\u23ED\u23EE\u23EF\u23F0\u23F1\u23F2\u23F3\u2602\u2604\u2611\u2614\u2615\u2622\u2623\u2626\u262A\u262E\u262F\u2638\u2639\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uFE0F)/g;
+function parseTwemoji(el){
+  el=el||document.body;
+  var walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false);
+  var nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(function(node){
+    if(!node.nodeValue||!emojiRegex.test(node.nodeValue))return;
+    emojiRegex.lastIndex=0;
+    var span=document.createElement("span");
+    span.innerHTML=node.nodeValue.replace(emojiRegex,function(m){
+      if(m.charCodeAt(0)===0xFE0F)return"";
+      return emojiImg(m,16);
+    });
+    node.parentNode.replaceChild(span,node);
+  });
+}
 function renderEmojiGrid(filter){
   var grid=g("emojiGrid");
   var h="";
@@ -2250,6 +2269,7 @@ function loadDmHistory(cid){
       h+="</div>";
     }
     g("dmHistory").innerHTML=h;
+    parseTwemoji(g("dmHistory"));
     g("dmHistory").scrollTop=g("dmHistory").scrollHeight;
   });
 }
