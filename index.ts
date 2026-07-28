@@ -808,7 +808,7 @@ function api(body,cb){
   var x=new XMLHttpRequest();
   x.open("POST","/api",true);
   x.setRequestHeader("Content-Type","application/json");
-  x.onload=function(){try{cb(JSON.parse(x.responseText))}catch(e){var preview=x.responseText.slice(0,300);console.error("API parse error:",preview);cb({error:"parse error: "+preview})}};
+  x.onload=function(){try{var d=JSON.parse(x.responseText);cb(d)}catch(e){console.error("api error:",e,x.responseText.slice(0,300));cb({error:"api error: "+(e.message||e)})}};
   x.onerror=function(){cb({error:"connection error"})};
   x.send(JSON.stringify(body));
 }
