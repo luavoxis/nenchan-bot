@@ -603,10 +603,7 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;he
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
 .sidebar button:hover img{opacity:.7}
 .sidebar button.active img{opacity:1;filter:none}
-#logoutBtn{color:#d45555!important;border-top:1px solid #2e343c;margin-top:auto;padding:9px 10px!important;border-radius:4px;flex-shrink:0;font-weight:600;font-size:10px;letter-spacing:.5px;text-transform:uppercase}
-#logoutBtn:hover{background:#2a1520!important;color:#ee7777!important}
-#logoutBtn img{width:12px;height:12px;opacity:.7;filter:none}
-#logoutBtn:hover img{opacity:1}
+#logoutBtn{border-top:1px solid #252a32;margin-top:auto;padding:7px 10px;border-radius:0;flex-shrink:0}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
 .main{flex:1;padding:16px;max-width:680px;margin-left:160px;height:100vh;overflow-y:auto}
@@ -1092,7 +1089,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="banBans"></div>
 </div>
 <div id="panel-channels" class="panel">
-<h2>channel management</h2>
 <div class="create-form" id="channelCreateForm">
 <input type="text" id="newChannelName" placeholder="channel name"/>
 <select id="newChannelType"><option value="0">Text</option><option value="2">Voice</option></select>
@@ -1102,15 +1098,12 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="channelList"></div>
 </div>
 <div id="panel-invites" class="panel">
-<h2>invites</h2>
 <div id="inviteList"></div>
 </div>
 <div id="panel-emojis" class="panel">
-<h2>emojis & stickers</h2>
 <div id="emojiContent"></div>
 </div>
 <div id="panel-events" class="panel">
-<h2>scheduled events</h2>
 <div class="create-form">
 <input type="text" id="newEventName" placeholder="event name"/>
 <input type="datetime-local" id="newEventStart"/>
@@ -1120,7 +1113,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="eventList"></div>
 </div>
 <div id="panel-audit" class="panel">
-<h2>audit log</h2>
 <div id="auditList"></div>
 </div>
 <div id="userModal" class="modal"><div class="modal-box" id="modalBox"></div></div>
