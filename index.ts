@@ -1386,11 +1386,11 @@ function renderEmojiGrid(catId,filter){
   cats.forEach(function(cat){
     if(filter){
       cat.emojis.forEach(function(e){
-        if(e.includes(filter))h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".png' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
+        if(e.toLowerCase().includes(filter.toLowerCase()))h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
       });
     }else{
       cat.emojis.forEach(function(e){
-        h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".png' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
+        h+="<img src='"+twemojiBase+emojiToCodepoint(e)+".svg' alt='' onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"'/>";
       });
     }
   });
