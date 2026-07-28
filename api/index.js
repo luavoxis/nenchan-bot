@@ -603,9 +603,10 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;he
 .sidebar button img{width:14px;height:14px;opacity:.4;filter:grayscale(1)}
 .sidebar button:hover img{opacity:.7}
 .sidebar button.active img{opacity:1;filter:none}
-#logoutBtn{color:#d45555!important;border-top:1px solid #2e343c;padding-top:8px!important;padding-left:10px!important;border-radius:4px;flex-shrink:0}
-#logoutBtn:hover{background:#2a1520!important}
-#logoutBtn img{opacity:.6;filter:none}
+#logoutBtn{color:#d45555!important;border-top:1px solid #2e343c;margin-top:auto;padding:9px 10px!important;border-radius:4px;flex-shrink:0;font-weight:600;font-size:10px;letter-spacing:.5px;text-transform:uppercase}
+#logoutBtn:hover{background:#2a1520!important;color:#ee7777!important}
+#logoutBtn img{width:12px;height:12px;opacity:.7;filter:none}
+#logoutBtn:hover img{opacity:1}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
 .main{flex:1;padding:16px;max-width:680px;margin-left:160px;height:100vh;overflow-y:auto}
@@ -986,10 +987,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="messages" onclick="switchTab('messages')"><img src="/icons/messages.png" alt="">messages</button>
 <button data-tab="dms" onclick="switchTab('dms')"><img src="/icons/whispers.png" alt="">whispers</button>
 <button data-tab="channels" onclick="switchTab('channels')"><img src="/icons/channels.png" alt="">channels</button>
-<button data-tab="invites" onclick="switchTab('invites')"><img src="/icons/members.png" alt="">invites</button>
-<button data-tab="emojis" onclick="switchTab('emojis')"><img src="/icons/dashboard.png" alt="">emojis</button>
-<button data-tab="events" onclick="switchTab('events')"><img src="/icons/dashboard.png" alt="">events</button>
-<button data-tab="audit" onclick="switchTab('audit')"><img src="/icons/sanctions.png" alt="">audit log</button>
+<button data-tab="invites" onclick="switchTab('invites')"><img src="/icons/invites.png" alt="">invites</button>
+<button data-tab="emojis" onclick="switchTab('emojis')"><img src="/icons/emojis.png" alt="">emojis</button>
+<button data-tab="events" onclick="switchTab('events')"><img src="/icons/events.png" alt="">events</button>
+<button data-tab="audit" onclick="switchTab('audit')"><img src="/icons/auditlog.png" alt="">audit log</button>
 <div class="bocchi-wrap"><img src="/icons/bocchi-rotate.gif" alt=""/></div>
 </div>
 <button id="logoutBtn" onclick="logout()"><img src="/icons/logout.png" alt="">logout</button>
