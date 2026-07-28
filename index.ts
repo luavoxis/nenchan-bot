@@ -342,14 +342,14 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
 .mobile-topbar{display:none}
 @media(max-width:768px){
-  .mobile-topbar{display:flex;position:sticky;top:0;z-index:50;background:#14181c;border:1px solid #252a32;align-items:center;justify-content:center;height:48px;margin:8px 8px 0;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
-  .mobile-topbar .menu-toggle-btn{display:flex;align-items:center;justify-content:center;background:none;border:none;color:#b48899;width:44px;height:44px;cursor:pointer;border-radius:10px;transition:color .15s,background .15s;padding:0;position:absolute;left:2px;top:2px}
-  .mobile-topbar .menu-toggle-btn:hover{color:#d4b0be;background:rgba(255,255,255,.05)}
-  .mobile-topbar .topbar-logo{height:26px;width:auto;opacity:.85}
-  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:64px;width:260px}
+  .mobile-topbar{display:flex;position:sticky;top:0;z-index:50;background:#14181c;border:1px solid #252a32;align-items:center;justify-content:center;height:40px;margin:6px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+  .mobile-topbar .menu-toggle-btn{background:none;border:none;color:#b48899;cursor:pointer;padding:0;position:absolute;left:8px;display:flex;align-items:center;justify-content:center}
+  .mobile-topbar .menu-toggle-btn:hover{color:#d4b0be}
+  .mobile-topbar .topbar-logo{height:22px;width:auto;opacity:.85}
+  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:52px;width:260px}
   .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4)}
   .sidebar-overlay.show{display:block}
-  .main{margin-left:0;padding:4px 10px 10px}
+  .main{margin-left:0;padding:0 10px 10px}
   .dash-grid{grid-template-columns:1fr!important;gap:6px}
   .dash-card{padding:6px 8px}
   .dash-card-icon{width:28px;height:28px}
