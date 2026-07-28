@@ -753,18 +753,17 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .msg-history-box::-webkit-scrollbar-thumb:hover{background:#363d47}
 .msg-compose{background:#191d23;border:1px solid #1e2228;border-radius:8px;padding:10px}
 .msg-status{font-size:10px;margin-top:6px;min-height:14px;color:#6d6572}
-.menu-toggle{display:none;position:fixed;top:4px;left:4px;z-index:100;background:#191d23;border:1px solid #252a32;color:#b48899;width:44px;height:44px;cursor:pointer;border-radius:10px;transition:color .15s,background .15s,border-color .15s;box-shadow:0 2px 8px rgba(0,0,0,.3);padding:0}
-.menu-toggle:hover,.menu-toggle:active{background:#232830;color:#d4b0be;border-color:#b48899}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
 .mobile-topbar{display:none}
 @media(max-width:768px){
-  .mobile-topbar{display:flex;position:fixed;top:0;left:0;right:0;height:48px;background:#14181c;border-bottom:1px solid #252a32;z-index:49;align-items:center;justify-content:center}
-  .mobile-topbar img{height:26px;width:auto;opacity:.85}
-  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:52px;width:260px}
+  .mobile-topbar{display:flex;position:sticky;top:0;z-index:50;background:#14181c;border:1px solid #252a32;align-items:center;justify-content:center;height:48px;margin:8px 8px 0;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+  .mobile-topbar .menu-toggle-btn{display:flex;align-items:center;justify-content:center;background:none;border:none;color:#b48899;width:44px;height:44px;cursor:pointer;border-radius:10px;transition:color .15s,background .15s;padding:0;position:absolute;left:2px;top:2px}
+  .mobile-topbar .menu-toggle-btn:hover{color:#d4b0be;background:rgba(255,255,255,.05)}
+  .mobile-topbar .topbar-logo{height:26px;width:auto;opacity:.85}
+  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:64px;width:260px}
   .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4)}
   .sidebar-overlay.show{display:block}
-  .menu-toggle{display:flex;align-items:center;justify-content:center;top:2px;left:2px}
-  .main{margin-left:0;padding:56px 10px 10px}
+  .main{margin-left:0;padding:4px 10px 10px}
   .dash-grid{grid-template-columns:1fr!important;gap:6px}
   .dash-card{padding:6px 8px}
   .dash-card-icon{width:28px;height:28px}
@@ -1037,8 +1036,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </style>
 </head>
 <body>
-<button class="menu-toggle" id="menuToggle" onclick="toggleMenu()"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-<div class="mobile-topbar"><img src="/icons/nenchan.png" alt="nenchan"></div>
+<div class="mobile-topbar">
+<button class="menu-toggle-btn" onclick="toggleMenu()"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+<img src="/icons/nenchan.png" alt="nenchan" class="topbar-logo">
+</div>
 <div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sidebar" class="sidebar" style="display:none">
 <div class="sidebar-nav">
