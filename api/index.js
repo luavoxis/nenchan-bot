@@ -753,15 +753,60 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .msg-history-box::-webkit-scrollbar-thumb:hover{background:#363d47}
 .msg-compose{background:#191d23;border:1px solid #1e2228;border-radius:8px;padding:10px}
 .msg-status{font-size:10px;margin-top:6px;min-height:14px;color:#6d6572}
-.menu-toggle{display:none;position:fixed;top:8px;left:8px;z-index:50;background:#191d23;border:1px solid #2e343c;color:#7d7582;width:32px;height:32px;font:14px 'Space Grotesk',monospace;cursor:pointer}
-.menu-toggle:hover{color:#e0dce4;border-color:#4a4350}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9}
-@media(max-width:600px){
-  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100vh;transform:translateX(-100%);transition:transform .2s ease;padding-top:48px}
-  .sidebar.open{transform:translateX(0)}
+.menu-toggle{display:none;position:fixed;top:0;left:0;z-index:100;background:#13161b;border:none;border-right:1px solid #252a32;border-bottom:1px solid #252a32;color:#9a929e;width:44px;height:44px;font-size:20px;cursor:pointer;border-radius:0 0 8px 0;transition:color .15s,background .15s}
+.menu-toggle:hover,.menu-toggle:active{color:#e0dce4;background:#1e2228}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
+@media(max-width:700px){
+  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:52px;width:260px}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4)}
   .sidebar-overlay.show{display:block}
-  .menu-toggle{display:block}
-  .main{margin-left:0;padding:16px 12px 16px 48px}
+  .menu-toggle{display:flex;align-items:center;justify-content:center}
+  .main{margin-left:0;padding:52px 10px 10px}
+  .dash-grid{grid-template-columns:1fr!important;gap:6px}
+  .dash-card{padding:6px 8px}
+  .dash-card-icon{width:28px;height:28px}
+  .dash-card-val{font-size:14px}
+  .dash-banner{height:80px}
+  .dash-header{padding:10px;gap:10px;flex-wrap:wrap}
+  .dash-icon{width:44px;height:44px;border-radius:12px}
+  .msg-avatar{width:28px;height:28px}
+  .msg-time,.msg-time-inline{font-size:8px}
+  .msg-topbar{flex-direction:column;gap:4px}
+  .msg-topbar select,.msg-topbar-channel,.msg-topbar-mention{max-width:100%}
+  .msg-search-bar input{font-size:11px}
+  .msg-compose{padding:8px}
+  .msg-input-row textarea{min-height:32px;font-size:11px;padding:6px 8px}
+  .msg-input-row button{padding:6px 12px;font-size:10px}
+  .msg-edit-area textarea{font-size:11px}
+  .emoji-picker-dropdown{width:280px;left:0;right:auto}
+  .member-stats{flex-wrap:wrap;gap:4px}
+  .member-stat{flex:1;min-width:60px;padding:8px}
+  .member-stat span{font-size:8px}
+  .member-stat p{font-size:16px}
+  .member-card{padding:6px 8px}
+  .member-avatar{width:28px;height:28px}
+  .ban-card{padding:8px}
+  .ban-card-actions{flex-direction:column;gap:4px;width:100%}
+  .ban-card-actions button{width:100%;text-align:center;padding:8px}
+  .invite-card{padding:8px;flex-wrap:wrap}
+  .invite-code{font-size:10px;word-break:break-all}
+  .emoji-picker-grid{grid-template-columns:repeat(6,1fr)}
+  .event-card{padding:8px;flex-wrap:wrap;gap:4px}
+  .event-del{padding:6px 12px;width:100%;text-align:center}
+  .channel-card{padding:6px 8px;flex-wrap:wrap}
+  .channel-del{padding:6px 12px;width:100%;text-align:center}
+  .create-form{flex-direction:column}
+  .create-form input,.create-form select,.create-form button{width:100%}
+  .role-manager{max-height:150px}
+  .msg-topbar-channel{max-width:100%}
+  .toast{bottom:10px;right:10px;left:10px;max-width:none;text-align:center}
+  .bocchi-wrap img{width:60px}
+  .dash-roles-list{font-size:10px}
+  .role-item{padding:3px 5px}
+  #panel-messages.show{height:calc(100dvh - 68px)}
+  .msg-history-box{max-height:calc(100dvh - 290px)}
+  .confirm-box{width:calc(100% - 32px);padding:16px}
+  .modal-box{width:calc(100% - 32px);margin:16px auto;max-height:calc(100dvh - 32px)}
 }
 .member-grid{display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 180px);overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .member-grid::-webkit-scrollbar{display:none}
