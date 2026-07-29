@@ -586,7 +586,6 @@ function html() {
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>nenchan v1.0</title>
 <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
 <style>
@@ -749,59 +748,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .msg-history-box::-webkit-scrollbar-track{background:transparent}
 .msg-history-box::-webkit-scrollbar-thumb{background:#252a32;border-radius:3px}
 .msg-history-box::-webkit-scrollbar-thumb:hover{background:#363d47}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
-.mobile-topbar{display:none}
-@media(max-width:768px){
-  .mobile-topbar{display:flex;position:sticky;top:0;z-index:50;background:#14181c;border:1px solid #252a32;align-items:center;justify-content:center;height:40px;margin:6px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.4)}
-  .mobile-topbar .menu-toggle-btn{background:none;border:none;color:#b48899;cursor:pointer;padding:0;position:absolute;left:8px;display:flex;align-items:center;justify-content:center}
-  .mobile-topbar .menu-toggle-btn:hover{color:#d4b0be}
-  .mobile-topbar .topbar-logo{height:22px;width:auto;opacity:.85}
-  .sidebar{position:fixed;top:0;left:0;z-index:10;height:100dvh;transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);padding-top:52px;width:260px}
-  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.4)}
-  .sidebar-overlay.show{display:block}
-  .main{margin-left:0;padding:0 10px 10px}
-  .dash-grid{grid-template-columns:1fr!important;gap:6px}
-  .dash-card{padding:6px 8px}
-  .dash-card-icon{width:28px;height:28px}
-  .dash-card-val{font-size:14px}
-  .dash-banner{height:80px}
-  .dash-header{padding:10px;gap:10px;flex-wrap:wrap}
-  .dash-icon{width:44px;height:44px;border-radius:12px}
-  .msg-avatar{width:32px;height:32px}
-  .msg-time,.msg-time-inline{font-size:10px}
-  .msg-topbar{flex-direction:column;gap:4px}
-  .msg-topbar .msg-channel-pick{max-width:none}
-  .msg-edit-area textarea{font-size:11px}
-  .member-stats{flex-wrap:wrap;gap:4px}
-  .member-stat{flex:1;min-width:60px;padding:8px}
-  .member-stat span{font-size:8px}
-  .member-stat p{font-size:16px}
-  .member-card{padding:6px 8px}
-  .member-avatar{width:28px;height:28px}
-  .ban-card{padding:8px}
-  .ban-card-actions{flex-direction:column;gap:4px;width:100%}
-  .ban-card-actions button{width:100%;text-align:center;padding:8px}
-  .invite-card{padding:8px;flex-wrap:wrap}
-  .invite-code{font-size:10px;word-break:break-all}
-  .emoji-picker-grid{grid-template-columns:repeat(6,1fr)}
-  .channel-card{padding:6px 8px;flex-wrap:wrap}
-  .channel-cat .channel-card{padding-left:16px}
-  .channel-cat-header{flex-wrap:wrap;gap:4px}
-  .channel-del{padding:6px 12px;text-align:center}
-  .create-form{flex-direction:column}
-  .create-form input,.create-form select,.create-form button{width:100%}
-  .create-form button{height:auto;padding:8px 14px}
-  .role-manager{max-height:150px}
-  .msg-channel-pick{max-width:none}
-  .toast{bottom:10px;right:10px;left:10px;max-width:none;text-align:center}
-  .bocchi-wrap img{width:60px}
-  .dash-roles-list{font-size:10px}
-  .role-item{padding:3px 5px}
-  #panel-messages.show{height:calc(100vh - 32px)}
-  .msg-history-box{max-height:none}
-  .confirm-box{width:calc(100% - 32px);padding:16px}
-  .modal-box{width:calc(100% - 32px);margin:16px auto;max-height:calc(100dvh - 32px)}
-}
 .member-grid{display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 180px);overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
 .member-grid::-webkit-scrollbar{display:none}
 .member-card{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#191d23;border:1px solid #252a32;border-radius:8px;cursor:pointer;transition:border-color .15s}
@@ -1015,12 +961,7 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </style>
 </head>
 <body>
-<div class="mobile-topbar">
-<button class="menu-toggle-btn" onclick="toggleMenu()"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-<img src="/icons/nenchan.png" alt="nenchan" class="topbar-logo">
-</div>
-<div class="sidebar-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
-<div id="sidebar" class="sidebar" style="display:none">
+<div id="sidebar" class="sidebar">
 <div class="sidebar-nav">
 <button class="active" data-tab="dashboard" onclick="switchTab('dashboard')"><img src="/icons/dashboard.png" alt="">dashboard</button>
 <button data-tab="members" onclick="switchTab('members')"><img src="/icons/members.png" alt="">members</button>
@@ -1146,7 +1087,6 @@ function loginDiscord(){
 }
 
 function initPanel(){
-  g("sidebar").style.display="flex";
   g("loginOverlay").style.display="none";
   g("panel-dashboard").classList.add("show");
   loadDashboard();loadMembers();loadMsgChannels();
@@ -1170,7 +1110,7 @@ function switchTab(name){
   if(name==="invites")loadInvites();
   if(name==="emojis")loadEmojis();
   if(name==="audit")loadAuditLog();
-  if(window.innerWidth<=768&&g("sidebar").classList.contains("open"))toggleMenu();
+
 }
 
 function api(body,cb){
@@ -1596,8 +1536,6 @@ function fmt(s,mentions){
   return r;
 }
 function logout(){fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"logout"})}).finally(function(){location.reload()})}
-function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
-
 // --- Toast notifications ---
 function showToast(msg,type){
   var t=document.createElement("div");
@@ -2432,7 +2370,7 @@ function executeConfirm(){
 }
 document.addEventListener("click",function(e){if(!e.target.closest("#channelPicker")&&!e.target.closest("#channelList"))hideChannelList()});
 api({action:"guildinfo"},function(d){
-  if(d.error&&d.error==="Unauthorized"){g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
+  if(d.error&&d.error==="Unauthorized"){g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
   else{initPanel()}
 });
 </script>
