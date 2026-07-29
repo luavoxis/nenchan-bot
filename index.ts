@@ -1,4 +1,4 @@
-﻿import type { VercelRequest, VercelResponse } from "@vercel/node";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import crypto from "crypto";
@@ -16,7 +16,7 @@ const HMAC_SECRET = process.env.DISCORD_CLIENT_SECRET || process.env.DISCORD_TOK
 const OAUTH_REDIRECT = "https://nenchan.vercel.app/api";
 
 if (!HMAC_SECRET) {
-  console.error("FATAL: HMAC_SECRET is empty — set DISCORD_CLIENT_SECRET or DISCORD_TOKEN");
+  console.error("FATAL: HMAC_SECRET is empty � set DISCORD_CLIENT_SECRET or DISCORD_TOKEN");
 }
 
 // --- Rate Limiter (per-IP, sliding window) ---
@@ -194,10 +194,10 @@ body{font:12px/1.4 'Space Grotesk',monospace;background:#13161b;color:#c0bcc4;he
 #logoutBtn img{opacity:1;filter:none}
 .bocchi-wrap{text-align:center;padding:12px 0 8px}
 .bocchi-wrap img{width:90px;height:auto;opacity:.85}
-.main{flex:1;padding:16px;max-width:680px;margin-left:160px;height:100vh;overflow-y:auto}
+.main{flex:1;padding:16px;margin-left:160px;height:100vh;overflow-y:auto}
 .panel{display:none}
 .panel.show{display:block}
-#panel-messages.show{display:flex;flex-direction:column;height:calc(100vh - 80px)}
+#panel-messages.show{display:flex;flex-direction:column;height:calc(100vh - 32px);max-width:900px}
 h2{font-size:12px;color:#6d6572;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:400}
 label{display:block;color:#6d6572;font-size:10px;text-transform:uppercase;margin-bottom:2px;margin-top:6px;font-weight:600}
 input,textarea,select{width:100%;padding:4px 6px;border:1px solid #2e343c;border-radius:6px;background:#191d23;color:#c0bcc4;font:12px 'Space Grotesk',monospace;margin-bottom:6px;outline:none}
@@ -259,86 +259,82 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .role-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.05)}
 #msgHistory{scrollbar-width:none;-ms-overflow-style:none}
 #msgHistory::-webkit-scrollbar{display:none}
-.msg-row{display:flex;gap:10px;padding:6px 8px;border-radius:6px;margin-bottom:2px;position:relative}
+.msg-row{display:grid;grid-template-columns:40px 1fr;gap:8px;padding:2px 14px;position:relative;align-items:start}
 .msg-row:hover{background:#191d23}
-.msg-row:hover .msg-del{opacity:1}
-.msg-row:last-child{border-bottom:none}
-.msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;cursor:pointer}
-.msg-body{flex:1;min-width:0}
-.msg-author{font-weight:600;color:#e0dce4;font-size:12px;cursor:pointer}
+.msg-row:hover .msg-act{display:inline}
+.msg-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;cursor:pointer;justify-self:center}
+.msg-body{min-width:0}
+.msg-author{font-weight:600;color:#e0dce4;font-size:15px;cursor:pointer}
 .msg-author:hover{text-decoration:underline}
-.msg-time{color:#5a5260;font-size:10px;margin-left:6px}
-.msg-time-inline{color:#5a5260;font-size:9px;visibility:hidden;min-width:34px;text-align:center}
-.msg-row:hover .msg-time-inline{visibility:visible}
-.msg-edited{color:#5a5260;font-size:9px;margin-left:4px}
-.msg-content{color:#c0bcc4;margin-top:2px;word-wrap:break-word;white-space:pre-wrap}
+.msg-time{color:#5a5260;font-size:11px;margin-left:6px}
+.msg-time-inline{color:#5a5260;font-size:10px;margin-left:8px}
+.msg-edited{color:#5a5260;font-size:10px;margin-left:4px}
+.msg-content{color:#c0bcc4;margin:0;word-wrap:break-word;white-space:pre-wrap;line-height:1.45;font-size:14px}
 .msg-content .mention{color:#b48899;background:rgba(180,136,153,0.12);padding:0 4px;border-radius:3px;cursor:pointer;font-weight:500}
 .msg-content .mention:hover{background:rgba(180,136,153,0.25)}
-.msg-content code{background:#252a32;padding:1px 5px;border-radius:3px;font-size:11px;color:#e0dce4}
-.msg-content pre{background:#191d23;border:1px solid #252a32;border-radius:6px;padding:8px;margin:4px 0;overflow-x:auto;font-size:10px;color:#e0dce4}
+.msg-content code{background:#252a32;padding:1px 5px;border-radius:4px;font-size:12px;color:#e0dce4}
+.msg-content pre{background:#191d23;border:1px solid #252a32;border-radius:8px;padding:10px;margin:4px 0;overflow-x:auto;font-size:12px;color:#e0dce4}
 .msg-content pre code{background:none;padding:0}
 .msg-content a{color:#b48899;text-decoration:none}
 .msg-content a:hover{text-decoration:underline}
-.msg-content blockquote{border-left:3px solid #b48899;padding-left:8px;color:#6d6572;margin:4px 0}
+.msg-content blockquote{border-left:3px solid #b48899;padding-left:10px;color:#6d6572;margin:4px 0}
 .msg-content .spoiler{background:#252a32;color:transparent;border-radius:3px;padding:0 4px;cursor:pointer}
 .msg-content .spoiler:hover,.msg-content .spoiler.revealed{color:#c0bcc4;background:rgba(180,136,153,0.15)}
-.msg-ref{color:#5a5260;font-size:10px;padding:2px 0 4px;border-left:2px solid #252a32;padding-left:8px;margin:2px 0 4px;display:flex;align-items:center;gap:4px}
+.msg-ref{color:#5a5260;font-size:12px;padding:2px 0;border-left:2px solid #252a32;padding-left:10px;margin:2px 0 4px;display:flex;align-items:center;gap:6px}
 .msg-ref:hover{color:#6d6572}
-.msg-sticker{max-height:120px;border-radius:6px;margin:4px 0}
-.msg-img{max-width:320px;max-height:240px;border-radius:6px;margin:4px 0;cursor:pointer;display:block}
-.msg-video{max-width:380px;max-height:260px;border-radius:6px;margin:4px 0;display:block}
-.msg-audio{max-width:320px;margin:4px 0}
-.msg-file-link{color:#b48899;text-decoration:none;font-size:10px;padding:4px 8px;border:1px solid #252a32;border-radius:6px;display:inline-block;background:#191d23;transition:all .15s}
+.msg-sticker{max-height:140px;border-radius:8px;margin:4px 0}
+.msg-img{max-width:400px;max-height:300px;border-radius:8px;margin:4px 0;cursor:pointer;display:block}
+.msg-video{max-width:480px;max-height:320px;border-radius:8px;margin:4px 0;display:block}
+.msg-audio{max-width:400px;margin:4px 0}
+.msg-file-link{color:#b48899;text-decoration:none;font-size:12px;padding:6px 10px;border:1px solid #252a32;border-radius:8px;display:inline-block;background:#191d23;transition:all .15s}
 .msg-file-link:hover{border-color:#b48899;background:#1e2228}
-.msg-embed{background:#191d23;border-left:3px solid #b48899;border-radius:0 6px 6px 0;padding:8px 10px;margin:6px 0;max-width:480px}
-.msg-embed-author{color:#b48899;font-size:10px;font-weight:600;margin-bottom:2px}
-.msg-embed-title{color:#e0dce4;font-size:12px;font-weight:600;margin-bottom:4px}
+.msg-embed{background:#1e2228;border-left:4px solid #b48899;border-radius:0 8px 8px 0;padding:10px 14px;margin:6px 0;max-width:560px;transition:background .15s;font-size:13px}
+.msg-embed:hover{background:#22262e}
+.msg-embed-author{color:#b48899;font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+.msg-embed-title{color:#e0dce4;font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.3}
 .msg-embed-title:hover{text-decoration:underline;cursor:pointer}
-.msg-embed-desc{color:#c0bcc4;font-size:11px;line-height:1.5}
-.msg-embed-field-name{color:#e0dce4;font-size:11px;font-weight:600;margin-top:6px}
-.msg-embed-field-val{color:#c0bcc4;font-size:11px;line-height:1.4}
+.msg-embed-desc{color:#b5b0bc;font-size:13px;line-height:1.5;margin-bottom:4px}
+.msg-embed-field-name{color:#e0dce4;font-size:12px;font-weight:700;margin-top:8px;margin-bottom:2px}
+.msg-embed-field-val{color:#b5b0bc;font-size:12px;line-height:1.4;margin-bottom:2px}
 .msg-reactions{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.msg-reaction{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border:1px solid #252a32;border-radius:4px;background:#191d23;font-size:10px;color:#c0bcc4;cursor:pointer;transition:all .15s}
+.msg-reaction{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border:1px solid #252a32;border-radius:6px;background:#191d23;font-size:12px;color:#c0bcc4;cursor:pointer;transition:all .15s}
 .msg-reaction:hover{border-color:#b48899;background:#1e2228}
 .msg-reaction-count{font-weight:600;color:#e0dce4}
-.msg-del{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;color:#6d6572;background:#191d23;border:1px solid #252a32;font-size:10px;transition:all .15s}
-.msg-del:hover{color:#d45555;border-color:#d45555;background:rgba(212,85,85,0.1)}
-.msg-day-divider{text-align:center;margin:12px 0 8px;position:relative}
-.msg-day-divider span{background:#13161b;padding:0 10px;color:#5a5260;font-size:10px;position:relative;z-index:1}
+.msg-act{font-size:10px;color:#5a5260;cursor:pointer;transition:color .15s;user-select:none}
+.msg-actions{position:absolute;top:2px;right:14px;z-index:5;display:none;gap:8px}
+.msg-row:hover .msg-actions{display:flex}
+.msg-act:hover{color:#b48899}
+.msg-act-del:hover{color:#d45555}
+.msg-day-divider{text-align:center;margin:10px 0 6px;position:relative}
+.msg-day-divider span{background:#13161b;padding:0 12px;color:#5a5260;font-size:11px;position:relative;z-index:1}
 .msg-day-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#1e2228}
-.msg-group-start{margin-top:8px}
-.msg-group-start .msg-avatar{visibility:visible}
-.mention-list{display:none;position:absolute;top:100%;left:0;right:0;background:#191d23;border:1px solid #252a32;border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;z-index:90;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
-.mention-list.show{display:block}
-.mention-list .mention-item{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:11px;color:#c0bcc4;transition:background .1s}
-.mention-list .mention-item:hover{background:#252a32}
-.mention-list .mention-item img{width:22px;height:22px;border-radius:50%}
-.mention-list .mention-item .m-name{font-weight:500;color:#e0dce4}
-.mention-list .mention-item .m-bot{font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:5px;font-weight:700;text-transform:uppercase;vertical-align:middle}
-.drop-zone{border:1px dashed #252a32;border-radius:6px;padding:8px;text-align:center;color:#5a5260;font-size:10px;cursor:pointer;margin-bottom:8px;transition:all .15s}
-.drop-zone:hover,.drop-zone.dragover{border-color:#b48899;color:#b48899;background:rgba(180,136,153,0.05)}
-.drop-zone.has-file{border-color:#b48899;color:#b48899}
-.msg-input-row{display:flex;gap:8px}
-.msg-input-row textarea{flex:1;border:1px solid #252a32;border-radius:6px;background:#13161b;color:#c0bcc4;padding:8px 10px;font:11px 'Space Grotesk',monospace;resize:none;min-height:36px;max-height:120px;outline:none;margin:0}
+.msg-group-start{margin-top:0;padding-top:0}
+.msg-compose{flex-shrink:0;margin-top:4px}
+.msg-compose textarea{width:100%;border:1px solid #2e343c;border-radius:8px;background:#13161b;color:#c0bcc4;padding:6px 10px;font:13px/1.4 'Space Grotesk',sans-serif;resize:none;max-height:80px;outline:none;margin:0;transition:border-color .15s;display:block;box-sizing:border-box}
+.msg-compose textarea:focus{border-color:#b48899}
+.msg-compose textarea::placeholder{color:#5a5260}
+.msg-input-row .inline-mention-wrap{flex:1}
+.msg-input-row textarea{width:100%;border:1px solid #2e343c;border-radius:8px;background:#13161b;color:#c0bcc4;padding:6px 10px;font:13px/1.4 'Space Grotesk',sans-serif;resize:none;max-height:80px;outline:none;margin:0;display:block;box-sizing:border-box}
 .msg-input-row textarea:focus{border-color:#b48899}
-.msg-input-row button{background:#b48899;color:#13161b;border:none;border-radius:6px;padding:8px 16px;font:11px 'Space Grotesk',monospace;font-weight:600;cursor:pointer;transition:background .15s}
-.msg-input-row button:hover{background:#c9a0ae}
-.msg-topbar{display:flex;gap:8px;margin-bottom:8px;align-items:center}
-.msg-topbar select{flex:1;max-width:220px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;padding:8px 10px;font:11px 'Space Grotesk',monospace;outline:none;cursor:pointer}
-.msg-topbar select:focus{border-color:#b48899}
-.msg-topbar-mention{flex:1;position:relative}
-.msg-topbar-mention input{width:100%;padding:8px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none}
-.msg-topbar-mention input:focus{border-color:#b48899}
-.msg-topbar-channel{flex:1;max-width:220px;position:relative}
-.msg-topbar-channel input{width:100%;padding:8px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none;margin:0}
-.msg-topbar-channel input:focus{border-color:#b48899}
-.msg-history-box{flex:1;min-height:0;overflow-y:auto;background:#13161b;border:1px solid #1e2228;border-radius:8px;padding:8px;font-size:11px;line-height:1.55;margin-bottom:8px;max-height:calc(100vh - 260px)}
+.inline-mention-wrap{position:relative}
+.inline-mention-list{display:none;position:absolute;bottom:100%;left:0;right:0;background:#1e2228;border:1px solid #2e343c;border-bottom:none;border-radius:8px 8px 0 0;max-height:160px;overflow-y:auto;z-index:20}
+.inline-mention-list.show{display:block}
+.inline-mention-list .mention-item{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;font-size:12px;color:#c0bcc4;transition:background .1s}
+.inline-mention-list .mention-item:hover,.inline-mention-list .mention-item.hl{background:#252a32}
+.inline-mention-list .mention-item img{width:22px;height:22px;border-radius:50%;flex-shrink:0}
+.msg-topbar{display:flex;gap:6px;margin-bottom:6px}
+.msg-topbar .msg-channel-pick{max-width:180px;position:relative;flex-shrink:0}
+.msg-topbar .msg-channel-pick input{width:100%;padding:6px 10px;border:1px solid #2e343c;border-radius:8px;background:#13161b;color:#c0bcc4;font:13px 'Space Grotesk',sans-serif;outline:none;margin:0;box-sizing:border-box}
+.msg-topbar .msg-channel-pick input:focus{border-color:#b48899}
+.msg-topbar .msg-search-input{flex:1;min-width:0}
+.msg-topbar .msg-search-input input{width:100%;padding:6px 10px;border:1px solid #2e343c;border-radius:8px;background:#13161b;color:#c0bcc4;font:13px 'Space Grotesk',sans-serif;outline:none;margin:0;box-sizing:border-box}
+.msg-topbar .msg-search-input input:focus{border-color:#b48899}
+.msg-topbar .msg-search-input input::placeholder{color:#5a5260}
+.msg-history-box{flex:1;min-height:0;overflow-y:auto;padding:6px 0;font-size:14px;line-height:1.4;scrollbar-width:thin;scrollbar-color:#252a32 transparent}
 .msg-history-box::-webkit-scrollbar{width:6px}
-.msg-history-box::-webkit-scrollbar-track{background:#13161b}
+.msg-history-box::-webkit-scrollbar-track{background:transparent}
 .msg-history-box::-webkit-scrollbar-thumb{background:#252a32;border-radius:3px}
 .msg-history-box::-webkit-scrollbar-thumb:hover{background:#363d47}
-.msg-compose{background:#191d23;border:1px solid #1e2228;border-radius:8px;padding:10px}
-.msg-status{font-size:10px;margin-top:6px;min-height:14px;color:#6d6572}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9}
 .mobile-topbar{display:none}
 @media(max-width:768px){
@@ -357,16 +353,11 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
   .dash-banner{height:80px}
   .dash-header{padding:10px;gap:10px;flex-wrap:wrap}
   .dash-icon{width:44px;height:44px;border-radius:12px}
-  .msg-avatar{width:28px;height:28px}
-  .msg-time,.msg-time-inline{font-size:8px}
+  .msg-avatar{width:32px;height:32px}
+  .msg-time,.msg-time-inline{font-size:10px}
   .msg-topbar{flex-direction:column;gap:4px}
-  .msg-topbar select,.msg-topbar-channel,.msg-topbar-mention{max-width:100%}
-  .msg-search-bar input{font-size:11px}
-  .msg-compose{padding:8px}
-  .msg-input-row textarea{min-height:32px;font-size:11px;padding:6px 8px}
-  .msg-input-row button{padding:6px 12px;font-size:10px}
+  .msg-topbar .msg-channel-pick{max-width:none}
   .msg-edit-area textarea{font-size:11px}
-  .emoji-picker-dropdown{width:280px;left:0;right:auto}
   .member-stats{flex-wrap:wrap;gap:4px}
   .member-stat{flex:1;min-width:60px;padding:8px}
   .member-stat span{font-size:8px}
@@ -379,20 +370,21 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
   .invite-card{padding:8px;flex-wrap:wrap}
   .invite-code{font-size:10px;word-break:break-all}
   .emoji-picker-grid{grid-template-columns:repeat(6,1fr)}
-  .event-card{padding:8px;flex-wrap:wrap;gap:4px}
-  .event-del{padding:6px 12px;width:100%;text-align:center}
   .channel-card{padding:6px 8px;flex-wrap:wrap}
-  .channel-del{padding:6px 12px;width:100%;text-align:center}
+  .channel-cat .channel-card{padding-left:16px}
+  .channel-cat-header{flex-wrap:wrap;gap:4px}
+  .channel-del{padding:6px 12px;text-align:center}
   .create-form{flex-direction:column}
   .create-form input,.create-form select,.create-form button{width:100%}
+  .create-form button{height:auto;padding:8px 14px}
   .role-manager{max-height:150px}
-  .msg-topbar-channel{max-width:100%}
+  .msg-channel-pick{max-width:none}
   .toast{bottom:10px;right:10px;left:10px;max-width:none;text-align:center}
   .bocchi-wrap img{width:60px}
   .dash-roles-list{font-size:10px}
   .role-item{padding:3px 5px}
-  #panel-messages.show{height:calc(100dvh - 68px)}
-  .msg-history-box{max-height:calc(100dvh - 290px)}
+  #panel-messages.show{height:calc(100vh - 32px)}
+  .msg-history-box{max-height:none}
   .confirm-box{width:calc(100% - 32px);padding:16px}
   .modal-box{width:calc(100% - 32px);margin:16px auto;max-height:calc(100dvh - 32px)}
 }
@@ -523,30 +515,32 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .mod-search{display:flex;gap:6px;margin-bottom:8px}
 .mod-search input{flex:1}
 .mod-search button{padding:5px 14px;white-space:nowrap}
-.msg-edit-btn{position:absolute;top:8px;right:32px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;color:#6d6572;background:#191d23;border:1px solid #252a32;font-size:10px;transition:all .15s}
-.msg-row:hover .msg-edit-btn{opacity:1}
-.msg-edit-btn:hover{color:#b48899;border-color:#b48899;background:rgba(180,136,153,0.1)}
-.msg-edit-area{margin-top:4px}
 .msg-edit-area textarea{width:100%;padding:6px 8px;border:1px solid #b48899;border-radius:6px;background:#13161b;color:#c0bcc4;font:11px 'Space Grotesk',monospace;resize:none;min-height:36px;outline:none}
 .msg-edit-actions{display:flex;gap:4px;margin-top:4px}
 .msg-edit-actions button{padding:3px 10px;font-size:10px;border-radius:4px;border:none;cursor:pointer;font-family:'Space Grotesk',monospace}
 .msg-edit-save{background:#b48899;color:#13161b}
 .msg-edit-cancel{background:#252a32;color:#7d7582}
-.msg-search-bar{display:flex;gap:6px;margin-bottom:8px}
-.msg-search-bar input{flex:1;padding:6px 10px;border:1px solid #252a32;border-radius:6px;background:#191d23;color:#c0bcc4;font:11px 'Space Grotesk',monospace;outline:none}
-.msg-search-bar input:focus{border-color:#b48899}
-.msg-search-bar button{padding:5px 12px}
-.msg-load-more{text-align:center;padding:8px;cursor:pointer;color:#b48899;font-size:10px;border:1px solid #252a32;border-radius:6px;background:#191d23;transition:all .15s;margin-bottom:8px}
+.msg-edit-area textarea{width:100%;padding:6px 8px;border:1px solid #b48899;border-radius:6px;background:#13161b;color:#c0bcc4;font:11px 'Space Grotesk',monospace;resize:none;min-height:36px;outline:none}
+.msg-load-more{text-align:center;padding:6px;cursor:pointer;color:#b48899;font-size:12px;border:1px solid #2e343c;border-radius:8px;background:#13161b;transition:all .15s;margin-bottom:6px}
 .msg-load-more:hover{border-color:#b48899;background:#1e2228}
-.audit-entry{display:flex;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s;font-size:11px}
+.audit-entry{display:grid;grid-template-columns:32px 1fr auto;gap:10px;padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s;font-size:12px;align-items:start}
 .audit-entry:hover{background:#1e2228}
 .audit-entry:last-child{border-bottom:none}
-.audit-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0}
-.audit-info{flex:1;min-width:0}
+.audit-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0}
+.audit-info{min-width:0}
 .audit-action{color:#c0bcc4;line-height:1.4}
 .audit-action b{color:#e0dce4;font-weight:600}
 .audit-action .hl{color:#b48899}
-.audit-time{color:#5a5260;font-size:9px;flex-shrink:0;margin-left:auto;font-weight:600}
+.audit-time{color:#5a5260;font-size:10px;flex-shrink:0;margin-left:auto}
+.audit-target{color:#5a5260;font-size:11px;margin-top:2px;font-family:monospace}
+.audit-changes{margin-top:4px;display:flex;flex-direction:column;gap:2px}
+.audit-change{font-size:11px;color:#6d6572;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.audit-change-key{color:#5a5260;font-size:10px;text-transform:uppercase;letter-spacing:.3px;min-width:60px}
+.audit-change-old{color:#d45555;font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.audit-change-new{color:#43b581;font-size:11px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.audit-change-arrow{color:#3a3340;font-size:10px}
+.audit-reason{color:#5a5260;font-size:11px;margin-top:3px;font-style:italic;border-left:2px solid #252a32;padding-left:6px}
+.audit-options{color:#6d6572;font-size:10px;margin-top:2px}
 .invite-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s}
 .invite-card:last-child{border-bottom:none}
 .invite-card:hover{background:#1e2228}
@@ -563,19 +557,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .emoji-item:hover{background:#252a32}
 .emoji-item img{width:32px;height:32px}
 .emoji-item span{font-size:8px;color:#5a5260;text-align:center;word-break:break-all;max-width:48px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.event-card{padding:10px 12px;border-bottom:1px solid #252a32;transition:background .15s}
-.event-card:last-child{border-bottom:none}
-.event-card:hover{background:#1e2228}
-.event-name{color:#e0dce4;font-size:12px;font-weight:600}
-.event-time{color:#b48899;font-size:10px;margin-top:2px}
-.event-desc{color:#6d6572;font-size:10px;margin-top:3px}
-.event-status{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;margin-left:6px}
-.event-active{background:rgba(85,180,136,.15);color:#55b488}
-.event-scheduled{background:rgba(180,136,153,.15);color:#b48899}
-.event-completed{background:rgba(90,82,96,.15);color:#5a5260}
-.event-cancelled{background:rgba(212,85,85,.15);color:#d45555}
-.event-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0;margin-top:4px}
-.event-del:hover{background:#d45555;color:#fff}
 .channel-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #252a32;transition:background .15s}
 .channel-card:last-child{border-bottom:none}
 .channel-card:hover{background:#1e2228}
@@ -584,21 +565,19 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .channel-type{color:#5a5260;font-size:9px;padding:2px 6px;background:#252a32;border-radius:3px;flex-shrink:0}
 .channel-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
 .channel-del:hover{background:#d45555;color:#fff}
-.create-form{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.create-form input,.create-form select{flex:1;min-width:100px}
-.create-form button{white-space:nowrap}
+.channel-cat{margin-bottom:4px;background:#191d23;border:1px solid #252a32;border-radius:8px;overflow:hidden}
+.channel-cat-header{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#1e2228;border-bottom:1px solid #252a32}
+.channel-cat-header .channel-del{margin-left:auto}
+.channel-cat .channel-card{border-bottom:1px solid #1e2228;padding-left:28px}
+.channel-cat .channel-card:last-child{border-bottom:none}
+.create-form{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.create-form input,.create-form select{flex:1;min-width:100px;margin:0}
+.create-form button{padding:6px 14px;font:12px/1.4 'Space Grotesk',sans-serif;font-weight:600;border-radius:6px;background:#b48899;color:#13161b;border:none;cursor:pointer;white-space:nowrap;height:30px;display:flex;align-items:center}
+.create-form button:hover{background:#c9a0ae}
 .toast{position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;font:11px 'Space Grotesk',monospace;z-index:300;animation:toastIn .2s ease;max-width:320px}
 .toast-success{background:#1e3a2a;border:1px solid #55b488;color:#55b488}
 .toast-error{background:#3a1e1e;border:1px solid #d45555;color:#d45555}
 @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.emoji-picker-wrap{position:relative;display:inline-block}
-.emoji-picker-dropdown{display:none;position:absolute;bottom:100%;left:0;background:#1e2228;border:1px solid #3a424c;border-radius:8px;width:320px;max-height:360px;z-index:80;overflow:hidden;box-shadow:0 -8px 24px rgba(0,0,0,.4);display:none;flex-direction:column}
-.emoji-picker-dropdown.show{display:flex}
-.emoji-picker-search{margin:6px 8px;padding:5px 8px;background:#13161b;border:1px solid #2e343c;border-radius:6px;color:#c0bcc4;font:12px 'Space Grotesk',monospace;width:calc(100% - 16px);outline:none}
-.emoji-picker-search:focus{border-color:#b48899}
-.emoji-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;padding:4px 8px 8px;overflow-y:auto;flex:1}
-.emoji-picker-grid img{width:22px;height:22px;cursor:pointer;border-radius:4px;padding:2px;transition:background .1s}
-.emoji-picker-grid img:hover{background:#252a32}
 .role-manager{max-height:200px;overflow-y:auto;padding:4px 0;scrollbar-width:thin;scrollbar-color:#252a32 transparent}
 .role-manager::-webkit-scrollbar{width:4px}
 .role-manager::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
@@ -637,7 +616,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <button data-tab="channels" onclick="switchTab('channels')"><img src="/icons/channels2.png" alt="">channels</button>
 <button data-tab="invites" onclick="switchTab('invites')"><img src="/icons/invites.png" alt="">invites</button>
 <button data-tab="emojis" onclick="switchTab('emojis')"><img src="/icons/emojis.png" alt="">emojis</button>
-<button data-tab="events" onclick="switchTab('events')"><img src="/icons/events.png" alt="">events</button>
 <button data-tab="audit" onclick="switchTab('audit')"><img src="/icons/auditlog.png" alt="">audit log</button>
 <div class="bocchi-wrap"><img src="/icons/bocchi-rotate.gif" alt=""/></div>
 </div>
@@ -658,39 +636,23 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <div id="panel-messages" class="panel">
 <div class="msg-topbar">
-<div class="msg-topbar-channel" id="channelPicker">
-<input type="text" id="channelSearch" placeholder="#channel" oninput="filterChannels(this.value)" onfocus="showChannelList()" style="margin:0"/>
+<div class="msg-channel-pick" id="channelPicker">
+<input type="text" id="channelSearch" placeholder="#channel" oninput="filterChannels(this.value)" onfocus="showChannelList()"/>
 <div id="channelList" class="channel-list"></div>
 </div>
-<div class="msg-topbar-mention">
-<input type="text" id="mentionSearch" placeholder="@mention" oninput="filterMentions(this.value)" onfocus="showMentionList()" style="margin:0"/>
-<div id="mentionList" class="mention-list"></div>
-</div>
-</div>
-<div class="msg-search-bar">
+<div class="msg-search-input">
 <input type="text" id="msgSearchInput" placeholder="search messages..." oninput="filterMsgHistory(this.value)"/>
+</div>
 </div>
 <div id="msgLoadMore" class="msg-load-more" style="display:none" onclick="loadMoreMessages()">load older messages</div>
 <div id="msgHistory" class="msg-history-box">
 <p style="color:#5a5260;text-align:center;padding:20px 0">select a channel</p>
 </div>
 <div class="msg-compose">
-<div class="drop-zone" id="dropZone" onclick="g('msgFile').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
-<span id="dropLabel">drop file or click to attach</span>
-</div>
-<input type="file" id="msgFile" style="display:none" onchange="updateDropLabel(this)"/>
-<div class="msg-input-row" style="align-items:flex-end">
-<div class="emoji-picker-wrap">
-<button onclick="toggleEmojiPicker()" style="padding:6px 8px;font-size:16px;background:none;border:none;cursor:pointer" title="emoji">&#128578;</button>
-<div class="emoji-picker-dropdown" id="emojiPicker">
-<input class="emoji-picker-search" id="emojiSearch" placeholder="search emoji..." oninput="filterEmojis(this.value)"/>
-<div class="emoji-picker-grid" id="emojiGrid"></div>
-</div>
-</div>
+<div class="inline-mention-wrap">
 <textarea id="msgInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
-<button onclick="sendMsg()">send</button>
+<div id="inlineMentionList" class="inline-mention-list"></div>
 </div>
-<div id="msgStatus" class="msg-status"></div>
 </div>
 </div>
 <div id="panel-members" class="panel">
@@ -715,7 +677,10 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <p style="color:#5a5260;text-align:center;padding:20px 0">loading...</p>
 </div>
 <div class="msg-input-row">
-<textarea id="dmInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDm()}" style="min-height:36px;resize:none;border-radius:6px"></textarea>
+<div class="inline-mention-wrap">
+<textarea id="dmInput" placeholder="message..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDm()}"></textarea>
+<div id="inlineMentionListDm" class="inline-mention-list"></div>
+</div>
 <button onclick="sendDm()" style="border-radius:6px;background:#b48899;color:#13161b;font-weight:600;border:none">send</button>
 </div>
 <div id="dmStatus" style="font-size:10px;margin-top:4px;min-height:14px"></div>
@@ -740,15 +705,6 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 </div>
 <div id="panel-emojis" class="panel">
 <div id="emojiContent"></div>
-</div>
-<div id="panel-events" class="panel">
-<div class="create-form">
-<input type="text" id="newEventName" placeholder="event name"/>
-<input type="datetime-local" id="newEventStart"/>
-<input type="datetime-local" id="newEventEnd"/>
-<button onclick="createEvent()" style="background:#b48899;color:#13161b;border:none">create</button>
-</div>
-<div id="eventList"></div>
 </div>
 <div id="panel-audit" class="panel">
 <div id="auditList"></div>
@@ -799,7 +755,6 @@ function switchTab(name){
   if(name==="channels")loadChannels();
   if(name==="invites")loadInvites();
   if(name==="emojis")loadEmojis();
-  if(name==="events")loadEvents();
   if(name==="audit")loadAuditLog();
   if(window.innerWidth<=768&&g("sidebar").classList.contains("open"))toggleMenu();
 }
@@ -813,9 +768,11 @@ function api(body,cb){
   x.send(JSON.stringify(body));
 }
 
+var botId=null;
 function loadDashboard(){
   api({action:"guildinfo"},function(d){
     if(d.error)return;
+    if(d.botId)botId=d.botId;
     var iconHtml=d.icon?"<img class='dash-icon' src='"+d.icon+"' alt=''/>":"<div class='dash-icon' style='display:flex;align-items:center;justify-content:center;color:#5a5260;font-size:22px'>"+esc(d.name.charAt(0))+"</div>";
     var rolesSorted=d.roles.slice().sort(function(a,b){return b.position-a.position});
     var hoisted=rolesSorted.filter(function(r){return r.hoist});
@@ -1071,79 +1028,13 @@ function pickChannel(cid,name){
   loadMsgHistory(cid);
 }
 
-var mentionVisible=false;
-function showMentionList(){
-  mentionVisible=true;
-  var el=g("mentionList");
-  if(!allMembers.length){loadMembers()}
-  if(!el.children.length)filterMentions("");
-  el.classList.add("show");
-}
-function hideMentionList(){mentionVisible=false;setTimeout(function(){g("mentionList").classList.remove("show")},150)}
-function filterMentions(q){
-  q=q.toLowerCase();
-  var el=g("mentionList");
-  var h="";
-  var count=0;
-  var sorted=allMembers.slice().sort(function(a,b){
-    var an=(a.nick||(a.user.global_name||a.user.username)).toLowerCase();
-    var bn=(b.nick||(b.user.global_name||b.user.username)).toLowerCase();
-    return an.localeCompare(bn);
-  });
-  for(var i=0;i<sorted.length&&count<50;i++){
-    var m=sorted[i],name=m.nick||(m.user.global_name||m.user.username);
-    if(q&&name.toLowerCase().indexOf(q)===-1&&m.user.username.toLowerCase().indexOf(q)===-1&&m.user.id.indexOf(q)===-1)continue;
-    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
-    h+="<div class='mention-item' data-uid='"+m.user.id+"' data-name='"+esc(name)+"' onclick='pickMention(this)'>";
-    h+="<img src='"+avatar+"' alt='' loading='lazy'/>";
-    h+="<span class='m-name'>"+esc(name)+(m.user.bot?"<span class='m-bot'>bot</span>":"")+"</span>";
-    h+="</div>";
-    count++;
-  }
-  if(!count)h="<div class='mention-item' style='color:#5a5260;cursor:default'>no results</div>";
-  el.innerHTML=h;
-  el.classList.add("show");
-}
-function pickMention(el){
-  var input=g("msgInput");
-  input.value+="<@"+el.dataset.uid+"> ";
-  input.focus();
-  g("mentionSearch").value="";
-  g("mentionList").classList.remove("show");
-}
-
 function sendMsg(){
-  var c=selectedChannelId,m=g("msgInput").value.trim(),file=g("msgFile").files[0];
-  if(!c){g("msgStatus").textContent="select a channel";g("msgStatus").style.color="#d45555";return}
-  if(!m&&!file){g("msgStatus").textContent="enter a message or pick a file";g("msgStatus").style.color="#d45555";return}
-  var status=g("msgStatus");
-  status.style.color="#6d6572";status.textContent="sending...";
-  var btn=document.querySelector(".msg-input-row button");
-  if(btn)btn.disabled=true;
-  var body={action:"send",channelId:c,content:m};
-  if(file){
-    var reader=new FileReader();
-    reader.onload=function(e){
-      body.fileData=e.target.result.split(",")[1];
-      body.fileName=file.name;
-      body.fileType=file.type;
-      doSend(body,c,btn);
-    };
-    reader.readAsDataURL(file);
-  }else{doSend(body,c,btn)}
-}
-
-function doSend(body,cid,btn){
-  api(body,function(d){
-    if(btn)btn.disabled=false;
-    if(d.success){
-      g("msgStatus").style.color="#b48899";g("msgStatus").textContent="sent!";
-      g("msgInput").value="";g("msgFile").value="";updateFileLabel(g("msgFile"));
-      loadMsgHistory(cid);
-      setTimeout(function(){g("msgStatus").textContent=""},2000);
-    }else{
-      g("msgStatus").style.color="#d45555";g("msgStatus").textContent=d.error||"failed";
-    }
+  var c=selectedChannelId,m=g("msgInput").value.trim();
+  if(!c)return;
+  if(!m)return;
+  g("msgInput").value="";
+  api({action:"send",channelId:c,content:m},function(d){
+    if(d.success)loadMsgHistory(c);
   });
 }
 
@@ -1253,7 +1144,20 @@ function filterMembers(q){
 function c(){g("userModal").classList.remove("show")}
 function esc(s){var d=document.createElement("div");d.appendChild(document.createTextNode(s));return d.innerHTML}
 function escUrl(s){return String(s).replace(/[^a-zA-Z0-9\-._~:/?#@[!$&'()*+,;=%]/g,encodeURIComponent)}
-function fmt(s){
+function isContentUrlInEmbeds(content,embeds){
+  if(!content||!embeds||!embeds.length)return false;
+  content=content.trim();
+  if(!content.startsWith("http"))return false;
+  for(var i=0;i<embeds.length;i++){
+    var e=embeds[i];
+    if(e.url===content)return true;
+    if(e.thumbnail&&e.thumbnail.url===content)return true;
+    if(e.image&&e.image.url===content)return true;
+    if(e.video&&e.video.url===content)return true;
+  }
+  return false;
+}
+function fmt(s,mentions){
   var r=esc(s);
   r=r.replace(new RegExp("&lt;:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.png' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
   r=r.replace(new RegExp("&lt;a:([^:]+):(\\\\d+)&gt;","g"),"<img src='https://cdn.discordapp.com/emojis/$2.gif' style='width:18px;height:18px;vertical-align:middle' alt=':$1:'>");
@@ -1264,22 +1168,20 @@ function fmt(s){
   r=r.replace(new RegExp("~~(.+?)~~","g"),"<s>$1</s>");
   r=r.replace(new RegExp("\x60\x60\x60([\\\\s\\\\S]+?)\x60\x60\x60","g"),"<pre><code>$1</code></pre>");
   r=r.replace(new RegExp("\x60([^\x60]+)\x60","g"),"<code>$1</code>");
-  r=r.replace(new RegExp("&lt;@(\\\\d+)&gt;","g"),"<span class='mention'>@$1</span>");
+  r=r.replace(new RegExp("&lt;@!?(\\\\d+)&gt;","g"),function(m,id){
+    if(mentions){
+      for(var mi=0;mi<mentions.length;mi++){
+        if(mentions[mi].id===id)return "<span class='mention'>@"+esc(mentions[mi].global_name||mentions[mi].username)+"</span>";
+      }
+    }
+    for(var mi=0;mi<allMembers.length;mi++){
+      if(allMembers[mi].user.id===id){var mn=allMembers[mi].nick||(allMembers[mi].user.global_name||allMembers[mi].user.username);return "<span class='mention'>@"+esc(mn)+"</span>"}
+    }
+    return "<span class='mention'>@"+id+"</span>";
+  });
   return r;
 }
 function logout(){fetch("/api",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"logout"})}).finally(function(){location.reload()})}
-function updateFileLabel(el){
-  var label=g("dropLabel");
-  if(el.files&&el.files.length){label.textContent=el.files[0].name;g("dropZone").classList.add("has-file")}
-  else{label.textContent="drop file or click to attach";g("dropZone").classList.remove("has-file")}
-}
-function updateDropLabel(el){updateFileLabel(el)}
-function handleDrop(e){
-  e.preventDefault();
-  var dz=g("dropZone");dz.classList.remove("dragover");
-  var files=e.dataTransfer.files;
-  if(files.length){g("msgFile").files=files;updateFileLabel(g("msgFile"))}
-}
 function toggleMenu(){g("sidebar").classList.toggle("open");g("menuOverlay").classList.toggle("show")}
 
 // --- Toast notifications ---
@@ -1358,22 +1260,84 @@ function loadMoreMessages(){
   if(msgPagination.loading||!msgPagination.before||!msgPagination.channelId)return;
   msgPagination.loading=true;
   g("msgLoadMore").textContent="loading...";
-  api({action:"messages",channelId:msgPagination.channelId,limit:50,before:msgPagination.before},function(d){
+  var cid=msgPagination.channelId,before=msgPagination.before;
+  api({action:"messages",channelId:cid,limit:50,before:before},function(d){
+    if(cid!==msgPagination.channelId)return;
     msgPagination.loading=false;
     g("msgLoadMore").textContent="load older messages";
     if(d.error||!d.messages||!d.messages.length){g("msgLoadMore").style.display="none";return}
-    var existing=g("msgHistory");
-    var newHtml="";
     if(d.messages.length>=50){msgPagination.before=d.messages[d.messages.length-1].id;g("msgLoadMore").style.display="block"}
     else{g("msgLoadMore").style.display="none";msgPagination.before=null}
-    var tmp=document.createElement("div");
-    tmp.innerHTML=renderMsgRows(d.messages,msgPagination.channelId);
-    var first=existing.querySelector(".msg-day-divider");
-    if(first)existing.insertBefore(tmp,first);
-    else existing.innerHTML=tmp.innerHTML+existing.innerHTML;
-    parseTwemoji(existing);
+    g("msgHistory").insertAdjacentHTML("afterbegin",renderMsgRows(d.messages,cid));
+    parseTwemoji(g("msgHistory"));
   });
 }
+
+// --- Inline @mention autocomplete ---
+var mentionRange=null;
+document.getElementById("msgInput").addEventListener("input",function(){
+  var ta=this,val=ta.value,pos=ta.selectionStart;
+  var idx=val.lastIndexOf("@",pos-1);
+  if(idx===-1||(idx>0&&val.charCodeAt(idx-1)!==32&&val.charCodeAt(idx-1)!==10)){g("inlineMentionList").classList.remove("show");mentionRange=null;return}
+  var query=val.substring(idx+1,pos);
+  if(query.indexOf(" ")!==-1||query.indexOf("@")!==-1){g("inlineMentionList").classList.remove("show");mentionRange=null;return}
+  mentionRange={start:idx,end:pos};
+  if(!allMembers.length){loadMembers()}
+  var h="";
+  var count=0;
+  var ql=query.toLowerCase();
+  for(var i=0;i<allMembers.length&&count<20;i++){
+    var m=allMembers[i],name=m.nick||(m.user.global_name||m.user.username);
+    if(ql&&name.toLowerCase().indexOf(ql)===-1&&m.user.username.toLowerCase().indexOf(ql)===-1)continue;
+    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+    h+="<div class='mention-item' data-uid='"+m.user.id+"' data-name='"+esc(name)+"'><img src='"+avatar+"' alt=''/>"+esc(name)+(m.user.bot?"<span style='font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;text-transform:uppercase'>bot</span>":"")+"</div>";
+    count++;
+  }
+  if(!count)h="<div class='mention-item' style='color:#5a5260;cursor:default'>no results</div>";
+  var ml=g("inlineMentionList");ml.innerHTML=h;ml.classList.add("show");
+});
+document.getElementById("inlineMentionList").addEventListener("mousedown",function(e){
+  var item=e.target.closest(".mention-item");
+  if(!item||!item.dataset.uid)return;
+  e.preventDefault();
+  var ta=g("msgInput"),val=ta.value;
+  if(mentionRange){ta.value=val.substring(0,mentionRange.start)+"<@"+item.dataset.uid+"> "+val.substring(mentionRange.end);ta.focus();ta.selectionStart=ta.selectionEnd=mentionRange.start+item.dataset.uid.length+4}
+  g("inlineMentionList").classList.remove("show");mentionRange=null;
+});
+document.addEventListener("click",function(e){if(!e.target.closest(".inline-mention-wrap")){g("inlineMentionList").classList.remove("show");g("inlineMentionListDm").classList.remove("show");mentionRange=null}});
+
+var mentionRangeDm=null;
+document.getElementById("dmInput").addEventListener("input",function(){
+  var ta=this,val=ta.value,pos=ta.selectionStart;
+  var idx=val.lastIndexOf("@",pos-1);
+  if(idx===-1||(idx>0&&val.charCodeAt(idx-1)!==32&&val.charCodeAt(idx-1)!==10)){g("inlineMentionListDm").classList.remove("show");mentionRangeDm=null;return}
+  var query=val.substring(idx+1,pos);
+  if(query.indexOf(" ")!==-1||query.indexOf("@")!==-1){g("inlineMentionListDm").classList.remove("show");mentionRangeDm=null;return}
+  mentionRangeDm={start:idx,end:pos};
+  if(!allMembers.length){loadMembers()}
+  var h="";
+  var count=0;
+  var ql=query.toLowerCase();
+  for(var i=0;i<allMembers.length&&count<20;i++){
+    var m=allMembers[i],name=m.nick||(m.user.global_name||m.user.username);
+    if(ql&&name.toLowerCase().indexOf(ql)===-1&&m.user.username.toLowerCase().indexOf(ql)===-1)continue;
+    var avatar=m.user.avatar?"https://cdn.discordapp.com/avatars/"+m.user.id+"/"+m.user.avatar+(m.user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(m.user.discriminator||"0")%5)+".png";
+    h+="<div class='mention-item' data-uid='"+m.user.id+"' data-name='"+esc(name)+"'><img src='"+avatar+"' alt=''/>"+esc(name)+(m.user.bot?"<span style='font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:700;text-transform:uppercase'>bot</span>":"")+"</div>";
+    count++;
+  }
+  if(!count)h="<div class='mention-item' style='color:#5a5260;cursor:default'>no results</div>";
+  var ml=g("inlineMentionListDm");ml.innerHTML=h;ml.classList.add("show");
+});
+document.getElementById("inlineMentionListDm").addEventListener("mousedown",function(e){
+  var item=e.target.closest(".mention-item");
+  if(!item||!item.dataset.uid)return;
+  e.preventDefault();
+  var ta=g("dmInput"),val=ta.value;
+  if(mentionRangeDm){ta.value=val.substring(0,mentionRangeDm.start)+"<@"+item.dataset.uid+"> "+val.substring(mentionRangeDm.end);ta.focus();ta.selectionStart=ta.selectionEnd=mentionRangeDm.start+item.dataset.uid.length+4}
+  g("inlineMentionListDm").classList.remove("show");mentionRangeDm=null;
+});
+
+
 function renderMsgRows(messages,cid){
   var h="";var prevDate="";var prevAuthor=null;var prevTime=0;
   for(var i=messages.length-1;i>=0;i--){
@@ -1388,18 +1352,18 @@ function renderMsgRows(messages,cid){
     var sameGroup=sameUser&&(tsVal-prevTime)<420000;
     var name=u.global_name||u.username;
     var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
+    if(!sameGroup&&prevAuthor!==null){h+="<div style='height:4px'></div>"}
     h+="<div class='msg-row"+(sameGroup?" msg-group-start":"")+"'>";
-    if(sameGroup){h+="<div class='msg-avatar' style='visibility:hidden;width:34px'></div>"}
+    if(sameGroup){h+="<div class='msg-avatar' style='visibility:hidden;width:28px;height:0'></div>"}
     else{h+="<img class='msg-avatar' src='"+avatar+"' alt='' loading='lazy'/>"}
     h+="<div class='msg-body'>";
     if(!sameGroup){h+="<div><span class='msg-author'>"+esc(name)+"</span>"+(u.bot?"<span style='font-size:8px;background:#b48899;color:#13161b;padding:1px 4px;border-radius:3px;margin-left:5px;font-weight:700;text-transform:uppercase;vertical-align:middle'>bot</span>":"")+"<span class='msg-time'>"+timeStr+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>"}
-    else{h+="<div class='msg-time-inline'>"+timeStr+"</div>"}
     if(msg.referenced_message&&msg.referenced_message.author){
       var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
       var ra=ru.avatar?"https://cdn.discordapp.com/avatars/"+ru.id+"/"+ru.avatar+(ru.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(ru.discriminator||"0")%5)+".png";
-      h+="<div class='msg-ref'><img src='"+ra+"' style='width:14px;height:14px;border-radius:50%;vertical-align:middle' alt=''/> <b>"+esc(rn)+"</b> "+fmt(msg.referenced_message.content||"(attachment)").substring(0,120)+"</div>";
+      h+="<div class='msg-ref'><img src='"+ra+"' style='width:14px;height:14px;border-radius:50%;vertical-align:middle' alt=''/> <b>"+esc(rn)+"</b> "+fmt(msg.referenced_message.content||"(attachment)",msg.mentions).substring(0,120)+"</div>";
     }
-    h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
+    if(!(msg.embeds&&msg.embeds.length&&isContentUrlInEmbeds(msg.content,msg.embeds))){h+="<div class='msg-content'>"+fmt(msg.content||"",msg.mentions)+"</div>"}
     if(msg.sticker_items&&msg.sticker_items.length){
       for(var j=0;j<msg.sticker_items.length;j++){
         var s=msg.sticker_items[j];
@@ -1428,10 +1392,11 @@ function renderMsgRows(messages,cid){
         h+="<div class='msg-embed'"+(bg?" style='border-left-color:"+bg+"'":"")+">";
         if(e.author&&e.author.name)h+="<div class='msg-embed-author'>"+esc(e.author.name)+"</div>";
         if(e.title){if(e.url)h+="<a class='msg-embed-title' href='"+escUrl(e.url)+"' style='text-decoration:none'>"+esc(e.title)+"</a>";else h+="<div class='msg-embed-title'>"+esc(e.title)+"</div>"}
-        if(e.description)h+="<div class='msg-embed-desc'>"+fmt(e.description||"")+"</div>";
-        if(e.fields&&e.fields.length){for(var k=0;k<e.fields.length;k++){var f=e.fields[k];h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"")+"</div></div>"}}
-        if(e.image&&e.image.url)h+="<img class='msg-img' src='"+escUrl(e.image.url)+"' alt='' loading='lazy'/>";
-        if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image"))h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
+        if(e.description)h+="<div class='msg-embed-desc'>"+fmt(e.description||"",msg.mentions)+"</div>";
+        if(e.fields&&e.fields.length){for(var k=0;k<e.fields.length;k++){var f=e.fields[k];h+="<div><div class='msg-embed-field-name'>"+esc(f.name)+"</div><div class='msg-embed-field-val'>"+fmt(f.value||"",msg.mentions)+"</div></div>"}}
+        if(e.video&&e.video.url){h+="<video class='msg-video' src='"+escUrl(e.video.url)+"' autoplay loop muted poster='"+(e.thumbnail&&e.thumbnail.url?escUrl(e.thumbnail.url):"")+"'></video>"}
+        else if(e.image&&e.image.url)h+="<img class='msg-img' src='"+escUrl(e.image.url)+"' alt='' loading='lazy'/>";
+        if(e.thumbnail&&e.thumbnail.url&&!(e.type=="image")&&!e.video)h+="<img class='msg-img' src='"+escUrl(e.thumbnail.url)+"' alt='' loading='lazy' style='max-width:80px;max-height:80px;float:right;margin:2px'/>";
         if(e.footer&&e.footer.text)h+="<div style='color:#5a5260;font-size:8px;margin-top:3px'>"+esc(e.footer.text)+"</div>";
         h+="</div>";
       }
@@ -1446,8 +1411,10 @@ function renderMsgRows(messages,cid){
       h+="</div>";
     }
     h+="</div>";
-    h+="<span class='msg-edit-btn' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='editMsg(this.dataset.cid,this.dataset.mid)' title='edit'>&#9998;</span>";
-    h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
+    h+="<div class='msg-actions'>";
+    if(msg.author.id===botId)h+="<span class='msg-act' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='editMsg(this.dataset.cid,this.dataset.mid)'>edit</span>";
+    h+="<span class='msg-act msg-act-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteMsg(this.dataset.cid,this.dataset.mid)'>delete</span>";
+    h+="</div>";
     h+="</div>";
     prevAuthor=u.id;prevTime=tsVal;
   }
@@ -1460,7 +1427,6 @@ function renderMsgHistory(messages,cid){
 }
 
 // --- Emoji picker (Discord/Twemoji) ---
-var allEmojis=["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😙","🥲","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🫢","🫣","🤫","🤔","🫡","🤐","🤨","😐","😑","😶","🫥","😏","😒","🙄","😬","🤥","😌","😔","😪","🤤","😴","😷","🤒","🤕","🤢","🤮","🥵","🥶","🥴","😵","🤯","🥳","🥸","😎","🤓","🧐","😕","🫤","😟","🙁","😮","😯","😲","😳","🥺","🥹","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖","😺","😸","😹","😻","😼","😽","🙀","😿","😾","🫶","👐","🤲","🤝","🙏","✌️","🤞","🫰","🤟","🤘","👌","🤌","🤏","👈","👉","👆","🖕","👇","☝️","🫵","👍","👎","✊","👊","🤛","🤜","👏","🙌","💪","🦾","🖐️","✋","🖖","🫱","🫲","🫳","🫴","👌","🤌","🤏","✌️","🤞","🫰","🤟","🤘","🤙","👈","👉","👆","🖕","👇","☝️","🫵","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🧠","🫀","🫁","🦷","🦴","👀","👁️","👅","👄","🫦","💋","🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🙈","🙉","🙊","🐒","🐔","🐧","🐦","🐤","🐣","🐥","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🪱","🐛","🦋","🐌","🐞","🐜","🪰","🪲","🪳","🦟","🦗","🕷️","🕸️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐡","🐠","🐟","🐬","🐳","🐋","🦈","🦭","🐊","🐅","🐆","🦓","🦍","🦧","🐘","🦣","🦛","🦏","🐪","🐫","🦒","🦘","🦬","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌","🐕","🐩","🦮","🐕‍🦺","🐈","🐈‍⬛","🪶","🐓","🦃","🦤","🦚","🦜","🦢","🦩","🕊️","🐇","🦝","🦨","🦡","🦫","🦦","🦥","🐁","🐀","🐿️","🦔","🐾","🐉","🐲","🌵","🎄","🌲","🌳","🌴","🪵","🌱","🌿","☘️","🍀","🎍","🪴","🎋","🍃","🍂","🍁","🪺","🪹","🍄","🐚","🪸","🪨","🌊","🫧","🔥","🌪️","🌈","🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🫑","🌽","🥕","🫒","🧄","🧅","🥔","🍠","🫘","🥐","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🦴","🌭","🍔","🍟","🍕","🫓","🥪","🥙","🧆","🌮","🌯","🫔","🥗","🥘","🫕","🥫","🍝","🍜","🍲","🍛","🍣","🍱","🥟","🦪","🍤","🍙","🍚","🍘","🍥","🥮","🍢","🍡","🍧","🍨","🍦","🥧","🧁","🍰","🎂","🍮","🍭","🍬","🍫","🍿","🍩","🍪","🌰","🥜","🍯","🥛","🍼","🫖","☕","🍵","🧃","🥤","🧋","🍶","🍺","🍻","🥂","🍷","🥃","🍸","🍹","🧉","🍾","🧊","🥄","🍴","🍽️","🥣","🥡","🥢","🧂","🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🏍️","🛵","🚲","🛴","🛺","🚍","🚘","🚖","🛞","🚡","🚠","🚟","🚃","🚋","🚞","🚝","🚄","🚅","🚈","🚂","🚆","🚇","🚊","🚉","✈️","🛫","🛬","🛩️","💺","🛰️","🚀","🛸","🚁","🛶","⛵","🚤","🛥️","🛳️","⛴️","🚢","🗼","🏰","🏯","🏟️","🎡","🎢","🎠","⛲","⛱️","🏖️","🏝️","🏜️","🌋","⛰️","🏔️","🗻","🏕️","🛖","🏠","🏡","🏘️","🏚️","🏗️","🏭","🏢","🏬","🏣","🏤","🏥","🏦","🏨","🏪","🏫","🏩","💒","🏛️","⛪","🕌","🛕","🕍","⛩️","🕋","⛲","⛺","🌁","🌃","🏙️","🌄","🌅","🌆","🌇","🌉","🌌","🎠","🛝","🎡","🎢","🚂","🚃","🎢","🎪","🖌️","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🪘","🎷","🎺","🪗","🎸","🪕","🎻","🎲","♟️","🎯","🎳","🎮","🎰","🧩","⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓","🏸","🏒","🥍","🏏","🪃","🥅","⛳","🪁","🏹","🎣","🤿","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🥌","🎿","🎯","🪀","🪁","🎮","🕹️","🎰","🧩","🎪","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🪘","🎷","🎺","🪗","🎸","🪕","🎻","🎲","♟️","🎭","🪅","🪩","🪆","🃏","🀄","🎴","📯","⌚","📱","📲","💻","⌨️","🖥️","🖨️","🖱️","🖲️","🕹️","🗜️","💽","💾","💿","📀","📼","📷","📸","📹","🎥","📽️","🎞️","📞","☎️","📟","📠","📺","📻","🎙️","🎚️","🎛️","🧭","⏱️","⏲️","⏰","🕰️","⌛","⏳","📡","🔋","🪫","🔌","💡","🔦","🕯️","🪔","🧯","🛢️","💸","💵","💴","💶","💷","🪙","💰","💳","🪪","🧾","📧","📨","📩","📤","📥","📦","🏷️","🪧","📪","📫","📬","📭","📮","📭","📜","📃","📄","📑","📊","📈","📉","🗒️","🗓️","📆","📅","🗑️","📂","📁","🗂️","🗞️","📰","📓","📔","📒","📕","📖","📗","📘","📙","📚","🔬","🔭","💉","🩸","💊","🩹","🩼","🩻","🩺","🚪","🛗","🪞","🪟","🛏️","🛋️","🪑","🚽","🪠","🚿","🛁","🪤","🪒","🧴","🧷","🧹","🧺","🧻","🪣","🧼","🪥","🧽","🧯","🛒","🚬","⚰️","🪦","⚱️","🗿","🧸","🪆","🪅","🪩","🪘","🪗","🪕","🪔","❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⛎","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","🆔","⚛️","🉑","☢️","☣️","📴","📳","🈶","🈚","🈸","🈺","🈷️","✴️","🆚","💮","🉐","㊙️","㊗️","🈴","🈵","🈹","🈲","🅰️","🅱️","🆎","🆑","🅾️","🆘","❌","⭕","🛑","⛔","📛","🚫","💯","💢","♨️","🚷","🚯","🚳","🚱","🔞","📵","🚭","❗","❕","❓","❔","‼️","⁉️","🔅","🔆","〽️","⚠️","🚸","🔱","⚜️","🔰","♻️","✅","🈯","💹","❇️","✳️","❎","🌐","💠","Ⓜ️","🌀","💤","🏧","🚾","♿","🅿️","🛗","🈳","🈂️","🛂","🛃","🛄","🛅","🚹","🚺","🚼","⚧️","🚻","🚮","🎦","📶","🈁","🔣","ℹ️","🔤","🔡","🔠","🆖","🆗","🆙","🆒","🆕","🆓","0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟","🔢","#️⃣","*️⃣","⏏️","▶️","⏸️","⏯️","⏹️","⏺️","⏭️","⏮️","⏩","⏪","⏫","⏬","◀️","🔼","🔽","➡️","⬅️","⬆️","⬇️","↗️","↘️","↙️","↖️","↕️","↔️","↪️","↩️","⤴️","⤵️","🔀","🔁","🔂","🔄","🔃","🎵","🎶","➕","➖","➗","✖️","🟰","♾️","💲","💱","™️","©️","®️","〰️","➰","➿","🔚","🔙","🔛","🔝","🔜","✔️","☑️","🔘","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔸","🔹","🔶","🔷","🔳","🔲","▪️","▫️","◾","◽","◼️","◻️","🟥","🟧","🟨","🟩","🟦","🟪","⬛","⬜","🟫","🔈","🔇","🔉","🔊","🔔","🔕","📣","📢","💬","💭","🗯️","♠️","♣️","♥️","♦️","🕐","🕑","🕒","🕓","🕔","🕕","🕖","🕗","🕘","🕙","🕚","🕛","🕜","🕝","🕞","🕟","🕠","🕡","🕢","🕣","🕤","🕥","🕦","🕧","🏳️","🏴","🏁","🚩","🎌","🇺🇸","🇬🇧","🇫🇷","🇩🇪","🇪🇸","🇮🇹","🇯🇵","🇰🇷","🇨🇳","🇷🇺","🇧🇷","🇮🇳","🇦🇺","🇨🇦","🇲🇽","🇦🇷","🇹🇷","🇸🇦","🇦🇪","🇿🇦","🇳🇬","🇪🇬","🇰🇪","🇹🇭","🇻🇳","🇮🇩","🇵🇭","🇲🇾","🇸🇬","🇳🇿","🇨🇭","🇸🇪","🇳🇴","🇩🇰","🇫🇮","🇮🇪","🇵🇹","🇳🇱","🇧🇪","🇦🇹","🇵🇱","🇨🇿","🇷🇴","🇭🇺","🇬🇷","🇺🇦","🇮🇱","🇵🇰","🇧🇩","🇱🇰","🇲🇲","🇰🇭","🇳🇵","🇲🇳","🇨🇴","🇨🇱","🇵🇪","🇪🇨","🇻🇪","🇵🇦","🇨🇷","🇺🇾","🇵🇾","🇧🇴","🇭🇳","🇸🇻","🇳🇮","🇬🇹","🇨🇺","🇯🇲","🇭🇹","🇩🇴","🇹🇹","🇧🇧","🇦🇬","🇩🇲","🇬🇩","🇰🇳","🇱🇨","🇻🇨","🇧🇸","🇯🇴","🇱🇧","🇮🇶","🇮🇷","🇦🇫","🇵🇸","🇸🇾","🇾🇪","🇴🇲","🇶🇦","🇰🇼","🇧🇭","🇦🇿","🇬🇪","🇦🇲","🇰🇿","🇺🇿","🇹🇲","🇰🇬","🇹🇯","🇦🇱","🇷🇸","🇭🇷","🇧🇦","🇲🇪","🇲🇰","🇸🇮","🇧🇬","🇱🇹","🇱🇻","🇪🇪","🇨🇾","🇲🇹","🇱🇺","🇮🇸","🇦🇩","🇲🇨","🇸🇲","🇻🇦","🇱🇮","🇧🇲","🇰🇾","🇻🇮","🇬🇺","🇦🇸","🇲🇵","🇵🇼","🇫🇲","🇲🇭","🇰🇮","🇳🇷","🇹🇻","🇼🇸","🇹🇴","🇫🇯","🇵🇬","🇸🇧","🇻🇺","🇳🇨","🇹🇭","🇰🇭","🇱🇦","🇧🇳"];
 var twemojiBase="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/";
 function emojiToCodepoint(e){
   var cp=[];
@@ -1490,30 +1456,7 @@ function parseTwemoji(el){
     p.replaceChild(span,node);
   });
 }
-function renderEmojiGrid(filter){
-  var grid=g("emojiGrid");
-  var h="";
-  allEmojis.forEach(function(e){
-    if(filter&&!e.toLowerCase().includes(filter.toLowerCase()))return;
-    h+="<span onclick='insertEmoji(&quot;"+e+"&quot;)' title='"+e+"' style='cursor:pointer;border-radius:4px;padding:2px;display:inline-flex;align-items:center;justify-content:center;transition:background .1s'>"+emojiImg(e)+"</span>";
-  });
-  grid.innerHTML=h;
-}
-function toggleEmojiPicker(){
-  var picker=g("emojiPicker");
-  if(picker.classList.contains("show")){picker.classList.remove("show");return}
-  if(!g("emojiGrid").innerHTML)renderEmojiGrid();
-  picker.classList.add("show");
-}
-function filterEmojis(q){
-  renderEmojiGrid((q||"").toLowerCase());
-}
-function insertEmoji(e){
-  var ta=g("msgInput");
-  ta.value+=e;ta.focus();
-  g("emojiPicker").classList.remove("show");
-}
-document.addEventListener("click",function(e){if(!e.target.closest(".emoji-picker-wrap")){var p=g("emojiPicker");if(p)p.classList.remove("show")}});
+;
 
 // --- Channel management ---
 function loadChannels(){
@@ -1524,29 +1467,41 @@ function loadChannels(){
     var catSel=g("newChannelCategory");
     catSel.innerHTML="<option value=''>no category</option>";
     for(var i=0;i<categories.length;i++){catSel.innerHTML+="<option value='"+categories[i].id+"'>"+esc(categories[i].name)+"</option>"}
-    var h="";
-    var grouped={};
+    var h='<div style="font-size:10px;color:#5a5260;margin-bottom:6px">'+channels.length+' channels</div>';
+    var byParent={};
     for(var i=0;i<channels.length;i++){
       var c=channels[i];
+      if(c.type===4)continue;
       var pid=c.parent_id||"_root";
-      if(!grouped[pid])grouped[pid]=[];
-      grouped[pid].push(c);
+      if(!byParent[pid])byParent[pid]=[];
+      byParent[pid].push(c);
     }
-    for(var pid in grouped){
-      var items=grouped[pid].sort(function(a,b){return a.position-b.position});
-      for(var i=0;i<items.length;i++){
-        var c=items[i];
-        var icon=c.type===0?"#":c.type===2?"🔊":c.type===4?"📂":"#";
-        var typeLabel=c.type===0?"text":c.type===2?"voice":c.type===4?"category":"type "+c.type;
-        h+="<div class='channel-card'>";
-        h+="<span class='channel-icon'>"+icon+"</span>";
-        h+="<span class='channel-name'>"+esc(c.name)+"</span>";
-        h+="<span class='channel-type'>"+typeLabel+"</span>";
-        if(c.type!==4)h+="<button class='channel-del' onclick='deleteChannel(&quot;"+c.id+"&quot;,&quot;"+esc(c.name)+"&quot;)'>delete</button>";
-        h+="</div>";
+    for(var ci=0;ci<categories.length;ci++){
+      var cat=categories[ci];
+      var children=byParent[cat.id]||[];
+      children.sort(function(a,b){return a.position-b.position});
+      h+="<div class=\\"channel-cat\\"><div class=\\"channel-cat-header\\"><span class=\\"channel-icon\\">📂</span><span class=\\"channel-name\\">"+esc(cat.name)+"</span><span class=\\"channel-type\\">category</span><button class=\\"channel-del\\" onclick=\\"deleteChannel('"+cat.id+"','"+esc(cat.name)+"')\\">delete</button></div>";
+      for(var j=0;j<children.length;j++){
+        var c=children[j];
+        var icon=c.type===0?"#":c.type===2?"🔊":"#";
+        var typeLabel=c.type===0?"text":c.type===2?"voice":"type "+c.type;
+        h+="<div class=\\"channel-card\\"><span class=\\"channel-icon\\">"+icon+"</span><span class=\\"channel-name\\">"+esc(c.name)+"</span><span class=\\"channel-type\\">"+typeLabel+"</span><button class=\\"channel-del\\" onclick=\\"deleteChannel('"+c.id+"','"+esc(c.name)+"')\\">delete</button></div>";
       }
+      h+='</div>';
     }
-    if(!channels.length)h="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no channels</p>";
+    var rootChannels=byParent["_root"]||[];
+    rootChannels.sort(function(a,b){return a.position-b.position});
+    if(rootChannels.length){
+      h+='<div class="channel-cat"><div class="channel-cat-header"><span class="channel-icon">📁</span><span class="channel-name" style="color:#5a5260">no category</span></div>';
+      for(var i=0;i<rootChannels.length;i++){
+        var c=rootChannels[i];
+        var icon=c.type===0?"#":c.type===2?"🔊":"#";
+        var typeLabel=c.type===0?"text":c.type===2?"voice":"type "+c.type;
+        h+="<div class=\\"channel-card\\"><span class=\\"channel-icon\\">"+icon+"</span><span class=\\"channel-name\\">"+esc(c.name)+"</span><span class=\\"channel-type\\">"+typeLabel+"</span><button class=\\"channel-del\\" onclick=\\"deleteChannel('"+c.id+"','"+esc(c.name)+"')\\">delete</button></div>";
+      }
+      h+='</div>';
+    }
+    if(!channels.length)h='<p style="color:#5a5260;font-size:10px;text-align:center;padding:16px">no channels</p>';
     g("channelManageList").innerHTML=h;
   });
 }
@@ -1584,7 +1539,7 @@ function loadInvites(){
       var inviterName=inviter?(inviter.global_name||inviter.username):"unknown";
       h+="<div class='invite-card'>";
       h+="<div class='invite-info'><div class='invite-code'>"+esc(inv.code)+"</div>";
-      h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" · #"+esc(inv.channel.name||""):"")+"</div>";
+      h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" � #"+esc(inv.channel.name||""):"")+"</div>";
       h+="<div class='invite-uses'>"+(inv.uses||0)+" uses"+(inv.max_uses?" / "+inv.max_uses+" max":"")+"</div></div>";
       h+="<button class='invite-del' onclick='deleteInvite(&quot;"+esc(inv.code)+"&quot;)'>delete</button>";
       h+="</div>";
@@ -1618,81 +1573,74 @@ function loadEmojis(){
   });
 }
 
-// --- Scheduled Events ---
-function loadEvents(){
-  g("eventList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
-  api({action:"events"},function(d){
-    if(d.error){g("eventList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
-    var events=d.events||[];
-    if(!events.length){g("eventList").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no scheduled events</p>";return}
-    var h="";
-    for(var i=0;i<events.length;i++){
-      var ev=events[i];
-      var start=new Date(ev.scheduled_start_time);
-      var startStr=start.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-      var statusClass=ev.status===1?"event-scheduled":ev.status===2?"event-active":ev.status===3?"event-completed":"event-cancelled";
-      var statusText=ev.status===1?"scheduled":ev.status===2?"active":ev.status===3?"ended":"cancelled";
-      h+="<div class='event-card'>";
-      h+="<div><span class='event-name'>"+esc(ev.name)+"</span><span class='event-status "+statusClass+"'>"+statusText+"</span></div>";
-      h+="<div class='event-time'>"+startStr+"</div>";
-      if(ev.description)h+="<div class='event-desc'>"+esc(ev.description.substring(0,200))+"</div>";
-      h+="<button class='event-del' onclick='deleteEvent(&quot;"+ev.id+"&quot;)'>delete</button>";
-      h+="</div>";
-    }
-    g("eventList").innerHTML=h;
-  });
-}
-function createEvent(){
-  var name=g("newEventName").value.trim();
-  var start=g("newEventStart").value;
-  var end=g("newEventEnd").value;
-  if(!name){showToast("enter event name","error");return}
-  if(!start){showToast("select start time","error");return}
-  var body={action:"create_event",name:name,startTime:new Date(start).toISOString()};
-  if(end)body.endTime=new Date(end).toISOString();
-  api(body,function(d){
-    if(d.success){showToast("event created");g("newEventName").value="";g("newEventStart").value="";g("newEventEnd").value="";loadEvents()}
-    else{showToast(d.error||"failed","error")}
-  });
-}
-function deleteEvent(id){
-  g("confirmTitle").textContent="delete event";
-  g("confirmBody").innerHTML="<p style='color:#7d7582;font-size:11px'>delete this event?</p>";
-  var btn=g("confirmBtn");btn.className="confirm-danger";btn.textContent="delete";
-  btn.onclick=function(){api({action:"delete_event",eventId:id},function(d){closeConfirm();if(d.success){showToast("event deleted");loadEvents()}else{showToast(d.error||"failed","error")}})};
-  g("confirmOverlay").classList.add("show");
-}
-
 // --- Audit Log ---
+var auditPagination=null;
 function loadAuditLog(){
-  g("auditList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
-  api({action:"audit_log",limit:50},function(d){
-    if(d.error){g("auditList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
+  auditPagination={entries:[],users:[],roles:[],webhooks:[],integrations:[],before:null,loading:false,allLoaded:false};
+  g("auditList").innerHTML="<p style='color:#6d6572;font-size:12px;text-align:center;padding:20px'>loading...</p>";
+  fetchAuditLog();
+}
+function fetchAuditLog(){
+  if(auditPagination.loading||auditPagination.allLoaded)return;
+  auditPagination.loading=true;
+  var limit=100;
+  var body={action:"audit_log",limit:limit};
+  if(auditPagination.before)body.before=auditPagination.before;
+  api(body,function(d){
+    auditPagination.loading=false;
+    if(d.error){g("auditList").innerHTML="<p style='color:#d45555;font-size:12px;text-align:center;padding:20px'>"+esc(d.error)+"</p>";return}
     var entries=d.entries||[];
-    var users=d.users||[];
-    if(!entries.length){g("auditList").innerHTML="<p style='color:#5a5260;font-size:10px;text-align:center;padding:16px'>no audit log entries</p>";return}
-    var userMap={};for(var i=0;i<users.length;i++)userMap[users[i].id]=users[i];
-    var h="";
-    for(var i=0;i<entries.length;i++){
-      var e=entries[i];
-      var user=userMap[e.user_id];
-      var userName=user?(user.global_name||user.username):e.user_id;
-      var avatar=user&&user.avatar?"https://cdn.discordapp.com/avatars/"+user.id+"/"+user.avatar+(user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+((user?user.discriminator:"0")%5||0)+".png";
-      var ts=new Date(e.id?String(BigInt(e.id)>>22n+1420070400000):Date.now());
-      var timeStr=ts.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-      var actionText=formatAuditAction(e,userName);
-      h+="<div class='audit-entry'>";
-      h+="<img class='audit-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
-      h+="<div class='audit-info'><div class='audit-action'>"+actionText+"</div></div>";
-      h+="<span class='audit-time'>"+timeStr+"</span>";
-      h+="</div>";
+    if(entries.length<limit)auditPagination.allLoaded=true;
+    if(!entries.length&&!auditPagination.entries.length){
+      if(auditPagination.before){/* no more entries */}
+      else{g("auditList").innerHTML="<p style='color:#5a5260;font-size:12px;text-align:center;padding:20px'>no audit log entries</p>";return}
     }
-    g("auditList").innerHTML=h;
+    auditPagination.entries=auditPagination.entries.concat(entries);
+    auditPagination.users=auditPagination.users.concat(d.users||[]);
+    auditPagination.roles=auditPagination.roles.concat(d.roles||[]);
+    auditPagination.webhooks=auditPagination.webhooks.concat(d.webhooks||[]);
+    auditPagination.integrations=auditPagination.integrations.concat(d.integrations||[]);
+    if(entries.length)auditPagination.before=entries[entries.length-1].id;
+    renderAuditLog();
   });
 }
-function formatAuditAction(e,userName){
+function renderAuditLog(){
+  var entries=auditPagination.entries,users=auditPagination.users,roles=auditPagination.roles;
+  var webhooks=auditPagination.webhooks,integrations=auditPagination.integrations;
+  var userMap={};for(var i=0;i<users.length;i++)userMap[users[i].id]=users[i];
+  var roleMap={};for(var i=0;i<roles.length;i++)roleMap[roles[i].id]=roles[i];
+  var webhookMap={};for(var i=0;i<webhooks.length;i++)webhookMap[webhooks[i].id]=webhooks[i];
+  var integrationMap={};for(var i=0;i<integrations.length;i++)integrationMap[integrations[i].id]=integrations[i];
+  entries.sort(function(a,b){return String(b.id).localeCompare(String(a.id))});
+  var h="";
+  if(!auditPagination.allLoaded&&!auditPagination.loading){
+    h+="<div class='msg-load-more' onclick='fetchAuditLog()' style='margin:8px'>load older entries</div>";
+  }
+  if(auditPagination.loading)h+="<p style='color:#5a5260;font-size:11px;text-align:center;padding:6px'>loading...</p>";
+  for(var i=0;i<entries.length;i++){
+    var e=entries[i];
+    var user=userMap[e.user_id];
+    var userName=user?(user.global_name||user.username):"@"+e.user_id;
+    var avatar=user&&user.avatar?"https://cdn.discordapp.com/avatars/"+user.id+"/"+user.avatar+(user.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+((user?Number(user.discriminator):0)%5)+".png";
+    var ts=new Date(e.id?Number(BigInt(e.id)>>22n)+1420070400000:Date.now());
+    var timeStr=ts.toLocaleString("en-US",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    h+="<div class='audit-entry'>";
+    h+="<img class='audit-avatar' src='"+avatar+"' alt='' loading='lazy'/>";
+    h+="<div class='audit-info'>";
+    h+=formatAuditAction(e,userName,roleMap);
+    h+="</div>";
+    h+="<span class='audit-time'>"+timeStr+"</span>";
+    h+="</div>";
+  }
+  if(!auditPagination.allLoaded&&!auditPagination.loading){
+    h+="<div class='msg-load-more' onclick='fetchAuditLog()' style='margin:8px'>load older entries</div>";
+  }
+  if(auditPagination.allLoaded)h+="<p style='color:#5a5260;font-size:10px;text-align:center;padding:10px;opacity:.6'>all entries loaded</p>";
+  g("auditList").innerHTML=h;
+}
+function formatAuditAction(e,userName,roleMap){
   var d=e.changes||[];
-  var target=e.target_id;
+  var target=e.target_id||"";
   var actions={
     1:"created",2:"updated",3:"deleted",10:"kick",11:"prune",12:"ban",13:"unban",
     14:"role update",15:"role create",16:"role delete",20:"invite create",21:"invite delete",
@@ -1710,14 +1658,60 @@ function formatAuditAction(e,userName){
   };
   var actionStr=actions[e.action_type]||"action #"+e.action_type;
   var result="<b>"+esc(userName)+"</b> <span class='hl'>"+esc(actionStr)+"</span>";
-  if(target)result+=" <span class='hl'>"+esc(target)+"</span>";
+  if(target){
+    var targetName=resolveTarget(target,roleMap);
+    result+="<div class='audit-target'>"+esc(targetName||target)+"</div>";
+  }
   if(d.length){
-    for(var i=0;i<Math.min(d.length,2);i++){
-      var c=d[i];
-      if(c.name)result+=" · "+esc(c.name);
+    result+="<div class='audit-changes'>";
+    for(var i=0;i<d.length;i++){
+      var c=d[i],k=c.key||"",ov=c.old_value,nv=c.new_value;
+      if(k==="$add"||k==="$remove"){
+        var items=k==="$add"?nv:ov;
+        if(items&&items.length){
+          var label=k==="$add"?"added":"removed";
+          var names=items.map(function(x){return roleMap[x.id]?roleMap[x.id].name:(x.name||x.id)}).join(", ");
+          result+="<div class='audit-change'><span class='audit-change-key'>"+esc(label)+":</span><span class='audit-change-new'>"+esc(names)+"</span></div>";
+        }
+      }else if(k==="permission_overwrites"){
+        if(ov){result+="<div class='audit-change'><span class='audit-change-key'>overwrites:</span><span class='audit-change-old'>"+esc(formatPermOverwrite(ov))+"</span></div>"}
+        if(nv){result+="<div class='audit-change'><span class='audit-change-key'>?</span><span class='audit-change-new'>"+esc(formatPermOverwrite(nv))+"</span></div>"}
+      }else{
+        result+="<div class='audit-change'>";
+        result+="<span class='audit-change-key'>"+esc(k)+":</span>";
+        if(ov!==undefined)result+="<span class='audit-change-old'>"+esc(formatValue(ov))+"</span>";
+        if(ov!==undefined&&nv!==undefined)result+="<span class='audit-change-arrow'>?</span>";
+        if(nv!==undefined)result+="<span class='audit-change-new'>"+esc(formatValue(nv))+"</span>";
+        result+="</div>";
+      }
     }
+    result+="</div>";
+  }
+  if(e.reason)result+="<div class='audit-reason'>"+esc(e.reason)+"</div>";
+  if(e.options){
+    var opts=e.options;
+    result+="<div class='audit-options'>";
+    if(opts.channel_id)result+="channel: "+esc(opts.channel_id)+" ";
+    if(opts.message_id)result+="message: "+esc(opts.message_id)+" ";
+    if(opts.count!==undefined)result+="count: "+opts.count+" ";
+    if(opts.members!==undefined)result+="members: "+opts.members+" ";
+    if(opts.role_name)result+="role: "+esc(opts.role_name)+" ";
+    if(opts.type)result+="type: "+opts.type+" ";
+    result+="</div>";
   }
   return result;
+}
+function resolveTarget(id,roleMap){
+  if(roleMap[id])return "@"+roleMap[id].name;
+  return id;
+}
+function formatValue(v){
+  if(typeof v==="object"&&v!==null)return JSON.stringify(v).substring(0,100);
+  return String(v).substring(0,100);
+}
+function formatPermOverwrite(arr){
+  if(!arr||!arr.length)return "none";
+  return arr.map(function(o){return (o.id?o.id:"")+" allow:"+(o.allow||0)+" deny:"+(o.deny||0)}).join("; ").substring(0,120);
 }
 
 // --- Role management in member modal ---
@@ -1842,7 +1836,7 @@ function loadDashboardActivity(){
         var b=d.bans[i];var u=b.user;
         var name=u.global_name||u.username;
         var avatar=u.avatar?"https://cdn.discordapp.com/avatars/"+u.id+"/"+u.avatar+(u.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(u.discriminator||"0")%5)+".png";
-        h+="<div class='activity-item'><img src='"+avatar+"' alt='' loading='lazy'/><div class='activity-text'><b>"+esc(name)+"</b>"+(b.reason?" · "+esc(b.reason):"")+"<span class='activity-badge badge-ban'>ban</span></div></div>";
+        h+="<div class='activity-item'><img src='"+avatar+"' alt='' loading='lazy'/><div class='activity-text'><b>"+esc(name)+"</b>"+(b.reason?" � "+esc(b.reason):"")+"<span class='activity-badge badge-ban'>ban</span></div></div>";
       }
     }
     if(!h)h="<p style='color:#5a5260;font-size:10px;text-align:center;padding:12px'>no recent activity</p>";
@@ -1931,9 +1925,9 @@ function loadDmHistory(cid){
       h+="<div><span class='msg-author'>"+esc(name)+"</span><span class='msg-time'>"+time+"</span>"+(msg.edited_timestamp?"<span class='msg-edited'>(edited)</span>":"")+"</div>";
       if(msg.referenced_message&&msg.referenced_message.author){
         var ru=msg.referenced_message.author,rn=ru.global_name||ru.username;
-        h+="<div class='msg-ref'>&#8618; "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)")+"</div>";
+        h+="<div class='msg-ref'>&#8618; "+esc(rn)+": "+fmt(msg.referenced_message.content||"(attachment)",msg.mentions)+"</div>";
       }
-      h+="<div class='msg-content'>"+fmt(msg.content||"")+"</div>";
+      h+="<div class='msg-content'>"+fmt(msg.content||"",msg.mentions)+"</div>";
       if(msg.sticker_items&&msg.sticker_items.length){
         for(var j=0;j<msg.sticker_items.length;j++){
           var s=msg.sticker_items[j];
@@ -1955,7 +1949,7 @@ function loadDmHistory(cid){
         }
       }
       h+="</div>";
-      h+="<span class='msg-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteDmMsg(this.dataset.cid,this.dataset.mid)' title='delete'>&#10005;</span>";
+      if(msg.author.id===botId)h+="<span class='msg-act msg-act-del' data-cid='"+cid+"' data-mid='"+msg.id+"' onclick='deleteDmMsg(this.dataset.cid,this.dataset.mid)'>delete</span>";
       h+="</div>";
     }
     g("dmHistory").innerHTML=h;
@@ -2022,7 +2016,7 @@ function executeConfirm(){
     }
   });
 }
-document.addEventListener("click",function(e){if(!e.target.closest("#mentionSearch")&&!e.target.closest("#mentionList"))hideMentionList();if(!e.target.closest("#channelPicker")&&!e.target.closest("#channelList"))hideChannelList()});
+document.addEventListener("click",function(e){if(!e.target.closest("#channelPicker")&&!e.target.closest("#channelList"))hideChannelList()});
 api({action:"guildinfo"},function(d){
   if(d.error&&d.error==="Unauthorized"){g("sidebar").style.display="flex";g("panel-dashboard").classList.add("show");g("loginOverlay").style.display="flex"}
   else{initPanel()}
@@ -2210,7 +2204,7 @@ async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, code
 
     if (userRes.id !== DISCORD_OWNER_ID) {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      return res.status(403).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#7d7582'>This account is not authorized.</p><a href='/api' style='color:#b48899'>← back</a></div></body></html>");
+      return res.status(403).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Access Denied</h1><p style='color:#7d7582'>This account is not authorized.</p><a href='/api' style='color:#b48899'>? back</a></div></body></html>");
     }
 
     res.setHeader("Set-Cookie", `token=${signToken(userRes.id)}; Path=/; Max-Age=86400; SameSite=Strict; HttpOnly; Secure`);
@@ -2219,7 +2213,7 @@ async function handleOAuthCallback(req: VercelRequest, res: VercelResponse, code
   } catch (err: any) {
     console.error("OAuth callback error:", err.message);
     res.setHeader("Content-Type", "text/html; charset=utf-8");
-    return res.status(500).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>OAuth Error</h1><p style='color:#7d7582'>" + htmlEscape(err.message || "Unknown error") + "</p><a href='/api' style='color:#b48899'>← back</a></div></body></html>");
+    return res.status(500).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>OAuth Error</h1><p style='color:#7d7582'>" + htmlEscape(err.message || "Unknown error") + "</p><a href='/api' style='color:#b48899'>? back</a></div></body></html>");
   }
 }
 
@@ -2237,7 +2231,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     return res.json({ success: true });
   }
 
-  // token check — read from HttpOnly cookie or Authorization header only
+  // token check � read from HttpOnly cookie or Authorization header only
   const reqToken = getTokenFromRequest(req) || "";
   if (!verifyToken(reqToken)) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -2255,6 +2249,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         discordFetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers }),
       ]);
       const guild = guildRes;
+      const botRes = await discordFetch("https://discord.com/api/v10/users/@me", { headers });
       const ownerRes = await discordFetch(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
       let bots = 0, humans = 0, totalMembers = guild.approximate_member_count || guild.member_count || "?";
       try {
@@ -2275,6 +2270,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         iconUrl = `https://cdn.discordapp.com/icons/${guildId}/${guild.icon}${ext}?size=256`;
       }
       return res.json({
+        botId: botRes.id,
         name: guild.name,
         icon: iconUrl,
         owner: ownerRes.global_name || ownerRes.username,
@@ -2288,7 +2284,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         categories: categoryCh,
         roleCount: rolesRes.length,
         roles: rolesRes.map((r: any) => ({ id: r.id, name: r.name, color: r.color, position: r.position, hoist: r.hoist })),
-        created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) + " · " + new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+        created: new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) + " � " + new Date(Number(BigInt(guild.id) >> 22n) + 1420070400000).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
         createdTs: Number(BigInt(guild.id) >> 22n) + 1420070400000,
         boostLevel: guild.premium_tier || 0,
         boostCount: guild.premium_subscription_count || 0,
@@ -2331,7 +2327,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         const messages = await discordFetch(url, { headers });
         return res.json({ messages });
       } catch (e: any) {
-        throw e;
+        return res.status(500).json({ error: e.message || "Failed to fetch messages" });
       }
     }
 
@@ -2526,11 +2522,10 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     if (body.action === "audit_log") {
       try {
         const limit = parseLimit(body.limit, 25, 100);
-        const log = await discordFetch(
-          `https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=${limit}`,
-          { headers },
-        );
-        return res.json({ entries: log.audit_log_entries || [], users: log.users || [], roles: log.roles || [] });
+        let url = `https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=${limit}`;
+        if (body.before) url += `&before=${body.before}`;
+        const log = await discordFetch(url, { headers });
+        return res.json({ entries: log.audit_log_entries || [], users: log.users || [], roles: log.roles || [], webhooks: log.webhooks || [], integrations: log.integrations || [] });
       } catch (e: any) {
         return res.status(500).json({ error: e.message || "Failed to fetch audit log" });
       }
@@ -2573,48 +2568,6 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       }
     }
 
-    if (body.action === "events") {
-      try {
-        const events = await discordFetch(
-          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events?with_user_count=true`,
-          { headers },
-        );
-        return res.json({ events: Array.isArray(events) ? events : [] });
-      } catch (e: any) {
-        return res.status(500).json({ error: e.message || "Failed to fetch events" });
-      }
-    }
-
-    if (body.action === "create_event") {
-      try {
-        const name = typeof body.name === "string" ? body.name.trim().slice(0, 100) : "";
-        if (!name) return res.status(400).json({ error: "Event name required" });
-        const eventBody: any = { name, scheduled_start_time: body.startTime || new Date(Date.now() + 3600000).toISOString() };
-        if (body.endTime) eventBody.scheduled_end_time = body.endTime;
-        if (body.description) eventBody.description = String(body.description).slice(0, 1000);
-        if (body.channelId && isValidSnowflake(body.channelId)) eventBody.channel_id = body.channelId;
-        const event = await discordFetch(
-          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events`,
-          { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(eventBody) },
-        );
-        return res.json({ success: true, event });
-      } catch (e: any) {
-        return res.status(500).json({ error: e.message || "Failed to create event" });
-      }
-    }
-
-    if (body.action === "delete_event") {
-      if (!body.eventId) return res.status(400).json({ error: "No event ID" });
-      try {
-        await discordFetch(
-          `https://discord.com/api/v10/guilds/${guildId}/scheduled-events/${body.eventId}`,
-          { method: "DELETE", headers },
-        );
-        return res.json({ success: true });
-      } catch (e: any) {
-        return res.status(500).json({ error: e.message || "Failed to delete event" });
-      }
-    }
 
     if (body.action === "create_channel") {
       try {
