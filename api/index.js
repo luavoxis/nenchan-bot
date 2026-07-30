@@ -917,7 +917,17 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .invite-code{color:#b48899;font-family:monospace;font-size:11px;font-weight:600}
 .invite-info{flex:1;min-width:0}
 .invite-meta{color:#5a5260;font-size:9px;margin-top:2px}
-.invite-uses{color:#6d6572;font-size:10px}
+.invite-details{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap}
+.invite-details span{color:#6d6572;font-size:9px}
+.invite-created{color:#5a5260}
+.invite-expires{color:#6d6572}
+.invite-never{color:#43b581}
+.invite-expired{color:#d45555}
+.invite-expires-in{color:#faa61a}
+.invite-temp-badge{color:#13161b;background:#faa61a;padding:1px 5px;border-radius:3px;font-weight:600;font-size:8px;text-transform:uppercase;letter-spacing:.3px}
+.invite-uses-count{color:#e0dce4;font-weight:600}
+.invite-unlimited{color:#43b581;font-size:11px}
+.invite-members{color:#5a5260}
 .invite-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
 .invite-del:hover{background:#d45555;color:#fff}
 .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;max-height:300px;overflow-y:auto;padding:4px}
@@ -2099,10 +2109,33 @@ function loadInvites(){
       var inv=invites[i];
       var inviter=inv.inviter;
       var inviterName=inviter?(inviter.global_name||inviter.username):"unknown";
+      var created=inv.created_at?timeAgo(new Date(inv.created_at)):"";
+      var maxAge=inv.max_age!==undefined?inv.max_age:86400;
+      var maxUses=inv.max_uses!==undefined?inv.max_uses:0;
+      var isTemp=inv.temporary;
+      var expiresStr;
+      if(maxAge<=0){expiresStr="<span class='invite-never'>never</span>"}
+      else{
+        var expiresAt=new Date(new Date(inv.created_at).getTime()+maxAge*1000);
+        if(expiresAt<=new Date()){expiresStr="<span class='invite-expired'>expired</span>"}
+        else{expiresStr="<span class='invite-expires-in'>"+formatDuration(maxAge)+"</span>"}
+      }
+      var usesStr="<span class='invite-uses-count'>"+(inv.uses||0)+"</span> / "+(maxUses>0?maxUses:"<span class='invite-unlimited'>&infin;</span>");
+      var memberStr=(inv.approximate_member_count!==undefined)?"<span class='invite-members'>~"+inv.approximate_member_count+" members</span>":"";
       h+="<div class='invite-card'>";
-      h+="<div class='invite-info'><div class='invite-code'>"+esc(inv.code)+"</div>";
-      h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" \uFFFD #"+esc(inv.channel.name||""):"")+"</div>";
-      h+="<div class='invite-uses'>"+(inv.uses||0)+" uses"+(inv.max_uses?" / "+inv.max_uses+" max":"")+"</div></div>";
+      h+="<div class='invite-info'>";
+      h+="<div class='invite-code'>"+esc(inv.code)+"</div>";
+      h+="<div class='invite-meta'>by <b style='color:#e0dce4'>"+esc(inviterName)+"</b>"+(inv.channel?" #"+esc(inv.channel.name||""):"")+"</div>";
+      h+="<div class='invite-details'>";
+      if(created)h+="<span class='invite-created'>created "+created+"</span>";
+      h+="<span class='invite-expires'>expires "+expiresStr+"</span>";
+      if(isTemp)h+="<span class='invite-temp-badge'>temporary</span>";
+      h+="</div>";
+      h+="<div class='invite-details'>";
+      h+="<span class='invite-uses'>uses: "+usesStr+"</span>";
+      if(memberStr)h+=memberStr;
+      h+="</div>";
+      h+="</div>";
       h+="<button class='invite-del' onclick='deleteInvite(&quot;"+esc(inv.code)+"&quot;)'>delete</button>";
       h+="</div>";
     }
@@ -2463,6 +2496,14 @@ function timeAgo(date){
   if(s<3600)return Math.floor(s/60)+"m ago";
   if(s<86400)return Math.floor(s/3600)+"h ago";
   return Math.floor(s/86400)+"d ago";
+}
+function formatDuration(s){
+  if(!s||s<=0)return "never";
+  if(s<60)return s+"s";
+  if(s<3600)return Math.floor(s/60)+"m";
+  if(s<86400)return Math.floor(s/3600)+"h";
+  if(s<604800)return Math.floor(s/86400)+"d";
+  return Math.floor(s/86400)+"d";
 }
 
 // --- Guild edit ---
