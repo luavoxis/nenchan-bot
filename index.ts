@@ -2188,7 +2188,7 @@ function editDmMsg(cid,mid){
   var content=row.querySelector(".msg-content");
   if(!content)return;
   var old=content.textContent;
-  content.outerHTML="<div class='msg-content'><textarea id='dmEditInput' style='width:100%;background:#13161b;border:1px solid #b48899;border-radius:6px;color:#c0bcc4;padding:4px 8px;font:13px monospace;resize:none'>"+esc(old)+"</textarea><div style='margin-top:4px'><button onclick='saveDmEdit(\""+cid+"\",\""+mid+"\")' style='padding:2px 8px;background:#b48899;color:#13161b;border:none;border-radius:4px;font-size:10px;cursor:pointer'>save</button> <button onclick='loadDmHistory(\""+cid+"\")' style='padding:2px 8px;font-size:10px;cursor:pointer'>cancel</button></div></div>";
+  content.outerHTML="<div class='msg-content'><textarea id='dmEditInput' style='width:100%;background:#13161b;border:1px solid #b48899;border-radius:6px;color:#c0bcc4;padding:4px 8px;font:13px monospace;resize:none'>"+esc(old)+"</textarea><div style='margin-top:4px'><button onclick='saveDmEdit(&quot;"+cid+"&quot;,&quot;"+mid+"&quot;)' style='padding:2px 8px;background:#b48899;color:#13161b;border:none;border-radius:4px;font-size:10px;cursor:pointer'>save</button> <button onclick='loadDmHistory(&quot;"+cid+"&quot;)' style='padding:2px 8px;font-size:10px;cursor:pointer'>cancel</button></div></div>";
   var inp=g("dmEditInput");inp.focus();inp.select();
 }
 function saveDmEdit(cid,mid){
