@@ -31,7 +31,9 @@ async function discordFetch(url, opts = {}) {
             msg = d.message || msg;
           } catch {
           }
-          reject(new Error(msg));
+          const err = new Error(msg);
+          err.status = res.statusCode;
+          reject(err);
         }
       });
     });
@@ -357,7 +359,9 @@ async function discordFetch2(url, opts = {}) {
             msg = d.message || msg;
           } catch {
           }
-          reject(new Error(msg));
+          const err = new Error(msg);
+          err.status = res.statusCode;
+          reject(err);
         }
       });
     });
@@ -544,7 +548,9 @@ async function discordFetch3(url, opts = {}) {
             msg = d.message || msg;
           } catch {
           }
-          reject(new Error(msg));
+          const err = new Error(msg);
+          err.status = res.statusCode;
+          reject(err);
         }
       });
     });
@@ -3290,6 +3296,7 @@ async function handlePanel(res, body, req) {
         );
         return res.json({ success: true });
       } catch (e) {
+        if (e.status === 404) return res.json({ success: true });
         return res.status(500).json({ error: e.message || "Failed to delete invite" });
       }
     }

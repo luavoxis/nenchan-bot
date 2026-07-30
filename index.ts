@@ -124,7 +124,9 @@ async function discordFetch(url: string, opts: any = {}): Promise<any> {
         } else {
           let msg = `HTTP ${res.statusCode}`;
           try { const d = JSON.parse(body); msg = d.message || msg; } catch {}
-          reject(new Error(msg));
+          const err = new Error(msg) as any;
+          err.status = res.statusCode;
+          reject(err);
         }
       });
     });
@@ -2913,6 +2915,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
         );
         return res.json({ success: true });
       } catch (e: any) {
+        if (e.status === 404) return res.json({ success: true });
         return res.status(500).json({ error: e.message || "Failed to delete invite" });
       }
     }
