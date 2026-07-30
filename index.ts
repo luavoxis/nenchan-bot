@@ -111,7 +111,7 @@ async function discordFetch(url: string, opts: any = {}): Promise<any> {
     method: opts.method || "GET",
     headers: { ...opts.headers },
   };
-  if (opts.body) {
+  if (opts.body && !options.headers["Content-Type"]) {
     options.headers["Content-Type"] = "application/json";
   }
   return new Promise((resolve, reject) => {
