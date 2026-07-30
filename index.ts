@@ -1749,7 +1749,21 @@ function loadInvites(){
 function populateInviteChannelSelect(){
   var sel=g("inviteChannel");
   if(!sel)return;
-  if(allChannels.length){sel.innerHTML="<option value=''>select channel...</option>";for(var i=0;i<allChannels.length;i++){var c=allChannels[i];if(c.type===4)continue;sel.innerHTML+="<option value='"+c.id+"'>"+esc(c.name)+"</option>"}}
+  if(allChannels.length){
+    sel.innerHTML="<option value=''>select channel...</option>";
+    for(var i=0;i<allChannels.length;i++){
+      var c=allChannels[i];
+      if(c.type===4)continue;
+      sel.innerHTML+="<option value='"+c.id+"'>"+esc(c.name)+"</option>"
+    }
+  }else{
+    sel.innerHTML="<option value=''>loading channels...</option>";
+    api({action:"channels"},function(d){
+      if(d.error)return;
+      allChannels=d.channels||[];
+      populateInviteChannelSelect();
+    });
+  }
 }
 function createInvite(){
   var channelId=g("inviteChannel").value;
