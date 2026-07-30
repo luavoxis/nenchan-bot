@@ -2064,7 +2064,8 @@ var allDmChannels=[];
 // --- DM Channel List ---
 function loadDmChannels(){
   api({action:"dm_channels"},function(d){
-    if(d.error||!d.channels)return;
+    if(d.error){g("dmChannelList").innerHTML="<p style='color:#d45555;padding:8px;font-size:11px'>"+esc(d.error)+"</p>";return}
+    if(!d.channels||!d.channels.length){g("dmChannelList").innerHTML="<p style='color:#5a5260;padding:8px;font-size:11px'>no DMs yet — send a message to the bot on Discord first</p>";return}
     var channels=d.channels;
     channels.sort(function(a,b){
       var al=(a.last_message_id||"0"),bl=(b.last_message_id||"0");
@@ -2587,8 +2588,12 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
     }
 
     if (body.action === "dm_channels") {
-      const channels = await discordFetch(`https://discord.com/api/v10/users/@me/channels`, { headers });
-      return res.json({ channels });
+      try {
+        const channels = await discordFetch(`https://discord.com/api/v10/users/@me/channels`, { headers });
+        return res.json({ channels });
+      } catch (e: any) {
+        return res.status(500).json({ error: e.message || "Failed to fetch DM channels" });
+      }
     }
 
     if (body.action === "dm_messages") {
