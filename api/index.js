@@ -930,6 +930,8 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .invite-members{color:#5a5260}
 .invite-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
 .invite-del:hover{background:#d45555;color:#fff}
+.invite-temp-label{color:#5a5260;font-size:10px;display:flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
+.invite-temp-label input{cursor:pointer}
 .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;max-height:300px;overflow-y:auto;padding:4px}
 .emoji-grid::-webkit-scrollbar{width:4px}
 .emoji-grid::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
@@ -1073,6 +1075,21 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 <div id="channelManageList"></div>
 </div>
 <div id="panel-invites" class="panel">
+<div class="create-form" id="inviteCreateForm">
+  <select id="inviteChannel"><option value="">select channel...</option></select>
+  <input type="number" id="inviteMaxUses" placeholder="max uses (0=unlimited)" min="0" value="0" style="max-width:90px"/>
+  <select id="inviteMaxAge">
+    <option value="1800">30 min</option>
+    <option value="3600">1 hour</option>
+    <option value="21600">6 hours</option>
+    <option value="43200">12 hours</option>
+    <option value="86400" selected>24 hours</option>
+    <option value="604800">7 days</option>
+    <option value="0">never</option>
+  </select>
+  <label class="invite-temp-label"><input type="checkbox" id="inviteTemporary"/> temp</label>
+  <button onclick="createInvite()">create</button>
+</div>
 <div id="inviteList"></div>
 </div>
 <div id="panel-emojis" class="panel">
@@ -2100,6 +2117,7 @@ function saveChannelEdit(){
 }
 function loadInvites(){
   g("inviteList").innerHTML="<p style='color:#6d6572;font-size:10px;text-align:center;padding:16px'>loading...</p>";
+  populateInviteChannelSelect();
   api({action:"invites"},function(d){
     if(d.error){g("inviteList").innerHTML="<p style='color:#d45555;font-size:10px'>"+esc(d.error)+"</p>";return}
     var invites=d.invites||[];
@@ -2140,6 +2158,23 @@ function loadInvites(){
       h+="</div>";
     }
     g("inviteList").innerHTML=h;
+  });
+}
+function populateInviteChannelSelect(){
+  var sel=g("inviteChannel");
+  if(!sel)return;
+  if(allChannels.length){sel.innerHTML="<option value=''>select channel...</option>";for(var i=0;i<allChannels.length;i++){var c=allChannels[i];if(c.type===4)continue;sel.innerHTML+="<option value='"+c.id+"'>"+esc(c.name)+"</option>"}}
+}
+function createInvite(){
+  var channelId=g("inviteChannel").value;
+  if(!channelId){showToast("select a channel","error");return}
+  var maxUses=parseInt(g("inviteMaxUses").value)||0;
+  if(maxUses<0)maxUses=0;
+  var maxAge=parseInt(g("inviteMaxAge").value)||0;
+  var temporary=g("inviteTemporary").checked;
+  api({action:"create_invite",channelId:channelId,max_uses:maxUses,max_age:maxAge,temporary:temporary},function(d){
+    if(d.success){showToast("invite created");loadInvites()}
+    else{showToast(d.error||"failed","error")}
   });
 }
 function deleteInvite(code){
@@ -3242,6 +3277,26 @@ async function handlePanel(res, body, req) {
         return res.json({ success: true });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to delete invite" });
+      }
+    }
+    if (body.action === "create_invite") {
+      if (!body.channelId) return res.status(400).json({ error: "No channel specified" });
+      try {
+        await discordFetch3(
+          `https://discord.com/api/v10/channels/${body.channelId}/invites`,
+          {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              max_age: typeof body.max_age === "number" ? body.max_age : 86400,
+              max_uses: typeof body.max_uses === "number" ? body.max_uses : 0,
+              temporary: !!body.temporary
+            })
+          }
+        );
+        return res.json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || "Failed to create invite" });
       }
     }
     if (body.action === "emojis") {
