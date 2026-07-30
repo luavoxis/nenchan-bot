@@ -2497,9 +2497,9 @@ function renderDmChannelList(channels){
     if(!recip)continue;
     var name=recip.global_name||recip.username;
     var avatar=recip.avatar?"https://cdn.discordapp.com/avatars/"+recip.id+"/"+recip.avatar+(recip.avatar.startsWith("a_")?".gif":".png"):"https://cdn.discordapp.com/embed/avatars/"+(parseInt(recip.discriminator||"0")%5)+".png";
-    h+="<div class='channel-item"+(currentDmChannel===ch.id?" selected":"")+"' onclick="pickDmChannel('"+ch.id+"')" data-name='"+esc(name.toLowerCase())+"'>";
-    h+="<img src='"+avatar+"' style='width:18px;height:18px;border-radius:50%;flex-shrink:0' alt='' loading='lazy'/>";
-    h+="<span class='ch-name'>"+esc(name)+"</span>";
+    h+="<div class=\\"channel-item"+(currentDmChannel===ch.id?" selected":"")+"\\" onclick=\\"pickDmChannel('"+ch.id+"')\\" data-name=\\""+esc(name.toLowerCase())+"\\">";
+    h+="<img src=\\""+avatar+"\\" style=\\"width:18px;height:18px;border-radius:50%;flex-shrink:0\\" alt=\\"\\" loading=\\"lazy\\"/>";
+    h+="<span class=\\"ch-name\\">"+esc(name)+"</span>";
     h+="</div>";
   }
   g("dmChannelList").innerHTML=h;
