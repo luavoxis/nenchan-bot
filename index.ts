@@ -1787,19 +1787,27 @@ function formatAuditAction(e,userName,roleMap){
   var d=e.changes||[];
   var target=e.target_id||"";
   var actions={
-    1:"created",2:"updated",3:"deleted",10:"kick",11:"prune",12:"ban",13:"unban",
-    14:"role update",15:"role create",16:"role delete",20:"invite create",21:"invite delete",
-    22:"webhook create",23:"webhook update",24:"webhook delete",25:"emoji create",26:"emoji update",27:"emoji delete",
-    28:"message delete",29:"bulk delete",30:"channel create",31:"channel update",32:"channel overwrite create",
-    33:"channel overwrite update",34:"channel overwrite delete",35:"member role update",36:"member move",
-    37:"member disconnect",38:"bot add",39:"role update",40:"role move",42:"members prune",
-    43:"connection create",44:"connection update",45:"connection delete",46:"bot remove",47:"integration create",
-    48:"integration update",49:"integration delete",50:"stage create",51:"stage update",52:"stage delete",
-    53:"sticker create",54:"sticker update",55:"sticker delete",56:"scheduled event create",
-    57:"scheduled event update",58:"scheduled event delete",61:"thread create",62:"thread update",63:"thread delete",
-    64:"permission create",65:"permission update",66:"permission delete",67:"auto moderation rule create",
-    68:"auto moderation rule update",69:"auto moderation rule delete",70:"auto moderation block message",
-    71:"auto moderation flag to channel",72:"auto moderation member communication disabled"
+    1:"guild update",
+    10:"channel create",11:"channel update",12:"channel delete",
+    13:"overwrite create",14:"overwrite update",15:"overwrite delete",
+    20:"kick",21:"prune",22:"ban",23:"unban",
+    24:"member update",25:"member role update",26:"member move",
+    27:"member disconnect",28:"bot add",
+    30:"role create",31:"role update",32:"role delete",
+    40:"invite create",41:"invite update",42:"invite delete",
+    50:"webhook create",51:"webhook update",52:"webhook delete",
+    60:"emoji create",61:"emoji update",62:"emoji delete",
+    72:"message delete",73:"bulk delete",74:"message pin",75:"message unpin",
+    80:"integration create",81:"integration update",82:"integration delete",
+    83:"stage create",84:"stage update",85:"stage delete",
+    90:"sticker create",91:"sticker update",92:"sticker delete",
+    100:"scheduled event create",101:"scheduled event update",102:"scheduled event delete",
+    110:"thread create",111:"thread update",112:"thread delete",
+    121:"permission update",
+    130:"soundboard create",131:"soundboard update",132:"soundboard delete",
+    140:"auto mod rule create",141:"auto mod rule update",142:"auto mod rule delete",
+    143:"auto mod block",144:"auto mod flag",145:"auto mod mute",
+    146:"auto mod quarantine"
   };
   var actionStr=actions[e.action_type]||"action #"+e.action_type;
   var result="<b>"+esc(userName)+"</b> <span class='hl'>"+esc(actionStr)+"</span>";
