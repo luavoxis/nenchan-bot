@@ -2486,7 +2486,7 @@ var allDmChannels=[];
 function loadDmChannels(){
   api({action:"dm_channels"},function(d){
     if(d.error){g("dmChannelList").innerHTML="<p style='color:#d45555;padding:8px;font-size:11px'>"+esc(d.error)+"</p>";return}
-    if(!d.channels||!d.channels.length){g("dmChannelList").innerHTML="<p style='color:#5a5260;padding:8px;font-size:11px'>no DMs yet \u2014 send a message to the bot on Discord first</p>";return}
+    if(!d.channels||!d.channels.length){g("dmChannelList").innerHTML="<p style='color:#5a5260;padding:8px;font-size:11px'>no DMs found</p><div style='padding:6px 8px;border-top:1px solid #252a32'><input id='dmUserIdInput' placeholder='enter user ID...' style='width:100%;padding:4px 6px;border:1px solid #2e343c;border-radius:4px;background:#13161b;color:#c0bcc4;font:11px monospace;outline:none;box-sizing:border-box' onkeydown='if(event.key==&quot;Enter&quot;)startDmWithUser()'/><div style='margin-top:4px'><button onclick='startDmWithUser()' style='padding:3px 10px;background:#b48899;color:#13161b;border:none;border-radius:4px;font-size:10px;cursor:pointer'>start DM</button></div></div>";return}
     var channels=d.channels;
     channels.sort(function(a,b){
       var al=(a.last_message_id||"0"),bl=(b.last_message_id||"0");
@@ -2494,6 +2494,17 @@ function loadDmChannels(){
     });
     allDmChannels=channels;
     renderDmChannelList(channels);
+  });
+}
+function startDmWithUser(){
+  var inp=g("dmUserIdInput");if(!inp)return;
+  var uid=inp.value.trim();
+  if(!uid||uid.length<17)return;
+  inp.disabled=true;
+  inp.value="opening DM...";
+  api({action:"dm_send",userId:uid,content:""},function(d){
+    if(d.success&&d.channelId){pickDmChannel(d.channelId)}
+    else{showToast(d.error||"failed to open DM","error");inp.disabled=false;inp.value=uid}
   });
 }
 function renderDmChannelList(channels){
@@ -3003,38 +3014,46 @@ async function handlePanel(res, body, req) {
       let channelId = body.channelId;
       if (!channelId && body.userId) {
         if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
-        const ch = await discordFetch3(`https://discord.com/api/v10/users/@me/channels`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ recipient_id: body.userId })
-        });
-        channelId = ch.id;
+        try {
+          const ch = await discordFetch3(`https://discord.com/api/v10/users/@me/channels`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ recipient_id: body.userId })
+          });
+          channelId = ch.id;
+        } catch (e) {
+          return res.status(500).json({ error: e.message || "Failed to create DM channel" });
+        }
       }
       if (!channelId) return res.status(400).json({ error: "No channel or user specified" });
       if (channelId && !isValidSnowflake(channelId)) return res.status(400).json({ error: "Invalid channel ID" });
-      if (body.content || body.fileData) {
-        const content = validateContent(body.content);
-        if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
-        const form = new FormData();
-        form.append("content", content);
-        const file = validateFileUpload(body.fileData, body.fileName, body.fileType);
-        if (file) form.append("file", file.blob, file.name);
-        const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
-          method: "POST",
-          headers: { ...headers },
-          body: form
-        });
-        if (!response.ok) {
-          let msg = `HTTP ${response.status}`;
-          try {
-            const d = await response.json();
-            msg = d.message || msg;
-          } catch {
+      try {
+        if (body.content || body.fileData) {
+          const content = validateContent(body.content);
+          if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
+          const form = new FormData();
+          form.append("content", content);
+          const file = validateFileUpload(body.fileData, body.fileName, body.fileType);
+          if (file) form.append("file", file.blob, file.name);
+          const response = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+            method: "POST",
+            headers: { ...headers },
+            body: form
+          });
+          if (!response.ok) {
+            let msg = `HTTP ${response.status}`;
+            try {
+              const d = await response.json();
+              msg = d.message || msg;
+            } catch {
+            }
+            return res.status(500).json({ error: msg });
           }
-          throw new Error(msg);
         }
+        return res.json({ success: true, channelId });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || "Failed to send DM" });
       }
-      return res.json({ success: true, channelId });
     }
     if (body.action === "ban") {
       const userId = body.userId;
