@@ -515,12 +515,19 @@ function logRequest(method, path, action, ip, status) {
 }
 async function discordFetch3(url, opts = {}) {
   const u = new URL(url);
-  const mod = u.protocol === "https:" ? await import("https") : await import("http");
+  const http = await (u.protocol === "https:" ? import("https") : import("http"));
+  const options = {
+    hostname: u.hostname,
+    port: u.port || (u.protocol === "https:" ? 443 : 80),
+    path: u.pathname + u.search,
+    method: opts.method || "GET",
+    headers: { ...opts.headers }
+  };
+  if (opts.body) {
+    options.headers["Content-Type"] = "application/json";
+  }
   return new Promise((resolve, reject) => {
-    const req = mod.request(u, {
-      method: opts.method || "GET",
-      headers: opts.body ? { "Content-Type": "application/json", ...opts.headers } : { ...opts.headers }
-    }, (res) => {
+    const req = http.request(options, (res) => {
       let body = "";
       res.on("data", (chunk) => body += chunk);
       res.on("end", () => {
