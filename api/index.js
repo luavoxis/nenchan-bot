@@ -2824,13 +2824,11 @@ ${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
 }
 async function handleOAuthCallback(req, res, code) {
   try {
-    const stateCookie = (req.headers.cookie || "").match(/oauth_state=([^;]+)/)?.[1] || "";
     const stateParam = req.query.state || "";
-    if (!stateParam || !stateCookie || !verifyState(stateParam) || stateParam !== stateCookie) {
+    if (!stateParam || !verifyState(stateParam)) {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       return res.status(403).send("<html><body style='background:#13161b;color:#d45555;font-family:monospace;display:flex;justify-content:center;align-items:center;height:100vh'><div style='text-align:center'><h1>Invalid State</h1><p style='color:#7d7582'>CSRF validation failed.</p><a href='/api' style='color:#b48899'>&larr; back</a></div></body></html>");
     }
-    res.setHeader("Set-Cookie", "oauth_state=; Path=/; Max-Age=0; SameSite=Strict; HttpOnly; Secure");
     const params = new URLSearchParams({
       client_id: DISCORD_APP_ID,
       client_secret: DISCORD_CLIENT_SECRET,
