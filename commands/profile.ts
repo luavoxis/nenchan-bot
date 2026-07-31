@@ -57,20 +57,11 @@ export default {
       };
     }
 
-    const resolved = data.interaction.data.resolved?.users?.[userId];
-    const displayName = resolved?.username || user.global_name || user.username;
-
     return {
       embeds: [
         {
           color: user.accent_color || 0xC9A0DC,
-          title: `${displayName}'s profile picture`,
-          fields: [
-            { name: "Username", value: `@${user.username}`, inline: true },
-            { name: "ID", value: `\`${user.id}\``, inline: true },
-          ],
           image: { url: avatarUrl(user) },
-          footer: user.bot ? { text: "Bot account" } : undefined,
         },
       ],
     };

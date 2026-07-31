@@ -57,21 +57,15 @@ var discordHeaders = {
 };
 
 // commands/userinfo.ts
-function snowflakeToDate(id) {
-  const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
-  return new Date(timestamp).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
+function snowflakeTimestamp(id) {
+  return Number(BigInt(id) >> 22n) + 14200704e5;
+}
+function relative(ms) {
+  return `<t:${Math.floor(ms / 1e3)}:R>`;
 }
 function formatDate(iso) {
   try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    return relative(new Date(iso).getTime());
   } catch {
     return iso;
   }
@@ -82,6 +76,32 @@ function avatarUrl(user) {
   }
   const ext = user.avatar.startsWith("a_") ? "gif" : "png";
   return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
+}
+var ACCENT = 13213916;
+var separator = () => ({ name: "\u200B", value: "\u200B", inline: false });
+function getBadges(user) {
+  const flags = user.public_flags ?? 0;
+  const flagMap = [
+    [0, "Discord Staff"],
+    [1, "Partner"],
+    [2, "HypeSquad Events"],
+    [3, "Bug Hunter Lv1"],
+    [6, "HypeSquad Bravery"],
+    [7, "HypeSquad Brilliance"],
+    [8, "HypeSquad Balance"],
+    [9, "Early Supporter"],
+    [10, "Team User"],
+    [14, "Bug Hunter Lv2"],
+    [16, "Verified Bot Dev"],
+    [17, "Certified Moderator"],
+    [18, "Bot HTTP Interactions"],
+    [19, "Active Developer"]
+  ];
+  const badges = [];
+  for (const [bit, label] of flagMap) {
+    if (flags & 1 << bit) badges.push(label);
+  }
+  return badges;
 }
 var userinfo_default = {
   data: {
@@ -111,42 +131,22 @@ var userinfo_default = {
         flags: MessageFlags.Ephemeral
       };
     }
-    const fields = [
-      { name: "Username", value: `@${user.username}`, inline: true },
-      { name: "Display Name", value: user.global_name || user.username, inline: true },
-      { name: "ID", value: `\`${user.id}\``, inline: false },
-      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
-      { name: "Joined Discord", value: snowflakeToDate(user.id), inline: true }
-    ];
-    if (user.accent_color) {
-      fields.push({
-        name: "Accent Color",
-        value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
-        inline: true
-      });
-    }
-    const badges = [];
-    const flags = user.public_flags ?? 0;
-    const flagMap = [
-      [0, "Discord Staff"],
-      [1, "Partner"],
-      [2, "HypeSquad Events"],
-      [3, "Bug Hunter Lv1"],
-      [6, "HypeSquad Bravery"],
-      [7, "HypeSquad Brilliance"],
-      [8, "HypeSquad Balance"],
-      [9, "Early Supporter"],
-      [10, "Team User"],
-      [14, "Bug Hunter Lv2"],
-      [16, "Verified Bot Dev"],
-      [17, "Certified Moderator"],
-      [18, "Bot HTTP Interactions"],
-      [19, "Active Developer"]
-    ];
-    for (const [bit, label] of flagMap) {
-      if (flags & 1 << bit) badges.push(label);
-    }
+    const displayName = user.global_name || user.username;
+    const badges = getBadges(user);
+    const color = user.accent_color || ACCENT;
+    const fields = [];
+    fields.push({ name: "Username", value: `@${user.username}`, inline: true });
+    fields.push({ name: "Display Name", value: displayName, inline: true });
+    fields.push({ name: "Bot", value: user.bot ? "Yes" : "No", inline: true });
+    fields.push({ name: "User ID", value: `\`${user.id}\``, inline: true });
+    fields.push({ name: "Created", value: relative(snowflakeTimestamp(user.id)), inline: true });
+    fields.push({
+      name: "Accent Color",
+      value: `\`#${(user.accent_color || ACCENT).toString(16).padStart(6, "0")}\``,
+      inline: true
+    });
     if (badges.length) {
+      fields.push(separator());
       fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
     try {
@@ -154,38 +154,41 @@ var userinfo_default = {
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
         { headers: discordHeaders }
       );
-      fields.splice(2, 0, {
-        name: "Nickname",
-        value: member.nick || "None",
+      fields.push(separator());
+      fields.push({ name: "Nickname", value: member.nick || "None", inline: true });
+      fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
+      const allRoles = await discordFetch(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
+        { headers: discordHeaders }
+      );
+      const memberRoles = (Array.isArray(allRoles) ? allRoles : []).filter((r) => member.roles.includes(r.id)).sort((a, b) => b.position - a.position);
+      fields.push({
+        name: "Highest Role",
+        value: memberRoles[0] ? `<@&${memberRoles[0].id}>` : "None",
         inline: true
       });
-      fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
-      try {
-        const allRoles = await discordFetch(
-          `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
-          { headers: discordHeaders }
-        );
-        const memberRoles = (Array.isArray(allRoles) ? allRoles : []).filter((r) => member.roles.includes(r.id)).sort((a, b) => b.position - a.position);
-        fields.push({ name: "Highest Role", value: memberRoles[0]?.name || "None", inline: true });
-        const roleMentions = memberRoles.slice(0, 10).map((r) => `<@&${r.id}>`).join(" ");
-        const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} more*` : roleMentions || "None";
-        fields.push({ name: "Roles", value: roleSummary, inline: false });
-      } catch {
-        fields.push({ name: "Roles", value: "*Could not fetch roles*", inline: false });
+      const roleMentions = memberRoles.slice(0, 10).map((r) => `<@&${r.id}>`).join(" ");
+      const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} more*` : roleMentions || "None";
+      fields.push({ name: "Roles", value: roleSummary, inline: false });
+    } catch (e) {
+      if (e.status !== 404) {
+        fields.push(separator());
+        fields.push({
+          name: "Note",
+          value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
+          inline: false
+        });
       }
-    } catch {
-      fields.push({
-        name: "Note",
-        value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
-        inline: false
-      });
     }
     return {
       embeds: [
         {
-          color: user.accent_color || 13213916,
+          color,
+          author: { name: `@${user.username}`, icon_url: avatarUrl(user) },
           thumbnail: { url: avatarUrl(user) },
-          fields
+          fields,
+          footer: { text: `User ID: ${user.id}` },
+          timestamp: (/* @__PURE__ */ new Date()).toISOString()
         }
       ]
     };
@@ -380,19 +383,11 @@ var profile_default = {
         flags: MessageFlags3.Ephemeral
       };
     }
-    const resolved = data.interaction.data.resolved?.users?.[userId];
-    const displayName = resolved?.username || user.global_name || user.username;
     return {
       embeds: [
         {
           color: user.accent_color || 13213916,
-          title: `${displayName}'s profile picture`,
-          fields: [
-            { name: "Username", value: `@${user.username}`, inline: true },
-            { name: "ID", value: `\`${user.id}\``, inline: true }
-          ],
-          image: { url: avatarUrl2(user) },
-          footer: user.bot ? { text: "Bot account" } : void 0
+          image: { url: avatarUrl2(user) }
         }
       ]
     };
