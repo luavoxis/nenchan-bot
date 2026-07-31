@@ -3291,7 +3291,7 @@ async function handlePanel(res, body, req) {
       if (!body.inviteCode) return res.status(400).json({ error: "No invite code" });
       try {
         await discordFetch3(
-          `https://discord.com/api/v10/guilds/${guildId}/invites/${encodeURIComponent(body.inviteCode)}`,
+          `https://discord.com/api/v10/invites/${encodeURIComponent(body.inviteCode)}`,
           { method: "DELETE", headers }
         );
         return res.json({ success: true });

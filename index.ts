@@ -2910,7 +2910,7 @@ async function handlePanel(res: VercelResponse, body: any, req: VercelRequest) {
       if (!body.inviteCode) return res.status(400).json({ error: "No invite code" });
       try {
         await discordFetch(
-          `https://discord.com/api/v10/guilds/${guildId}/invites/${encodeURIComponent(body.inviteCode)}`,
+          `https://discord.com/api/v10/invites/${encodeURIComponent(body.inviteCode)}`,
           { method: "DELETE", headers },
         );
         return res.json({ success: true });
