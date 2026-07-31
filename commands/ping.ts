@@ -7,14 +7,14 @@ import type {
 export default {
   data: {
     name: "ping",
-    description: "Bot çevrimiçi mi ve gecikme ne kadar?",
+    description: "Checks if the bot is online and shows latency",
   } as CommandData,
   async execute(data: {
     interaction: SimplifiedInteraction;
   }): CommandExecuteResult {
     const start = Date.now();
     return {
-      content: `Pong! Gecikme: **${Date.now() - start}ms**`,
+      content: `Pong! Latency: **${Date.now() - start}ms**`,
     };
   },
 };

@@ -12,11 +12,11 @@ import type {
 export default {
   data: {
     name: "banner",
-    description: "Bir kullanıcının banner'ını gösterir",
+    description: "Shows a user's banner",
     options: [
       {
         name: "user",
-        description: "Banner'ını görmek istediğin kullanıcı",
+        description: "The user whose banner you want to see",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
@@ -31,7 +31,7 @@ export default {
 
     if (!userId) {
       return {
-        content: "Bir kullanıcı belirtmelisin.",
+        content: "You must specify a user.",
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -44,7 +44,7 @@ export default {
       );
     } catch (e: any) {
       return {
-        content: e.status === 404 ? "Kullanıcı bulunamadı." : `Banner alınamadı: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch banner: ${e.message || e}`,
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -52,7 +52,7 @@ export default {
     if (!user.banner) {
       const displayName = user.global_name || user.username;
       return {
-        content: `**@${displayName}**'in bir banner'ı yok.`,
+        content: `**@${displayName}** doesn't have a banner.`,
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -64,7 +64,7 @@ export default {
       embeds: [
         {
           color: user.accent_color || 0xC9A0DC,
-          title: `${user.global_name || user.username} banner'ı`,
+          title: `${user.global_name || user.username}'s banner`,
           image: { url: bannerUrl },
         },
       ],

@@ -20,11 +20,11 @@ function avatarUrl(user: any): string {
 export default {
   data: {
     name: "profile",
-    description: "Bir kullanıcının profil fotoğrafını gösterir",
+    description: "Shows a user's profile picture",
     options: [
       {
         name: "user",
-        description: "Profilini görmek istediğin kullanıcı",
+        description: "The user whose profile you want to see",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
@@ -39,7 +39,7 @@ export default {
 
     if (!userId) {
       return {
-        content: "Bir kullanıcı belirtmelisin.",
+        content: "You must specify a user.",
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -52,7 +52,7 @@ export default {
       );
     } catch (e: any) {
       return {
-        content: e.status === 404 ? "Kullanıcı bulunamadı." : `Profil alınamadı: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch profile: ${e.message || e}`,
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -64,13 +64,13 @@ export default {
       embeds: [
         {
           color: user.accent_color || 0xC9A0DC,
-          title: `${displayName} profil fotoğrafı`,
+          title: `${displayName}'s profile picture`,
           fields: [
-            { name: "Kullanıcı Adı", value: `@${user.username}`, inline: true },
+            { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true },
           ],
           image: { url: avatarUrl(user) },
-          footer: user.bot ? { text: "Bot hesabı" } : undefined,
+          footer: user.bot ? { text: "Bot account" } : undefined,
         },
       ],
     };

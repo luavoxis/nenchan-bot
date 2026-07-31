@@ -13,17 +13,17 @@ import type {
 export default {
   data: {
     name: "kick",
-    description: "Bir kullanıcıyı sunucudan atar",
+    description: "Kicks a user from the server",
     options: [
       {
         name: "user",
-        description: "Atılacak kullanıcı",
+        description: "The user to kick",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "reason",
-        description: "Atma sebebi",
+        description: "Reason for the kick",
         type: ApplicationCommandOptionType.String,
         required: false,
       },
@@ -34,13 +34,13 @@ export default {
   }): CommandExecuteResult {
     const interaction = data.interaction;
     const userId = findTargetId(interaction);
-    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "No reason provided";
 
     if (!userId) {
-      return { content: "Bir kullanıcı belirtmelisin.", flags: MessageFlags.Ephemeral };
+      return { content: "You must specify a user.", flags: MessageFlags.Ephemeral };
     }
     if (userId === interaction.member.user.id) {
-      return { content: "Kendini atamazsın.", flags: MessageFlags.Ephemeral };
+      return { content: "You can't kick yourself.", flags: MessageFlags.Ephemeral };
     }
 
     const denied = await checkModPermission(interaction, Perm.KickMembers);
@@ -57,14 +57,14 @@ export default {
       );
       const name = resolved?.username || userId;
       return {
-        content: `**@${name}** sunucudan atıldı.\nSebep: *${reason}*`,
+        content: `**@${name}** was kicked from the server.\nReason: *${reason}*`,
         flags: MessageFlags.Ephemeral,
       };
     } catch (e: any) {
       if (e.status === 403) {
-        return { content: "Atma yetkisi yok veya hedef kullanıcı senden daha yüksek bir role sahip.", flags: MessageFlags.Ephemeral };
+        return { content: "No permission to kick, or the target user has a higher role than you.", flags: MessageFlags.Ephemeral };
       }
-      return { content: `Atma başarısız: ${e.message || e}`, flags: MessageFlags.Ephemeral };
+      return { content: `Kick failed: ${e.message || e}`, flags: MessageFlags.Ephemeral };
     }
   },
 };

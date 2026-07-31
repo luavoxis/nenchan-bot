@@ -13,17 +13,17 @@ import type {
 export default {
   data: {
     name: "ban",
-    description: "Bir kullanıcıyı sunucudan yasaklar",
+    description: "Bans a user from the server",
     options: [
       {
         name: "user",
-        description: "Yasaklanacak kullanıcı",
+        description: "The user to ban",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
       {
         name: "reason",
-        description: "Yasaklama sebebi",
+        description: "Reason for the ban",
         type: ApplicationCommandOptionType.String,
         required: false,
       },
@@ -34,13 +34,13 @@ export default {
   }): CommandExecuteResult {
     const interaction = data.interaction;
     const userId = findTargetId(interaction);
-    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "No reason provided";
 
     if (!userId) {
-      return { content: "Bir kullanıcı belirtmelisin.", flags: MessageFlags.Ephemeral };
+      return { content: "You must specify a user.", flags: MessageFlags.Ephemeral };
     }
     if (userId === interaction.member.user.id) {
-      return { content: "Kendini yasaklayamazsın.", flags: MessageFlags.Ephemeral };
+      return { content: "You can't ban yourself.", flags: MessageFlags.Ephemeral };
     }
 
     const denied = await checkModPermission(interaction, Perm.BanMembers);
@@ -58,14 +58,14 @@ export default {
       );
       const name = resolved?.username || userId;
       return {
-        content: `**@${name}** yasaklandı.\nSebep: *${reason}*`,
+        content: `**@${name}** was banned.\nReason: *${reason}*`,
         flags: MessageFlags.Ephemeral,
       };
     } catch (e: any) {
       if (e.status === 403) {
-        return { content: "Yasaklama yetkisi yok veya hedef kullanıcı senden daha yüksek bir role sahip.", flags: MessageFlags.Ephemeral };
+        return { content: "No permission to ban, or the target user has a higher role than you.", flags: MessageFlags.Ephemeral };
       }
-      return { content: `Yasaklama başarısız: ${e.message || e}`, flags: MessageFlags.Ephemeral };
+      return { content: `Ban failed: ${e.message || e}`, flags: MessageFlags.Ephemeral };
     }
   },
 };

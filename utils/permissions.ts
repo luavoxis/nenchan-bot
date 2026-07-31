@@ -16,15 +16,15 @@ export function hasPerm(permissions: string | bigint | undefined, perm: bigint):
   }
 }
 
-const TURKISH_NAMES: Record<bigint, string> = {
-  [Perm.KickMembers]: "Üyeleri At",
-  [Perm.BanMembers]: "Üyeleri Yasakla",
-  [Perm.ManageMessages]: "Mesajları Yönet",
-  [Perm.ModerateMembers]: "Üyeleri Kısıkla",
+const PERM_NAMES: Record<bigint, string> = {
+  [Perm.KickMembers]: "Kick Members",
+  [Perm.BanMembers]: "Ban Members",
+  [Perm.ManageMessages]: "Manage Messages",
+  [Perm.ModerateMembers]: "Moderate Members",
 };
 
 export function permName(perm: bigint): string {
-  return TURKISH_NAMES[perm] || "Gerekli Yetki";
+  return PERM_NAMES[perm] || "Required Permission";
 }
 
 export async function getGuildPermissions(
@@ -57,11 +57,11 @@ export async function checkModPermission(
   required: bigint,
 ): Promise<string | null> {
   if (!hasPerm(interaction.member.permissions, required)) {
-    return `Bu işlemi yapmak için **${permName(required)}** yetkine sahip olmalısın.`;
+    return `You need the **${permName(required)}** permission to do this.`;
   }
   const botPerms = await getGuildPermissions(interaction.guild_id, interaction.application_id);
   if (!hasPerm(botPerms, required)) {
-    return `Botun **${permName(required)}** yetkisi yok. Botu sunucudan çıkarıp tekrar davet etmelisin.`;
+    return `The bot is missing the **${permName(required)}** permission. Remove and re-invite the bot.`;
   }
   return null;
 }

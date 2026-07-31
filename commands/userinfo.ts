@@ -11,7 +11,7 @@ import type {
 
 function snowflakeToDate(id: string): string {
   const timestamp = Number(BigInt(id) >> 22n) + 1420070400000;
-  return new Date(timestamp).toLocaleDateString("tr-TR", {
+  return new Date(timestamp).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -20,7 +20,7 @@ function snowflakeToDate(id: string): string {
 
 function formatDate(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString("tr-TR", {
+    return new Date(iso).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -41,11 +41,11 @@ function avatarUrl(user: any): string {
 export default {
   data: {
     name: "userinfo",
-    description: "Bir kullanıcı hakkında detaylı bilgi gösterir",
+    description: "Shows detailed information about a user",
     options: [
       {
         name: "user",
-        description: "Bakılacak kullanıcı (varsayılan: sen)",
+        description: "The user to look up (defaults to you)",
         type: ApplicationCommandOptionType.User,
         required: false,
       },
@@ -67,22 +67,22 @@ export default {
       );
     } catch (e: any) {
       return {
-        content: e.status === 404 ? "Kullanıcı bulunamadı." : `Kullanıcı bilgisi alınamadı: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch user info: ${e.message || e}`,
         flags: MessageFlags.Ephemeral,
       };
     }
 
     const fields: Array<{ name: string; value: string; inline: boolean }> = [
-      { name: "Kullanıcı Adı", value: `@${user.username}`, inline: true },
-      { name: "Görünen Ad", value: user.global_name || user.username, inline: true },
+      { name: "Username", value: `@${user.username}`, inline: true },
+      { name: "Display Name", value: user.global_name || user.username, inline: true },
       { name: "ID", value: `\`${user.id}\``, inline: false },
-      { name: "Bot", value: user.bot ? "Evet" : "Hayır", inline: true },
-      { name: "Discord'a Katılış", value: snowflakeToDate(user.id), inline: true },
+      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
+      { name: "Joined Discord", value: snowflakeToDate(user.id), inline: true },
     ];
 
     if (user.accent_color) {
       fields.push({
-        name: "Vurgu Rengi",
+        name: "Accent Color",
         value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
         inline: true,
       });
@@ -110,7 +110,7 @@ export default {
       if (flags & (1 << bit)) badges.push(label);
     }
     if (badges.length) {
-      fields.push({ name: "Rozetler", value: badges.join(", "), inline: false });
+      fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
 
     try {
@@ -120,11 +120,11 @@ export default {
       );
 
       fields.splice(2, 0, {
-        name: "Takma Ad",
-        value: member.nick || "Yok",
+        name: "Nickname",
+        value: member.nick || "None",
         inline: true,
       });
-      fields.push({ name: "Sunucuya Katılış", value: formatDate(member.joined_at), inline: true });
+      fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
 
       try {
         const allRoles = await discordFetch(
@@ -135,21 +135,21 @@ export default {
           .filter((r: any) => (member.roles as string[]).includes(r.id))
           .sort((a: any, b: any) => b.position - a.position);
 
-        fields.push({ name: "En Yüksek Rol", value: memberRoles[0]?.name || "Yok", inline: true });
+        fields.push({ name: "Highest Role", value: memberRoles[0]?.name || "None", inline: true });
 
         const roleMentions = memberRoles.slice(0, 10).map((r: any) => `<@&${r.id}>`).join(" ");
         const roleSummary =
           memberRoles.length > 10
-            ? `${roleMentions} *+${memberRoles.length - 10} tane daha*`
-            : roleMentions || "Yok";
-        fields.push({ name: "Roller", value: roleSummary, inline: false });
+            ? `${roleMentions} *+${memberRoles.length - 10} more*`
+            : roleMentions || "None";
+        fields.push({ name: "Roles", value: roleSummary, inline: false });
       } catch {
-        fields.push({ name: "Roller", value: "*Roller alınamadı*", inline: false });
+        fields.push({ name: "Roles", value: "*Could not fetch roles*", inline: false });
       }
     } catch {
       fields.push({
-        name: "Not",
-        value: "*Sunucu üye verisi alınamadı - botun **Server Members Intent** özelliğinin açık olduğundan emin ol.*",
+        name: "Note",
+        value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
         inline: false,
       });
     }

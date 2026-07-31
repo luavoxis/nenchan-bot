@@ -59,7 +59,7 @@ var discordHeaders = {
 // commands/userinfo.ts
 function snowflakeToDate(id) {
   const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
-  return new Date(timestamp).toLocaleDateString("tr-TR", {
+  return new Date(timestamp).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric"
@@ -67,7 +67,7 @@ function snowflakeToDate(id) {
 }
 function formatDate(iso) {
   try {
-    return new Date(iso).toLocaleDateString("tr-TR", {
+    return new Date(iso).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric"
@@ -86,11 +86,11 @@ function avatarUrl(user) {
 var userinfo_default = {
   data: {
     name: "userinfo",
-    description: "Bir kullan\u0131c\u0131 hakk\u0131nda detayl\u0131 bilgi g\xF6sterir",
+    description: "Shows detailed information about a user",
     options: [
       {
         name: "user",
-        description: "Bak\u0131lacak kullan\u0131c\u0131 (varsay\u0131lan: sen)",
+        description: "The user to look up (defaults to you)",
         type: ApplicationCommandOptionType.User,
         required: false
       }
@@ -107,20 +107,20 @@ var userinfo_default = {
       );
     } catch (e) {
       return {
-        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Kullan\u0131c\u0131 bilgisi al\u0131namad\u0131: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch user info: ${e.message || e}`,
         flags: MessageFlags.Ephemeral
       };
     }
     const fields = [
-      { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
-      { name: "G\xF6r\xFCnen Ad", value: user.global_name || user.username, inline: true },
+      { name: "Username", value: `@${user.username}`, inline: true },
+      { name: "Display Name", value: user.global_name || user.username, inline: true },
       { name: "ID", value: `\`${user.id}\``, inline: false },
-      { name: "Bot", value: user.bot ? "Evet" : "Hay\u0131r", inline: true },
-      { name: "Discord'a Kat\u0131l\u0131\u015F", value: snowflakeToDate(user.id), inline: true }
+      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
+      { name: "Joined Discord", value: snowflakeToDate(user.id), inline: true }
     ];
     if (user.accent_color) {
       fields.push({
-        name: "Vurgu Rengi",
+        name: "Accent Color",
         value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
         inline: true
       });
@@ -147,7 +147,7 @@ var userinfo_default = {
       if (flags & 1 << bit) badges.push(label);
     }
     if (badges.length) {
-      fields.push({ name: "Rozetler", value: badges.join(", "), inline: false });
+      fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
     try {
       const member = await discordFetch(
@@ -155,28 +155,28 @@ var userinfo_default = {
         { headers: discordHeaders }
       );
       fields.splice(2, 0, {
-        name: "Takma Ad",
-        value: member.nick || "Yok",
+        name: "Nickname",
+        value: member.nick || "None",
         inline: true
       });
-      fields.push({ name: "Sunucuya Kat\u0131l\u0131\u015F", value: formatDate(member.joined_at), inline: true });
+      fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
       try {
         const allRoles = await discordFetch(
           `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
           { headers: discordHeaders }
         );
         const memberRoles = (Array.isArray(allRoles) ? allRoles : []).filter((r) => member.roles.includes(r.id)).sort((a, b) => b.position - a.position);
-        fields.push({ name: "En Y\xFCksek Rol", value: memberRoles[0]?.name || "Yok", inline: true });
+        fields.push({ name: "Highest Role", value: memberRoles[0]?.name || "None", inline: true });
         const roleMentions = memberRoles.slice(0, 10).map((r) => `<@&${r.id}>`).join(" ");
-        const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} tane daha*` : roleMentions || "Yok";
-        fields.push({ name: "Roller", value: roleSummary, inline: false });
+        const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} more*` : roleMentions || "None";
+        fields.push({ name: "Roles", value: roleSummary, inline: false });
       } catch {
-        fields.push({ name: "Roller", value: "*Roller al\u0131namad\u0131*", inline: false });
+        fields.push({ name: "Roles", value: "*Could not fetch roles*", inline: false });
       }
     } catch {
       fields.push({
-        name: "Not",
-        value: "*Sunucu \xFCye verisi al\u0131namad\u0131 - botun **Server Members Intent** \xF6zelli\u011Finin a\xE7\u0131k oldu\u011Fundan emin ol.*",
+        name: "Note",
+        value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
         inline: false
       });
     }
@@ -212,14 +212,14 @@ function hasPerm(permissions, perm) {
     return false;
   }
 }
-var TURKISH_NAMES = {
-  [Perm.KickMembers]: "\xDCyeleri At",
-  [Perm.BanMembers]: "\xDCyeleri Yasakla",
-  [Perm.ManageMessages]: "Mesajlar\u0131 Y\xF6net",
-  [Perm.ModerateMembers]: "\xDCyeleri K\u0131s\u0131kla"
+var PERM_NAMES = {
+  [Perm.KickMembers]: "Kick Members",
+  [Perm.BanMembers]: "Ban Members",
+  [Perm.ManageMessages]: "Manage Messages",
+  [Perm.ModerateMembers]: "Moderate Members"
 };
 function permName(perm) {
-  return TURKISH_NAMES[perm] || "Gerekli Yetki";
+  return PERM_NAMES[perm] || "Required Permission";
 }
 async function getGuildPermissions(guildId, userId) {
   try {
@@ -244,11 +244,11 @@ async function getGuildPermissions(guildId, userId) {
 }
 async function checkModPermission(interaction, required) {
   if (!hasPerm(interaction.member.permissions, required)) {
-    return `Bu i\u015Flemi yapmak i\xE7in **${permName(required)}** yetkine sahip olmal\u0131s\u0131n.`;
+    return `You need the **${permName(required)}** permission to do this.`;
   }
   const botPerms = await getGuildPermissions(interaction.guild_id, interaction.application_id);
   if (!hasPerm(botPerms, required)) {
-    return `Botun **${permName(required)}** yetkisi yok. Botu sunucudan \xE7\u0131kar\u0131p tekrar davet etmelisin.`;
+    return `The bot is missing the **${permName(required)}** permission. Remove and re-invite the bot.`;
   }
   return null;
 }
@@ -258,24 +258,24 @@ function findTargetId(interaction, optionName = "user") {
 
 // commands/timeout.ts
 function formatMinutes(min) {
-  if (min < 60) return `${min} dakika`;
-  if (min < 1440) return `${Math.floor(min / 60)} saat ${min % 60 ? min % 60 + " dakika" : ""}`;
-  return `${Math.floor(min / 1440)} g\xFCn ${min % 1440 ? Math.floor(min % 1440 / 60) + " saat" : ""}`;
+  if (min < 60) return `${min} minute${min === 1 ? "" : "s"}`;
+  if (min < 1440) return `${Math.floor(min / 60)} hour${Math.floor(min / 60) === 1 ? "" : "s"}${min % 60 ? ` ${min % 60} minute${min % 60 === 1 ? "" : "s"}` : ""}`;
+  return `${Math.floor(min / 1440)} day${Math.floor(min / 1440) === 1 ? "" : "s"}${min % 1440 ? ` ${Math.floor(min % 1440 / 60)} hour${Math.floor(min % 1440 / 60) === 1 ? "" : "s"}` : ""}`;
 }
 var timeout_default = {
   data: {
     name: "timeout",
-    description: "Bir kullan\u0131c\u0131y\u0131 belirli bir s\xFCre susturur",
+    description: "Times out a user for a specified duration",
     options: [
       {
         name: "user",
-        description: "Susturulacak kullan\u0131c\u0131",
+        description: "The user to timeout",
         type: ApplicationCommandOptionType2.User,
         required: true
       },
       {
         name: "minutes",
-        description: "S\xFCre (dakika, 1-40320 yani 28 g\xFCn)",
+        description: "Duration in minutes (1-40320, i.e. 28 days)",
         type: ApplicationCommandOptionType2.Integer,
         required: true,
         min_value: 1,
@@ -283,7 +283,7 @@ var timeout_default = {
       },
       {
         name: "reason",
-        description: "Susturma sebebi",
+        description: "Reason for the timeout",
         type: ApplicationCommandOptionType2.String,
         required: false
       }
@@ -295,15 +295,15 @@ var timeout_default = {
     const minutes = Number(
       interaction.data.options?.find((o) => o.name === "minutes")?.value || 0
     );
-    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "No reason provided";
     if (!userId) {
-      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags2.Ephemeral };
+      return { content: "You must specify a user.", flags: MessageFlags2.Ephemeral };
     }
     if (minutes < 1) {
-      return { content: "S\xFCre en az 1 dakika olmal\u0131.", flags: MessageFlags2.Ephemeral };
+      return { content: "Duration must be at least 1 minute.", flags: MessageFlags2.Ephemeral };
     }
     if (userId === interaction.member.user.id) {
-      return { content: "Kendini susturamazs\u0131n.", flags: MessageFlags2.Ephemeral };
+      return { content: "You can't timeout yourself.", flags: MessageFlags2.Ephemeral };
     }
     const denied = await checkModPermission(interaction, Perm.ModerateMembers);
     if (denied) return { content: denied, flags: MessageFlags2.Ephemeral };
@@ -320,15 +320,15 @@ var timeout_default = {
       );
       const name = resolved?.username || userId;
       return {
-        content: `**@${name}** **${formatMinutes(minutes)}** s\xFCreyle susturuldu.
-Sebep: *${reason}*`,
+        content: `**@${name}** was timed out for **${formatMinutes(minutes)}**.
+Reason: *${reason}*`,
         flags: MessageFlags2.Ephemeral
       };
     } catch (e) {
       if (e.status === 403) {
-        return { content: "Susturma yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags2.Ephemeral };
+        return { content: "No permission to timeout, or the target user has a higher role than you.", flags: MessageFlags2.Ephemeral };
       }
-      return { content: `Susturma ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags2.Ephemeral };
+      return { content: `Timeout failed: ${e.message || e}`, flags: MessageFlags2.Ephemeral };
     }
   }
 };
@@ -348,11 +348,11 @@ function avatarUrl2(user) {
 var profile_default = {
   data: {
     name: "profile",
-    description: "Bir kullan\u0131c\u0131n\u0131n profil foto\u011Fraf\u0131n\u0131 g\xF6sterir",
+    description: "Shows a user's profile picture",
     options: [
       {
         name: "user",
-        description: "Profilini g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        description: "The user whose profile you want to see",
         type: ApplicationCommandOptionType3.User,
         required: true
       }
@@ -364,7 +364,7 @@ var profile_default = {
     )?.value;
     if (!userId) {
       return {
-        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
+        content: "You must specify a user.",
         flags: MessageFlags3.Ephemeral
       };
     }
@@ -376,7 +376,7 @@ var profile_default = {
       );
     } catch (e) {
       return {
-        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Profil al\u0131namad\u0131: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch profile: ${e.message || e}`,
         flags: MessageFlags3.Ephemeral
       };
     }
@@ -386,13 +386,13 @@ var profile_default = {
       embeds: [
         {
           color: user.accent_color || 13213916,
-          title: `${displayName} profil foto\u011Fraf\u0131`,
+          title: `${displayName}'s profile picture`,
           fields: [
-            { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
+            { name: "Username", value: `@${user.username}`, inline: true },
             { name: "ID", value: `\`${user.id}\``, inline: true }
           ],
           image: { url: avatarUrl2(user) },
-          footer: user.bot ? { text: "Bot hesab\u0131" } : void 0
+          footer: user.bot ? { text: "Bot account" } : void 0
         }
       ]
     };
@@ -403,12 +403,12 @@ var profile_default = {
 var ping_default = {
   data: {
     name: "ping",
-    description: "Bot \xE7evrimi\xE7i mi ve gecikme ne kadar?"
+    description: "Checks if the bot is online and shows latency"
   },
   async execute(data) {
     const start = Date.now();
     return {
-      content: `Pong! Gecikme: **${Date.now() - start}ms**`
+      content: `Pong! Latency: **${Date.now() - start}ms**`
     };
   }
 };
@@ -421,17 +421,17 @@ import {
 var kick_default = {
   data: {
     name: "kick",
-    description: "Bir kullan\u0131c\u0131y\u0131 sunucudan atar",
+    description: "Kicks a user from the server",
     options: [
       {
         name: "user",
-        description: "At\u0131lacak kullan\u0131c\u0131",
+        description: "The user to kick",
         type: ApplicationCommandOptionType4.User,
         required: true
       },
       {
         name: "reason",
-        description: "Atma sebebi",
+        description: "Reason for the kick",
         type: ApplicationCommandOptionType4.String,
         required: false
       }
@@ -440,12 +440,12 @@ var kick_default = {
   async execute(data) {
     const interaction = data.interaction;
     const userId = findTargetId(interaction);
-    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "No reason provided";
     if (!userId) {
-      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags4.Ephemeral };
+      return { content: "You must specify a user.", flags: MessageFlags4.Ephemeral };
     }
     if (userId === interaction.member.user.id) {
-      return { content: "Kendini atamazs\u0131n.", flags: MessageFlags4.Ephemeral };
+      return { content: "You can't kick yourself.", flags: MessageFlags4.Ephemeral };
     }
     const denied = await checkModPermission(interaction, Perm.KickMembers);
     if (denied) return { content: denied, flags: MessageFlags4.Ephemeral };
@@ -460,15 +460,15 @@ var kick_default = {
       );
       const name = resolved?.username || userId;
       return {
-        content: `**@${name}** sunucudan at\u0131ld\u0131.
-Sebep: *${reason}*`,
+        content: `**@${name}** was kicked from the server.
+Reason: *${reason}*`,
         flags: MessageFlags4.Ephemeral
       };
     } catch (e) {
       if (e.status === 403) {
-        return { content: "Atma yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags4.Ephemeral };
+        return { content: "No permission to kick, or the target user has a higher role than you.", flags: MessageFlags4.Ephemeral };
       }
-      return { content: `Atma ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags4.Ephemeral };
+      return { content: `Kick failed: ${e.message || e}`, flags: MessageFlags4.Ephemeral };
     }
   }
 };
@@ -481,11 +481,11 @@ import {
 var clear_default = {
   data: {
     name: "clear",
-    description: "Kanalda belirli say\u0131da mesaj\u0131 siler",
+    description: "Deletes a number of messages in the channel",
     options: [
       {
         name: "amount",
-        description: "Silinecek mesaj say\u0131s\u0131 (1-100)",
+        description: "Number of messages to delete (1-100)",
         type: ApplicationCommandOptionType5.Integer,
         required: true,
         min_value: 1,
@@ -493,7 +493,7 @@ var clear_default = {
       },
       {
         name: "user",
-        description: "Sadece bu kullan\u0131c\u0131n\u0131n mesajlar\u0131n\u0131 sil",
+        description: "Only delete this user's messages",
         type: ApplicationCommandOptionType5.User,
         required: false
       }
@@ -507,7 +507,7 @@ var clear_default = {
     const filterUserId = interaction.data.options?.find((o) => o.name === "user")?.value;
     const channelId = interaction.channel_id;
     if (amount < 1 || amount > 100) {
-      return { content: "Mesaj say\u0131s\u0131 1-100 aras\u0131nda olmal\u0131.", flags: MessageFlags5.Ephemeral };
+      return { content: "Message count must be between 1-100.", flags: MessageFlags5.Ephemeral };
     }
     const denied = await checkModPermission(interaction, Perm.ManageMessages);
     if (denied) return { content: denied, flags: MessageFlags5.Ephemeral };
@@ -517,14 +517,14 @@ var clear_default = {
         { headers: discordHeaders }
       );
       if (!Array.isArray(messages) || messages.length === 0) {
-        return { content: "Silinecek mesaj bulunamad\u0131.", flags: MessageFlags5.Ephemeral };
+        return { content: "No messages found to delete.", flags: MessageFlags5.Ephemeral };
       }
       let toDelete = filterUserId ? messages.filter((m) => m.author.id === filterUserId) : messages;
       if (!filterUserId) {
         toDelete = messages.slice(0, amount);
       }
       if (toDelete.length === 0) {
-        return { content: "Bu kullan\u0131c\u0131n\u0131n silinecek mesaj\u0131 bulunamad\u0131.", flags: MessageFlags5.Ephemeral };
+        return { content: "No messages from this user found to delete.", flags: MessageFlags5.Ephemeral };
       }
       if (toDelete.length > 100) toDelete = toDelete.slice(0, 100);
       await discordFetch(
@@ -536,14 +536,14 @@ var clear_default = {
         }
       );
       return {
-        content: `${toDelete.length} mesaj silindi${filterUserId ? " (filtrelenmi\u015F)" : ""}.`,
+        content: `${toDelete.length} message${toDelete.length === 1 ? "" : "s"} deleted${filterUserId ? " (filtered)" : ""}.`,
         flags: MessageFlags5.Ephemeral
       };
     } catch (e) {
       if (e.status === 403) {
-        return { content: "Mesaj silme yetkisi yok.", flags: MessageFlags5.Ephemeral };
+        return { content: "No permission to delete messages.", flags: MessageFlags5.Ephemeral };
       }
-      return { content: `Silme ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags5.Ephemeral };
+      return { content: `Delete failed: ${e.message || e}`, flags: MessageFlags5.Ephemeral };
     }
   }
 };
@@ -558,17 +558,17 @@ import {
 var chat_default = {
   data: {
     name: "chat",
-    description: "Gemini AI ile sohbet et",
+    description: "Chat with Gemini AI",
     options: [
       {
         name: "prompt",
-        description: "AI'ya soraca\u011F\u0131n \u015Fey",
+        description: "What you want to ask the AI",
         type: ApplicationCommandOptionType6.String,
         required: true
       },
       {
         name: "image",
-        description: "Prompt'a eklenecek g\xF6rsel (opsiyonel)",
+        description: "Image to include with the prompt (optional)",
         type: ApplicationCommandOptionType6.Attachment,
         required: false
       }
@@ -578,7 +578,7 @@ var chat_default = {
     const apiKey = process.env.GOOGLE_AI_API_KEY;
     if (!apiKey) {
       return {
-        content: "Bu komut \u015Fu anda ayarlanmam\u0131\u015F (GOOGLE_AI_API_KEY eksik). Sunucu sahibiyle ileti\u015Fime ge\xE7.",
+        content: "This command is not configured yet (GOOGLE_AI_API_KEY missing). Contact the server owner.",
         flags: MessageFlags6.Ephemeral
       };
     }
@@ -589,7 +589,7 @@ var chat_default = {
     const interaction = data.interaction;
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
-        content: "Bu komut sadece slash (chat input) komutu olarak kullan\u0131labilir.",
+        content: "This command can only be used as a slash (chat input) command.",
         flags: MessageFlags6.Ephemeral
       };
     }
@@ -603,7 +603,7 @@ var chat_default = {
     const imageAttachment = interaction.data.resolved?.attachments?.[imageOption?.value || ""];
     if (prompt.length > 2e3) {
       return {
-        content: "Prompt 2000 karakterden k\u0131sa olmal\u0131.",
+        content: "Prompt must be shorter than 2000 characters.",
         flags: MessageFlags6.Ephemeral
       };
     }
@@ -623,12 +623,12 @@ var chat_default = {
       }
       const result = await model.generateContent(parts);
       const response = result.response.text();
-      const truncated = response.length > 1900 ? response.slice(0, 1900) + "\n...[2000 karakter s\u0131n\u0131r\u0131 i\xE7in k\u0131salt\u0131ld\u0131]" : response;
+      const truncated = response.length > 1900 ? response.slice(0, 1900) + "\n...[truncated for the 2000 character limit]" : response;
       return { content: truncated };
     } catch (error) {
       console.error("Error during AI chat:", error);
       return {
-        content: "\u0130stek i\u015Flenirken bir hata olu\u015Ftu.",
+        content: "An error occurred while processing the request.",
         flags: MessageFlags6.Ephemeral
       };
     }
@@ -643,11 +643,11 @@ import {
 var banner_default = {
   data: {
     name: "banner",
-    description: "Bir kullan\u0131c\u0131n\u0131n banner'\u0131n\u0131 g\xF6sterir",
+    description: "Shows a user's banner",
     options: [
       {
         name: "user",
-        description: "Banner'\u0131n\u0131 g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        description: "The user whose banner you want to see",
         type: ApplicationCommandOptionType7.User,
         required: true
       }
@@ -659,7 +659,7 @@ var banner_default = {
     )?.value;
     if (!userId) {
       return {
-        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
+        content: "You must specify a user.",
         flags: MessageFlags7.Ephemeral
       };
     }
@@ -671,14 +671,14 @@ var banner_default = {
       );
     } catch (e) {
       return {
-        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Banner al\u0131namad\u0131: ${e.message || e}`,
+        content: e.status === 404 ? "User not found." : `Could not fetch banner: ${e.message || e}`,
         flags: MessageFlags7.Ephemeral
       };
     }
     if (!user.banner) {
       const displayName = user.global_name || user.username;
       return {
-        content: `**@${displayName}**'in bir banner'\u0131 yok.`,
+        content: `**@${displayName}** doesn't have a banner.`,
         flags: MessageFlags7.Ephemeral
       };
     }
@@ -688,7 +688,7 @@ var banner_default = {
       embeds: [
         {
           color: user.accent_color || 13213916,
-          title: `${user.global_name || user.username} banner'\u0131`,
+          title: `${user.global_name || user.username}'s banner`,
           image: { url: bannerUrl }
         }
       ]
@@ -704,17 +704,17 @@ import {
 var ban_default = {
   data: {
     name: "ban",
-    description: "Bir kullan\u0131c\u0131y\u0131 sunucudan yasaklar",
+    description: "Bans a user from the server",
     options: [
       {
         name: "user",
-        description: "Yasaklanacak kullan\u0131c\u0131",
+        description: "The user to ban",
         type: ApplicationCommandOptionType8.User,
         required: true
       },
       {
         name: "reason",
-        description: "Yasaklama sebebi",
+        description: "Reason for the ban",
         type: ApplicationCommandOptionType8.String,
         required: false
       }
@@ -723,12 +723,12 @@ var ban_default = {
   async execute(data) {
     const interaction = data.interaction;
     const userId = findTargetId(interaction);
-    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "No reason provided";
     if (!userId) {
-      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags8.Ephemeral };
+      return { content: "You must specify a user.", flags: MessageFlags8.Ephemeral };
     }
     if (userId === interaction.member.user.id) {
-      return { content: "Kendini yasaklayamazs\u0131n.", flags: MessageFlags8.Ephemeral };
+      return { content: "You can't ban yourself.", flags: MessageFlags8.Ephemeral };
     }
     const denied = await checkModPermission(interaction, Perm.BanMembers);
     if (denied) return { content: denied, flags: MessageFlags8.Ephemeral };
@@ -744,15 +744,15 @@ var ban_default = {
       );
       const name = resolved?.username || userId;
       return {
-        content: `**@${name}** yasakland\u0131.
-Sebep: *${reason}*`,
+        content: `**@${name}** was banned.
+Reason: *${reason}*`,
         flags: MessageFlags8.Ephemeral
       };
     } catch (e) {
       if (e.status === 403) {
-        return { content: "Yasaklama yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags8.Ephemeral };
+        return { content: "No permission to ban, or the target user has a higher role than you.", flags: MessageFlags8.Ephemeral };
       }
-      return { content: `Yasaklama ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags8.Ephemeral };
+      return { content: `Ban failed: ${e.message || e}`, flags: MessageFlags8.Ephemeral };
     }
   }
 };

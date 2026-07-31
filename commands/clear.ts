@@ -13,11 +13,11 @@ import type {
 export default {
   data: {
     name: "clear",
-    description: "Kanalda belirli sayıda mesajı siler",
+    description: "Deletes a number of messages in the channel",
     options: [
       {
         name: "amount",
-        description: "Silinecek mesaj sayısı (1-100)",
+        description: "Number of messages to delete (1-100)",
         type: ApplicationCommandOptionType.Integer,
         required: true,
         min_value: 1,
@@ -25,7 +25,7 @@ export default {
       },
       {
         name: "user",
-        description: "Sadece bu kullanıcının mesajlarını sil",
+        description: "Only delete this user's messages",
         type: ApplicationCommandOptionType.User,
         required: false,
       },
@@ -42,7 +42,7 @@ export default {
     const channelId = interaction.channel_id;
 
     if (amount < 1 || amount > 100) {
-      return { content: "Mesaj sayısı 1-100 arasında olmalı.", flags: MessageFlags.Ephemeral };
+      return { content: "Message count must be between 1-100.", flags: MessageFlags.Ephemeral };
     }
 
     const denied = await checkModPermission(interaction, Perm.ManageMessages);
@@ -55,7 +55,7 @@ export default {
       );
 
       if (!Array.isArray(messages) || messages.length === 0) {
-        return { content: "Silinecek mesaj bulunamadı.", flags: MessageFlags.Ephemeral };
+        return { content: "No messages found to delete.", flags: MessageFlags.Ephemeral };
       }
 
       let toDelete = filterUserId
@@ -67,7 +67,7 @@ export default {
       }
 
       if (toDelete.length === 0) {
-        return { content: "Bu kullanıcının silinecek mesajı bulunamadı.", flags: MessageFlags.Ephemeral };
+        return { content: "No messages from this user found to delete.", flags: MessageFlags.Ephemeral };
       }
 
       if (toDelete.length > 100) toDelete = toDelete.slice(0, 100);
@@ -82,14 +82,14 @@ export default {
       );
 
       return {
-        content: `${toDelete.length} mesaj silindi${filterUserId ? " (filtrelenmiş)" : ""}.`,
+        content: `${toDelete.length} message${toDelete.length === 1 ? "" : "s"} deleted${filterUserId ? " (filtered)" : ""}.`,
         flags: MessageFlags.Ephemeral,
       };
     } catch (e: any) {
       if (e.status === 403) {
-        return { content: "Mesaj silme yetkisi yok.", flags: MessageFlags.Ephemeral };
+        return { content: "No permission to delete messages.", flags: MessageFlags.Ephemeral };
       }
-      return { content: `Silme başarısız: ${e.message || e}`, flags: MessageFlags.Ephemeral };
+      return { content: `Delete failed: ${e.message || e}`, flags: MessageFlags.Ephemeral };
     }
   },
 };

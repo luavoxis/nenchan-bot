@@ -14,17 +14,17 @@ import type {
 export default {
   data: {
     name: "chat",
-    description: "Gemini AI ile sohbet et",
+    description: "Chat with Gemini AI",
     options: [
       {
         name: "prompt",
-        description: "AI'ya soracağın şey",
+        description: "What you want to ask the AI",
         type: ApplicationCommandOptionType.String,
         required: true,
       },
       {
         name: "image",
-        description: "Prompt'a eklenecek görsel (opsiyonel)",
+        description: "Image to include with the prompt (optional)",
         type: ApplicationCommandOptionType.Attachment,
         required: false,
       },
@@ -36,7 +36,7 @@ export default {
     const apiKey = process.env.GOOGLE_AI_API_KEY;
     if (!apiKey) {
       return {
-        content: "Bu komut şu anda ayarlanmamış (GOOGLE_AI_API_KEY eksik). Sunucu sahibiyle iletişime geç.",
+        content: "This command is not configured yet (GOOGLE_AI_API_KEY missing). Contact the server owner.",
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -50,7 +50,7 @@ export default {
 
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
-        content: "Bu komut sadece slash (chat input) komutu olarak kullanılabilir.",
+        content: "This command can only be used as a slash (chat input) command.",
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -67,7 +67,7 @@ export default {
 
     if (prompt.length > 2000) {
       return {
-        content: "Prompt 2000 karakterden kısa olmalı.",
+        content: "Prompt must be shorter than 2000 characters.",
         flags: MessageFlags.Ephemeral,
       };
     }
@@ -94,14 +94,14 @@ export default {
 
       const truncated =
         response.length > 1900
-          ? response.slice(0, 1900) + "\n...[2000 karakter sınırı için kısaltıldı]"
+          ? response.slice(0, 1900) + "\n...[truncated for the 2000 character limit]"
           : response;
 
       return { content: truncated };
     } catch (error) {
       console.error("Error during AI chat:", error);
       return {
-        content: "İstek işlenirken bir hata oluştu.",
+        content: "An error occurred while processing the request.",
         flags: MessageFlags.Ephemeral,
       };
     }
