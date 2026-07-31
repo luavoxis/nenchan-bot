@@ -4,20 +4,17 @@ import type {
   SimplifiedInteraction,
 } from "../utils/types";
 
-// Here you define your command data
-// Discraft will handle the registration and interactions with the API
-
 export default {
   data: {
-    name: "ping", // The name of the command
-    description: "Check if the bot is online", // The description of the command
+    name: "ping",
+    description: "Bot çevrimiçi mi ve gecikme ne kadar?",
   } as CommandData,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async execute(data: {
     interaction: SimplifiedInteraction;
   }): CommandExecuteResult {
+    const start = Date.now();
     return {
-      content: "Pong from Vercel!", // The message content
+      content: `Pong! Gecikme: **${Date.now() - start}ms**`,
     };
   },
 };

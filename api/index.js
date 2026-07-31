@@ -1,20 +1,27 @@
 // index.ts
-import { InteractionResponseType, MessageFlags as MessageFlags5 } from "discord-api-types/v10";
+import { InteractionResponseType, MessageFlags as MessageFlags9 } from "discord-api-types/v10";
 import { InteractionType as InteractionType2, verifyKey } from "discord-interactions";
 import crypto from "crypto";
 
 // commands/userinfo.ts
 import {
-  ApplicationCommandOptionType
+  ApplicationCommandOptionType,
+  MessageFlags
 } from "discord-api-types/v10";
+
+// utils/discordFetch.ts
 async function discordFetch(url, opts = {}) {
   const u = new URL(url);
   const mod = u.protocol === "https:" ? await import("https") : await import("http");
+  const options = {
+    hostname: u.hostname,
+    port: u.port || (u.protocol === "https:" ? 443 : 80),
+    path: u.pathname + u.search,
+    method: opts.method || "GET",
+    headers: { "Content-Type": "application/json", ...opts.headers }
+  };
   return new Promise((resolve, reject) => {
-    const req = mod.request(u, {
-      method: opts.method || "GET",
-      headers: { "Content-Type": "application/json", ...opts.headers }
-    }, (res) => {
+    const req = mod.request(options, (res) => {
       let body = "";
       res.on("data", (chunk) => body += chunk);
       res.on("end", () => {
@@ -45,22 +52,45 @@ async function discordFetch(url, opts = {}) {
     req.end();
   });
 }
+var discordHeaders = {
+  Authorization: `Bot ${process.env.DISCORD_TOKEN}`
+};
+
+// commands/userinfo.ts
 function snowflakeToDate(id) {
   const timestamp = Number(BigInt(id) >> 22n) + 14200704e5;
-  return new Date(timestamp).toLocaleDateString("en-US", {
+  return new Date(timestamp).toLocaleDateString("tr-TR", {
     year: "numeric",
     month: "long",
     day: "numeric"
   });
 }
+function formatDate(iso) {
+  try {
+    return new Date(iso).toLocaleDateString("tr-TR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  } catch {
+    return iso;
+  }
+}
+function avatarUrl(user) {
+  if (!user.avatar) {
+    return `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator || 0) % 5}.png`;
+  }
+  const ext = user.avatar.startsWith("a_") ? "gif" : "png";
+  return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
+}
 var userinfo_default = {
   data: {
     name: "userinfo",
-    description: "Shows detailed information about a user",
+    description: "Bir kullan\u0131c\u0131 hakk\u0131nda detayl\u0131 bilgi g\xF6sterir",
     options: [
       {
         name: "user",
-        description: "The user to inspect (defaults to you)",
+        description: "Bak\u0131lacak kullan\u0131c\u0131 (varsay\u0131lan: sen)",
         type: ApplicationCommandOptionType.User,
         required: false
       }
@@ -69,98 +99,92 @@ var userinfo_default = {
   async execute(data) {
     const interaction = data.interaction;
     const targetId = interaction.data.options?.find((o) => o.name === "user")?.value || interaction.member.user.id;
-    const headers = {
-      Authorization: `Bot ${process.env.DISCORD_TOKEN}`
-    };
-    const user = await discordFetch(
-      `https://discord.com/api/v10/users/${targetId}`,
-      { headers }
-    );
-    const isAnimated = user.avatar?.startsWith("a_");
-    const ext = isAnimated ? "gif" : "png";
-    const avatarUrl = user.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024` : `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator) % 5}.png`;
+    let user;
+    try {
+      user = await discordFetch(
+        `https://discord.com/api/v10/users/${targetId}`,
+        { headers: discordHeaders }
+      );
+    } catch (e) {
+      return {
+        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Kullan\u0131c\u0131 bilgisi al\u0131namad\u0131: ${e.message || e}`,
+        flags: MessageFlags.Ephemeral
+      };
+    }
     const fields = [
-      { name: "Username", value: `@${user.username}`, inline: true },
-      { name: "Display Name", value: user.global_name || user.username, inline: true },
+      { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
+      { name: "G\xF6r\xFCnen Ad", value: user.global_name || user.username, inline: true },
       { name: "ID", value: `\`${user.id}\``, inline: false },
-      { name: "Bot", value: user.bot ? "Yes" : "No", inline: true },
-      { name: "Joined Discord", value: snowflakeToDate(user.id), inline: true }
+      { name: "Bot", value: user.bot ? "Evet" : "Hay\u0131r", inline: true },
+      { name: "Discord'a Kat\u0131l\u0131\u015F", value: snowflakeToDate(user.id), inline: true }
     ];
     if (user.accent_color) {
       fields.push({
-        name: "Accent Color",
+        name: "Vurgu Rengi",
         value: `\`#${user.accent_color.toString(16).padStart(6, "0")}\``,
         inline: true
       });
     }
     const badges = [];
     const flags = user.public_flags ?? 0;
-    if (flags & 1 << 0) badges.push("Discord Staff");
-    if (flags & 1 << 1) badges.push("Partner");
-    if (flags & 1 << 2) badges.push("HypeSquad Events");
-    if (flags & 1 << 3) badges.push("Bug Hunter Lv1");
-    if (flags & 1 << 6) badges.push("HypeSquad Bravery");
-    if (flags & 1 << 7) badges.push("HypeSquad Brilliance");
-    if (flags & 1 << 8) badges.push("HypeSquad Balance");
-    if (flags & 1 << 9) badges.push("Early Supporter");
-    if (flags & 1 << 10) badges.push("Team User");
-    if (flags & 1 << 14) badges.push("Bug Hunter Lv2");
-    if (flags & 1 << 16) badges.push("Verified Bot Dev");
-    if (flags & 1 << 17) badges.push("Certified Moderator");
-    if (flags & 1 << 18) badges.push("Bot HTTP Interactions");
-    if (flags & 1 << 19) badges.push("Active Developer");
+    const flagMap = [
+      [0, "Discord Staff"],
+      [1, "Partner"],
+      [2, "HypeSquad Events"],
+      [3, "Bug Hunter Lv1"],
+      [6, "HypeSquad Bravery"],
+      [7, "HypeSquad Brilliance"],
+      [8, "HypeSquad Balance"],
+      [9, "Early Supporter"],
+      [10, "Team User"],
+      [14, "Bug Hunter Lv2"],
+      [16, "Verified Bot Dev"],
+      [17, "Certified Moderator"],
+      [18, "Bot HTTP Interactions"],
+      [19, "Active Developer"]
+    ];
+    for (const [bit, label] of flagMap) {
+      if (flags & 1 << bit) badges.push(label);
+    }
     if (badges.length) {
-      fields.push({ name: "Badges", value: badges.join(", "), inline: false });
+      fields.push({ name: "Rozetler", value: badges.join(", "), inline: false });
     }
     try {
       const member = await discordFetch(
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
-        { headers }
+        { headers: discordHeaders }
       );
       fields.splice(2, 0, {
-        name: "Nickname",
-        value: member.nick || "None",
+        name: "Takma Ad",
+        value: member.nick || "Yok",
         inline: true
       });
-      const joinedAt = new Date(member.joined_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
-      fields.push({ name: "Joined Server", value: joinedAt, inline: true });
+      fields.push({ name: "Sunucuya Kat\u0131l\u0131\u015F", value: formatDate(member.joined_at), inline: true });
       try {
         const allRoles = await discordFetch(
           `https://discord.com/api/v10/guilds/${interaction.guild_id}/roles`,
-          { headers }
+          { headers: discordHeaders }
         );
-        const memberRoleIds = member.roles;
-        const memberRoles = allRoles.filter((r) => memberRoleIds.includes(r.id)).sort(
-          (a, b) => b.position - a.position
-        );
-        fields.push({
-          name: "Top Role",
-          value: memberRoles[0]?.name || "None",
-          inline: true
-        });
+        const memberRoles = (Array.isArray(allRoles) ? allRoles : []).filter((r) => member.roles.includes(r.id)).sort((a, b) => b.position - a.position);
+        fields.push({ name: "En Y\xFCksek Rol", value: memberRoles[0]?.name || "Yok", inline: true });
         const roleMentions = memberRoles.slice(0, 10).map((r) => `<@&${r.id}>`).join(" ");
-        const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} more*` : roleMentions || "None";
-        fields.push({ name: "Roles", value: roleSummary, inline: false });
+        const roleSummary = memberRoles.length > 10 ? `${roleMentions} *+${memberRoles.length - 10} tane daha*` : roleMentions || "Yok";
+        fields.push({ name: "Roller", value: roleSummary, inline: false });
       } catch {
-        fields.push({
-          name: "Roles",
-          value: "*Could not fetch roles*",
-          inline: false
-        });
+        fields.push({ name: "Roller", value: "*Roller al\u0131namad\u0131*", inline: false });
       }
-    } catch (err) {
-      const status = err.message?.match(/HTTP (\d+)/)?.[1] || "?";
-      fields.push({ name: "Note", value: `*Could not fetch member data (HTTP ${status}) - make sure the bot has Server Members Intent enabled and try re-inviting with \`guilds.members.read\` scope*`, inline: false });
+    } catch {
+      fields.push({
+        name: "Not",
+        value: "*Sunucu \xFCye verisi al\u0131namad\u0131 - botun **Server Members Intent** \xF6zelli\u011Finin a\xE7\u0131k oldu\u011Fundan emin ol.*",
+        inline: false
+      });
     }
     return {
       embeds: [
         {
           color: user.accent_color || 13213916,
-          thumbnail: { url: avatarUrl },
+          thumbnail: { url: avatarUrl(user) },
           fields
         }
       ]
@@ -168,220 +192,168 @@ var userinfo_default = {
   }
 };
 
-// commands/profile.ts
+// commands/timeout.ts
 import {
   ApplicationCommandOptionType as ApplicationCommandOptionType2,
   MessageFlags as MessageFlags2
 } from "discord-api-types/v10";
-var profile_default = {
+
+// utils/permissions.ts
+var Perm = {
+  KickMembers: 1n << 1n,
+  BanMembers: 1n << 2n,
+  ManageMessages: 1n << 13n,
+  ModerateMembers: 1n << 40n
+};
+function hasPerm(permissions, perm) {
+  try {
+    return (BigInt(permissions || 0) & perm) === perm;
+  } catch {
+    return false;
+  }
+}
+var TURKISH_NAMES = {
+  [Perm.KickMembers]: "\xDCyeleri At",
+  [Perm.BanMembers]: "\xDCyeleri Yasakla",
+  [Perm.ManageMessages]: "Mesajlar\u0131 Y\xF6net",
+  [Perm.ModerateMembers]: "\xDCyeleri K\u0131s\u0131kla"
+};
+function permName(perm) {
+  return TURKISH_NAMES[perm] || "Gerekli Yetki";
+}
+async function getGuildPermissions(guildId, userId) {
+  try {
+    const [member, roles] = await Promise.all([
+      discordFetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}`, { headers: discordHeaders }),
+      discordFetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers: discordHeaders })
+    ]);
+    if (!Array.isArray(roles)) return 0n;
+    let perms = 0n;
+    const everyone = roles.find((r) => r.id === guildId);
+    if (everyone) perms |= BigInt(everyone.permissions || 0);
+    const memberRoleIds = Array.isArray(member?.roles) ? member.roles : [];
+    for (const r of roles) {
+      if (r.id !== guildId && memberRoleIds.includes(r.id)) {
+        perms |= BigInt(r.permissions || 0);
+      }
+    }
+    return perms;
+  } catch {
+    return 0n;
+  }
+}
+async function checkModPermission(interaction, required) {
+  if (!hasPerm(interaction.member.permissions, required)) {
+    return `Bu i\u015Flemi yapmak i\xE7in **${permName(required)}** yetkine sahip olmal\u0131s\u0131n.`;
+  }
+  const botPerms = await getGuildPermissions(interaction.guild_id, interaction.application_id);
+  if (!hasPerm(botPerms, required)) {
+    return `Botun **${permName(required)}** yetkisi yok. Botu sunucudan \xE7\u0131kar\u0131p tekrar davet etmelisin.`;
+  }
+  return null;
+}
+function findTargetId(interaction, optionName = "user") {
+  return interaction.data.options?.find((o) => o.name === optionName)?.value;
+}
+
+// commands/timeout.ts
+function formatMinutes(min) {
+  if (min < 60) return `${min} dakika`;
+  if (min < 1440) return `${Math.floor(min / 60)} saat ${min % 60 ? min % 60 + " dakika" : ""}`;
+  return `${Math.floor(min / 1440)} g\xFCn ${min % 1440 ? Math.floor(min % 1440 / 60) + " saat" : ""}`;
+}
+var timeout_default = {
   data: {
-    name: "profile",
-    description: "Shows a user's profile picture",
+    name: "timeout",
+    description: "Bir kullan\u0131c\u0131y\u0131 belirli bir s\xFCre susturur",
     options: [
       {
         name: "user",
-        description: "The user you want to see the profile of",
+        description: "Susturulacak kullan\u0131c\u0131",
         type: ApplicationCommandOptionType2.User,
-        required: true
-      }
-    ]
-  },
-  async execute(data) {
-    const interaction = data.interaction;
-    const userId = interaction.data.options?.find(
-      (o) => o.name === "user"
-    )?.value;
-    if (!userId) {
-      return {
-        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
-        flags: MessageFlags2.Ephemeral
-      };
-    }
-    const user = interaction.data.resolved?.users?.[userId];
-    if (!user) {
-      return {
-        content: "Kullan\u0131c\u0131 bulunamad\u0131.",
-        flags: MessageFlags2.Ephemeral
-      };
-    }
-    const isAnimated = user.avatar.startsWith("a_");
-    const ext = isAnimated ? "gif" : "png";
-    const avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
-    return {
-      embeds: [
-        {
-          color: 13213916,
-          fields: [
-            { name: "Username", value: `@${user.username}`, inline: true },
-            { name: "ID", value: `\`${user.id}\``, inline: true }
-          ],
-          image: { url: avatarUrl }
-        }
-      ]
-    };
-  }
-};
-
-// commands/ping.ts
-var ping_default = {
-  data: {
-    name: "ping",
-    // The name of the command
-    description: "Check if the bot is online"
-    // The description of the command
-  },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async execute(data) {
-    return {
-      content: "Pong from Vercel!"
-      // The message content
-    };
-  }
-};
-
-// commands/chat.ts
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import {
-  ApplicationCommandOptionType as ApplicationCommandOptionType3,
-  ApplicationCommandType,
-  MessageFlags as MessageFlags3
-} from "discord-api-types/v10";
-var chat_default = {
-  data: {
-    name: "chat",
-    // The name of the command
-    description: "Chat with Gemini AI",
-    // The description of the command
-    options: [
-      {
-        name: "prompt",
-        // The name of the prompt option
-        description: "The prompt for the AI",
-        // The description of the prompt option
-        type: ApplicationCommandOptionType3.String,
         required: true
       },
       {
-        name: "image",
-        // The name of the image option
-        description: "Optional image to include in the prompt",
-        // The description of the image option
-        type: ApplicationCommandOptionType3.Attachment,
+        name: "minutes",
+        description: "S\xFCre (dakika, 1-40320 yani 28 g\xFCn)",
+        type: ApplicationCommandOptionType2.Integer,
+        required: true,
+        min_value: 1,
+        max_value: 40320
+      },
+      {
+        name: "reason",
+        description: "Susturma sebebi",
+        type: ApplicationCommandOptionType2.String,
         required: false
       }
     ]
   },
   async execute(data) {
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
-    const model = genAI.getGenerativeModel({
-      model: process.env.GOOGLE_AI_MODEL || "gemini-1.5-flash"
-    });
     const interaction = data.interaction;
-    if (interaction.data.type !== ApplicationCommandType.ChatInput) {
-      return {
-        content: "This command can only be used as a chat input (slash) command.",
-        flags: MessageFlags3.Ephemeral
-        // Make the response visible only to the user
-      };
-    }
-    const chatInteraction = interaction;
-    const promptOption = chatInteraction.data.options?.find(
-      (option) => option.name === "prompt"
+    const userId = findTargetId(interaction);
+    const minutes = Number(
+      interaction.data.options?.find((o) => o.name === "minutes")?.value || 0
     );
-    const imageOption = chatInteraction.data.options?.find(
-      (option) => option.name === "image"
-    );
-    const prompt = promptOption?.value || "";
-    const imageAttachment = chatInteraction.data.resolved?.attachments?.[imageOption?.value || ""];
-    if (prompt.length > 2e3) {
-      return {
-        content: "Prompt must be less than 2000 characters.",
-        flags: MessageFlags3.Ephemeral
-      };
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    if (!userId) {
+      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags2.Ephemeral };
     }
+    if (minutes < 1) {
+      return { content: "S\xFCre en az 1 dakika olmal\u0131.", flags: MessageFlags2.Ephemeral };
+    }
+    if (userId === interaction.member.user.id) {
+      return { content: "Kendini susturamazs\u0131n.", flags: MessageFlags2.Ephemeral };
+    }
+    const denied = await checkModPermission(interaction, Perm.ModerateMembers);
+    if (denied) return { content: denied, flags: MessageFlags2.Ephemeral };
+    const until = new Date(Date.now() + minutes * 6e4).toISOString();
     try {
-      let parts = [prompt];
-      if (imageAttachment) {
-        const imageBuffer = await (await fetch(imageAttachment.url)).arrayBuffer();
-        const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-        const image = {
-          inlineData: {
-            data: imageBase64,
-            // The base64 encoded image data
-            mimeType: imageAttachment.content_type
-            // The MIME type of the image
-          }
-        };
-        parts = [prompt, image];
+      const resolved = interaction.data.resolved?.users?.[userId];
+      await discordFetch(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${userId}`,
+        {
+          method: "PATCH",
+          headers: { ...discordHeaders, "X-Audit-Log-Reason": reason },
+          body: JSON.stringify({ communication_disabled_until: until })
+        }
+      );
+      const name = resolved?.username || userId;
+      return {
+        content: `**@${name}** **${formatMinutes(minutes)}** s\xFCreyle susturuldu.
+Sebep: *${reason}*`,
+        flags: MessageFlags2.Ephemeral
+      };
+    } catch (e) {
+      if (e.status === 403) {
+        return { content: "Susturma yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags2.Ephemeral };
       }
-      const result = await model.generateContent(parts);
-      const response = result.response.text();
-      const truncatedResponse = response.length > 1900 ? response.slice(0, 1900) + "\n...[truncated to keep below 2000 characters]" : response;
-      return {
-        content: truncatedResponse
-      };
-    } catch (error) {
-      console.error("Error during AI chat:", error);
-      return {
-        content: "An error occurred while processing your request.",
-        flags: MessageFlags3.Ephemeral
-      };
+      return { content: `Susturma ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags2.Ephemeral };
     }
   }
 };
 
-// commands/banner.ts
+// commands/profile.ts
 import {
-  ApplicationCommandOptionType as ApplicationCommandOptionType4,
-  MessageFlags as MessageFlags4
+  ApplicationCommandOptionType as ApplicationCommandOptionType3,
+  MessageFlags as MessageFlags3
 } from "discord-api-types/v10";
-async function discordFetch2(url, opts = {}) {
-  const u = new URL(url);
-  const mod = u.protocol === "https:" ? await import("https") : await import("http");
-  return new Promise((resolve, reject) => {
-    const req = mod.request(u, {
-      method: opts.method || "GET",
-      headers: { "Content-Type": "application/json", ...opts.headers }
-    }, (res) => {
-      let body = "";
-      res.on("data", (chunk) => body += chunk);
-      res.on("end", () => {
-        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            resolve(JSON.parse(body));
-          } catch {
-            resolve(body);
-          }
-        } else {
-          let msg = `HTTP ${res.statusCode}`;
-          try {
-            const d = JSON.parse(body);
-            msg = d.message || msg;
-          } catch {
-          }
-          const err = new Error(msg);
-          err.status = res.statusCode;
-          reject(err);
-        }
-      });
-    });
-    req.on("error", reject);
-    if (opts.body) {
-      if (typeof opts.body === "string") req.write(opts.body);
-      else req.write(JSON.stringify(opts.body));
-    }
-    req.end();
-  });
+function avatarUrl2(user) {
+  if (!user.avatar) {
+    return `https://cdn.discordapp.com/embed/avatars/${Number(user.discriminator || 0) % 5}.png`;
+  }
+  const ext = user.avatar.startsWith("a_") ? "gif" : "png";
+  return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
 }
-var banner_default = {
+var profile_default = {
   data: {
-    name: "banner",
-    description: "Shows a user's banner",
+    name: "profile",
+    description: "Bir kullan\u0131c\u0131n\u0131n profil foto\u011Fraf\u0131n\u0131 g\xF6sterir",
     options: [
       {
         name: "user",
-        description: "The user you want to see the banner of",
-        type: ApplicationCommandOptionType4.User,
+        description: "Profilini g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        type: ApplicationCommandOptionType3.User,
         required: true
       }
     ]
@@ -392,31 +364,331 @@ var banner_default = {
     )?.value;
     if (!userId) {
       return {
-        content: "You must specify a user.",
-        flags: MessageFlags4.Ephemeral
+        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
+        flags: MessageFlags3.Ephemeral
       };
     }
-    const user = await discordFetch2(
-      `https://discord.com/api/v10/users/${userId}`,
-      {
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_TOKEN}`
-        }
-      }
-    );
-    if (!user.banner) {
+    let user;
+    try {
+      user = await discordFetch(
+        `https://discord.com/api/v10/users/${userId}`,
+        { headers: discordHeaders }
+      );
+    } catch (e) {
       return {
-        content: "This user doesn't have a banner.",
-        flags: MessageFlags4.Ephemeral
+        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Profil al\u0131namad\u0131: ${e.message || e}`,
+        flags: MessageFlags3.Ephemeral
       };
     }
-    const isAnimated = user.banner.startsWith("a_");
-    const ext = isAnimated ? "gif" : "png";
+    const resolved = data.interaction.data.resolved?.users?.[userId];
+    const displayName = resolved?.username || user.global_name || user.username;
+    return {
+      embeds: [
+        {
+          color: user.accent_color || 13213916,
+          title: `${displayName} profil foto\u011Fraf\u0131`,
+          fields: [
+            { name: "Kullan\u0131c\u0131 Ad\u0131", value: `@${user.username}`, inline: true },
+            { name: "ID", value: `\`${user.id}\``, inline: true }
+          ],
+          image: { url: avatarUrl2(user) },
+          footer: user.bot ? { text: "Bot hesab\u0131" } : void 0
+        }
+      ]
+    };
+  }
+};
+
+// commands/ping.ts
+var ping_default = {
+  data: {
+    name: "ping",
+    description: "Bot \xE7evrimi\xE7i mi ve gecikme ne kadar?"
+  },
+  async execute(data) {
+    const start = Date.now();
+    return {
+      content: `Pong! Gecikme: **${Date.now() - start}ms**`
+    };
+  }
+};
+
+// commands/kick.ts
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType4,
+  MessageFlags as MessageFlags4
+} from "discord-api-types/v10";
+var kick_default = {
+  data: {
+    name: "kick",
+    description: "Bir kullan\u0131c\u0131y\u0131 sunucudan atar",
+    options: [
+      {
+        name: "user",
+        description: "At\u0131lacak kullan\u0131c\u0131",
+        type: ApplicationCommandOptionType4.User,
+        required: true
+      },
+      {
+        name: "reason",
+        description: "Atma sebebi",
+        type: ApplicationCommandOptionType4.String,
+        required: false
+      }
+    ]
+  },
+  async execute(data) {
+    const interaction = data.interaction;
+    const userId = findTargetId(interaction);
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    if (!userId) {
+      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags4.Ephemeral };
+    }
+    if (userId === interaction.member.user.id) {
+      return { content: "Kendini atamazs\u0131n.", flags: MessageFlags4.Ephemeral };
+    }
+    const denied = await checkModPermission(interaction, Perm.KickMembers);
+    if (denied) return { content: denied, flags: MessageFlags4.Ephemeral };
+    try {
+      const resolved = interaction.data.resolved?.users?.[userId];
+      await discordFetch(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${userId}`,
+        {
+          method: "DELETE",
+          headers: { ...discordHeaders, "X-Audit-Log-Reason": reason }
+        }
+      );
+      const name = resolved?.username || userId;
+      return {
+        content: `**@${name}** sunucudan at\u0131ld\u0131.
+Sebep: *${reason}*`,
+        flags: MessageFlags4.Ephemeral
+      };
+    } catch (e) {
+      if (e.status === 403) {
+        return { content: "Atma yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags4.Ephemeral };
+      }
+      return { content: `Atma ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags4.Ephemeral };
+    }
+  }
+};
+
+// commands/clear.ts
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType5,
+  MessageFlags as MessageFlags5
+} from "discord-api-types/v10";
+var clear_default = {
+  data: {
+    name: "clear",
+    description: "Kanalda belirli say\u0131da mesaj\u0131 siler",
+    options: [
+      {
+        name: "amount",
+        description: "Silinecek mesaj say\u0131s\u0131 (1-100)",
+        type: ApplicationCommandOptionType5.Integer,
+        required: true,
+        min_value: 1,
+        max_value: 100
+      },
+      {
+        name: "user",
+        description: "Sadece bu kullan\u0131c\u0131n\u0131n mesajlar\u0131n\u0131 sil",
+        type: ApplicationCommandOptionType5.User,
+        required: false
+      }
+    ]
+  },
+  async execute(data) {
+    const interaction = data.interaction;
+    const amount = Number(
+      interaction.data.options?.find((o) => o.name === "amount")?.value || 0
+    );
+    const filterUserId = interaction.data.options?.find((o) => o.name === "user")?.value;
+    const channelId = interaction.channel_id;
+    if (amount < 1 || amount > 100) {
+      return { content: "Mesaj say\u0131s\u0131 1-100 aras\u0131nda olmal\u0131.", flags: MessageFlags5.Ephemeral };
+    }
+    const denied = await checkModPermission(interaction, Perm.ManageMessages);
+    if (denied) return { content: denied, flags: MessageFlags5.Ephemeral };
+    try {
+      const messages = await discordFetch(
+        `https://discord.com/api/v10/channels/${channelId}/messages?limit=${Math.min(amount * 2, 100)}`,
+        { headers: discordHeaders }
+      );
+      if (!Array.isArray(messages) || messages.length === 0) {
+        return { content: "Silinecek mesaj bulunamad\u0131.", flags: MessageFlags5.Ephemeral };
+      }
+      let toDelete = filterUserId ? messages.filter((m) => m.author.id === filterUserId) : messages;
+      if (!filterUserId) {
+        toDelete = messages.slice(0, amount);
+      }
+      if (toDelete.length === 0) {
+        return { content: "Bu kullan\u0131c\u0131n\u0131n silinecek mesaj\u0131 bulunamad\u0131.", flags: MessageFlags5.Ephemeral };
+      }
+      if (toDelete.length > 100) toDelete = toDelete.slice(0, 100);
+      await discordFetch(
+        `https://discord.com/api/v10/channels/${channelId}/messages/bulk-delete`,
+        {
+          method: "POST",
+          headers: discordHeaders,
+          body: JSON.stringify({ messages: toDelete.map((m) => m.id) })
+        }
+      );
+      return {
+        content: `${toDelete.length} mesaj silindi${filterUserId ? " (filtrelenmi\u015F)" : ""}.`,
+        flags: MessageFlags5.Ephemeral
+      };
+    } catch (e) {
+      if (e.status === 403) {
+        return { content: "Mesaj silme yetkisi yok.", flags: MessageFlags5.Ephemeral };
+      }
+      return { content: `Silme ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags5.Ephemeral };
+    }
+  }
+};
+
+// commands/chat.ts
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType6,
+  ApplicationCommandType,
+  MessageFlags as MessageFlags6
+} from "discord-api-types/v10";
+var chat_default = {
+  data: {
+    name: "chat",
+    description: "Gemini AI ile sohbet et",
+    options: [
+      {
+        name: "prompt",
+        description: "AI'ya soraca\u011F\u0131n \u015Fey",
+        type: ApplicationCommandOptionType6.String,
+        required: true
+      },
+      {
+        name: "image",
+        description: "Prompt'a eklenecek g\xF6rsel (opsiyonel)",
+        type: ApplicationCommandOptionType6.Attachment,
+        required: false
+      }
+    ]
+  },
+  async execute(data) {
+    const apiKey = process.env.GOOGLE_AI_API_KEY;
+    if (!apiKey) {
+      return {
+        content: "Bu komut \u015Fu anda ayarlanmam\u0131\u015F (GOOGLE_AI_API_KEY eksik). Sunucu sahibiyle ileti\u015Fime ge\xE7.",
+        flags: MessageFlags6.Ephemeral
+      };
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: process.env.GOOGLE_AI_MODEL || "gemini-1.5-flash"
+    });
+    const interaction = data.interaction;
+    if (interaction.data.type !== ApplicationCommandType.ChatInput) {
+      return {
+        content: "Bu komut sadece slash (chat input) komutu olarak kullan\u0131labilir.",
+        flags: MessageFlags6.Ephemeral
+      };
+    }
+    const promptOption = interaction.data.options?.find(
+      (option) => option.name === "prompt"
+    );
+    const imageOption = interaction.data.options?.find(
+      (option) => option.name === "image"
+    );
+    const prompt = promptOption?.value || "";
+    const imageAttachment = interaction.data.resolved?.attachments?.[imageOption?.value || ""];
+    if (prompt.length > 2e3) {
+      return {
+        content: "Prompt 2000 karakterden k\u0131sa olmal\u0131.",
+        flags: MessageFlags6.Ephemeral
+      };
+    }
+    try {
+      let parts = [prompt];
+      if (imageAttachment) {
+        const imageBuffer = await (await fetch(imageAttachment.url)).arrayBuffer();
+        parts = [
+          prompt,
+          {
+            inlineData: {
+              data: Buffer.from(imageBuffer).toString("base64"),
+              mimeType: imageAttachment.content_type
+            }
+          }
+        ];
+      }
+      const result = await model.generateContent(parts);
+      const response = result.response.text();
+      const truncated = response.length > 1900 ? response.slice(0, 1900) + "\n...[2000 karakter s\u0131n\u0131r\u0131 i\xE7in k\u0131salt\u0131ld\u0131]" : response;
+      return { content: truncated };
+    } catch (error) {
+      console.error("Error during AI chat:", error);
+      return {
+        content: "\u0130stek i\u015Flenirken bir hata olu\u015Ftu.",
+        flags: MessageFlags6.Ephemeral
+      };
+    }
+  }
+};
+
+// commands/banner.ts
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType7,
+  MessageFlags as MessageFlags7
+} from "discord-api-types/v10";
+var banner_default = {
+  data: {
+    name: "banner",
+    description: "Bir kullan\u0131c\u0131n\u0131n banner'\u0131n\u0131 g\xF6sterir",
+    options: [
+      {
+        name: "user",
+        description: "Banner'\u0131n\u0131 g\xF6rmek istedi\u011Fin kullan\u0131c\u0131",
+        type: ApplicationCommandOptionType7.User,
+        required: true
+      }
+    ]
+  },
+  async execute(data) {
+    const userId = data.interaction.data.options?.find(
+      (o) => o.name === "user"
+    )?.value;
+    if (!userId) {
+      return {
+        content: "Bir kullan\u0131c\u0131 belirtmelisin.",
+        flags: MessageFlags7.Ephemeral
+      };
+    }
+    let user;
+    try {
+      user = await discordFetch(
+        `https://discord.com/api/v10/users/${userId}`,
+        { headers: discordHeaders }
+      );
+    } catch (e) {
+      return {
+        content: e.status === 404 ? "Kullan\u0131c\u0131 bulunamad\u0131." : `Banner al\u0131namad\u0131: ${e.message || e}`,
+        flags: MessageFlags7.Ephemeral
+      };
+    }
+    if (!user.banner) {
+      const displayName = user.global_name || user.username;
+      return {
+        content: `**@${displayName}**'in bir banner'\u0131 yok.`,
+        flags: MessageFlags7.Ephemeral
+      };
+    }
+    const ext = user.banner.startsWith("a_") ? "gif" : "png";
     const bannerUrl = `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${ext}?size=1024`;
     return {
       embeds: [
         {
-          color: 13213916,
+          color: user.accent_color || 13213916,
+          title: `${user.global_name || user.username} banner'\u0131`,
           image: { url: bannerUrl }
         }
       ]
@@ -424,13 +696,78 @@ var banner_default = {
   }
 };
 
+// commands/ban.ts
+import {
+  ApplicationCommandOptionType as ApplicationCommandOptionType8,
+  MessageFlags as MessageFlags8
+} from "discord-api-types/v10";
+var ban_default = {
+  data: {
+    name: "ban",
+    description: "Bir kullan\u0131c\u0131y\u0131 sunucudan yasaklar",
+    options: [
+      {
+        name: "user",
+        description: "Yasaklanacak kullan\u0131c\u0131",
+        type: ApplicationCommandOptionType8.User,
+        required: true
+      },
+      {
+        name: "reason",
+        description: "Yasaklama sebebi",
+        type: ApplicationCommandOptionType8.String,
+        required: false
+      }
+    ]
+  },
+  async execute(data) {
+    const interaction = data.interaction;
+    const userId = findTargetId(interaction);
+    const reason = interaction.data.options?.find((o) => o.name === "reason")?.value || "Sebep belirtilmedi";
+    if (!userId) {
+      return { content: "Bir kullan\u0131c\u0131 belirtmelisin.", flags: MessageFlags8.Ephemeral };
+    }
+    if (userId === interaction.member.user.id) {
+      return { content: "Kendini yasaklayamazs\u0131n.", flags: MessageFlags8.Ephemeral };
+    }
+    const denied = await checkModPermission(interaction, Perm.BanMembers);
+    if (denied) return { content: denied, flags: MessageFlags8.Ephemeral };
+    try {
+      const resolved = interaction.data.resolved?.users?.[userId];
+      await discordFetch(
+        `https://discord.com/api/v10/guilds/${interaction.guild_id}/bans/${userId}`,
+        {
+          method: "PUT",
+          headers: { ...discordHeaders, "X-Audit-Log-Reason": reason },
+          body: JSON.stringify({ delete_message_seconds: 0 })
+        }
+      );
+      const name = resolved?.username || userId;
+      return {
+        content: `**@${name}** yasakland\u0131.
+Sebep: *${reason}*`,
+        flags: MessageFlags8.Ephemeral
+      };
+    } catch (e) {
+      if (e.status === 403) {
+        return { content: "Yasaklama yetkisi yok veya hedef kullan\u0131c\u0131 senden daha y\xFCksek bir role sahip.", flags: MessageFlags8.Ephemeral };
+      }
+      return { content: `Yasaklama ba\u015Far\u0131s\u0131z: ${e.message || e}`, flags: MessageFlags8.Ephemeral };
+    }
+  }
+};
+
 // .discraft/commands/index.ts
 var commands_default = {
   userinfo: userinfo_default,
+  timeout: timeout_default,
   profile: profile_default,
   ping: ping_default,
+  kick: kick_default,
+  clear: clear_default,
   chat: chat_default,
-  banner: banner_default
+  banner: banner_default,
+  ban: ban_default
 };
 
 // utils/types.ts
@@ -517,7 +854,7 @@ function verifyState(signed) {
 function logRequest(method, path, action, ip, status) {
   console.log(JSON.stringify({ ts: (/* @__PURE__ */ new Date()).toISOString(), method, path, action: action || "-", ip, status }));
 }
-async function discordFetch3(url, opts = {}) {
+async function discordFetch2(url, opts = {}) {
   const u = new URL(url);
   const http = await (u.protocol === "https:" ? import("https") : import("http"));
   const options = {
@@ -2881,14 +3218,14 @@ async function handleDiscord(req, res, rawBody, signature, timestamp) {
     const command = commands_default[commandName];
     if (command) {
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               type: InteractionResponseType.DeferredChannelMessageWithSource,
-              data: { flags: command.data.initialEphemeral ? MessageFlags5.Ephemeral : 0 }
+              data: { flags: command.data.initialEphemeral ? MessageFlags9.Ephemeral : 0 }
             })
           }
         );
@@ -2901,7 +3238,7 @@ async function handleDiscord(req, res, rawBody, signature, timestamp) {
       } catch (error) {
         const errMsg = error instanceof Error ? error.message : "Unknown error";
         commandResult = {
-          flags: MessageFlags5.Ephemeral,
+          flags: MessageFlags9.Ephemeral,
           embeds: [{
             color: 15548997,
             title: "Command Error",
@@ -2915,7 +3252,7 @@ ${errMsg.length > 1e3 ? errMsg.slice(0, 1e3) + "..." : errMsg}
         };
       }
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
           {
             method: "PATCH",
@@ -2950,12 +3287,12 @@ async function handleOAuthCallback(req, res, code) {
       code,
       redirect_uri: OAUTH_REDIRECT
     });
-    const tokenRes = await discordFetch3("https://discord.com/api/v10/oauth2/token", {
+    const tokenRes = await discordFetch2("https://discord.com/api/v10/oauth2/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params.toString()
     });
-    const userRes = await discordFetch3("https://discord.com/api/v10/users/@me", {
+    const userRes = await discordFetch2("https://discord.com/api/v10/users/@me", {
       headers: { Authorization: `Bearer ${tokenRes.access_token}` }
     });
     if (userRes.id !== DISCORD_OWNER_ID) {
@@ -2992,16 +3329,16 @@ async function handlePanel(res, body, req) {
   try {
     if (body.action === "guildinfo") {
       const [guildRes, chanRes, rolesRes] = await Promise.all([
-        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
-        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
-        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
+        discordFetch2(`https://discord.com/api/v10/guilds/${guildId}?with_counts=true`, { headers }),
+        discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers }),
+        discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       const guild = guildRes;
-      const botRes = await discordFetch3("https://discord.com/api/v10/users/@me", { headers });
-      const ownerRes = await discordFetch3(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
+      const botRes = await discordFetch2("https://discord.com/api/v10/users/@me", { headers });
+      const ownerRes = await discordFetch2(`https://discord.com/api/v10/users/${guild.owner_id}`, { headers });
       let bots = 0, humans = 0, totalMembers = guild.approximate_member_count || guild.member_count || "?";
       try {
-        const members = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
+        const members = await discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers });
         bots = members.filter((m) => m.user?.bot).length;
         humans = members.length - bots;
         totalMembers = guild.approximate_member_count || guild.member_count || members.length;
@@ -3041,7 +3378,7 @@ async function handlePanel(res, body, req) {
       });
     }
     if (body.action === "channels") {
-      const channels = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
+      const channels = await discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/channels`, { headers });
       return res.json({ channels });
     }
     if (body.action === "send") {
@@ -3074,7 +3411,7 @@ async function handlePanel(res, body, req) {
         const limit = parseLimit(body.limit, 30, 100);
         let url = `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${limit}`;
         if (body.before && isValidSnowflake(body.before)) url += `&before=${body.before}`;
-        const messages = await discordFetch3(url, { headers });
+        const messages = await discordFetch2(url, { headers });
         return res.json({ messages });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to fetch messages" });
@@ -3083,7 +3420,7 @@ async function handlePanel(res, body, req) {
     if (body.action === "delete") {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       if (!isValidSnowflake(body.messageId)) return res.status(400).json({ error: "Invalid message ID" });
-      await discordFetch3(
+      await discordFetch2(
         `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
         { method: "DELETE", headers }
       );
@@ -3091,20 +3428,20 @@ async function handlePanel(res, body, req) {
     }
     if (body.action === "members") {
       const [memberRes, rolesRes] = await Promise.all([
-        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
-        discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
+        discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }),
+        discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/roles`, { headers })
       ]);
       const members = Array.isArray(memberRes) ? memberRes : [];
       return res.json({ members, roles: rolesRes });
     }
     if (body.action === "userinfo") {
       if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
-      const userRes = await discordFetch3(`https://discord.com/api/v10/users/${body.userId}`, { headers });
+      const userRes = await discordFetch2(`https://discord.com/api/v10/users/${body.userId}`, { headers });
       return res.json(userRes);
     }
     if (body.action === "dm_channels") {
       try {
-        const channels = await discordFetch3(`https://discord.com/api/v10/users/@me/channels`, { headers });
+        const channels = await discordFetch2(`https://discord.com/api/v10/users/@me/channels`, { headers });
         return res.json({ channels });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to fetch DM channels" });
@@ -3116,7 +3453,7 @@ async function handlePanel(res, body, req) {
         const limit = parseLimit(body.limit, 50, 100);
         let url = `https://discord.com/api/v10/channels/${body.channelId}/messages?limit=${limit}`;
         if (body.before && isValidSnowflake(body.before)) url += `&before=${body.before}`;
-        const messages = await discordFetch3(url, { headers });
+        const messages = await discordFetch2(url, { headers });
         return res.json({ messages });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to fetch DM messages" });
@@ -3127,7 +3464,7 @@ async function handlePanel(res, body, req) {
       if (!channelId && body.userId) {
         if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
         try {
-          const ch = await discordFetch3(`https://discord.com/api/v10/users/@me/channels`, {
+          const ch = await discordFetch2(`https://discord.com/api/v10/users/@me/channels`, {
             method: "POST",
             headers,
             body: JSON.stringify({ recipient_id: body.userId })
@@ -3176,7 +3513,7 @@ async function handlePanel(res, body, req) {
         if (body.reason) banHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
         const banBody = {};
         if (body.deleteDays) banBody.delete_message_seconds = Math.min(Math.max(parseInt(String(body.deleteDays), 10) || 1, 0), 7) * 86400;
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
           { method: "PUT", headers: banHeaders, body: JSON.stringify(banBody) }
         );
@@ -3192,7 +3529,7 @@ async function handlePanel(res, body, req) {
       try {
         const kickHeaders = { ...headers };
         if (body.reason) kickHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
           { method: "DELETE", headers: kickHeaders }
         );
@@ -3210,7 +3547,7 @@ async function handlePanel(res, body, req) {
         const timeoutValue = clampedMinutes > 0 ? new Date(Date.now() + clampedMinutes * 60 * 1e3).toISOString() : null;
         const timeoutHeaders = { ...headers, "Content-Type": "application/json" };
         if (body.reason) timeoutHeaders["X-Audit-Log-Reason"] = encodeURIComponent(String(body.reason).slice(0, 512));
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/members/${userId}`,
           { method: "PATCH", headers: timeoutHeaders, body: JSON.stringify({ communication_disabled_until: timeoutValue }) }
         );
@@ -3222,8 +3559,8 @@ async function handlePanel(res, body, req) {
     if (body.action === "moderations") {
       try {
         const [bans, members] = await Promise.all([
-          discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`, { headers }).catch(() => []),
-          discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }).catch(() => [])
+          discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`, { headers }).catch(() => []),
+          discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/members?limit=1000`, { headers }).catch(() => [])
         ]);
         const now = (/* @__PURE__ */ new Date()).toISOString();
         const timeouts = (Array.isArray(members) ? members : []).filter((m) => m.communication_disabled_until && m.communication_disabled_until > now);
@@ -3237,7 +3574,7 @@ async function handlePanel(res, body, req) {
     }
     if (body.action === "bans") {
       try {
-        const bans = await discordFetch3(
+        const bans = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/bans?limit=1000`,
           { headers }
         );
@@ -3251,7 +3588,7 @@ async function handlePanel(res, body, req) {
       if (!userId) return res.status(400).json({ error: "No user specified" });
       if (!isValidSnowflake(userId)) return res.status(400).json({ error: "Invalid user ID" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/bans/${userId}`,
           { method: "DELETE", headers }
         );
@@ -3266,7 +3603,7 @@ async function handlePanel(res, body, req) {
       const content = validateContent(body.content);
       if (content === null) return res.status(400).json({ error: "Invalid content (max 2000 chars)" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/channels/${body.channelId}/messages/${body.messageId}`,
           { method: "PATCH", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify({ content }) }
         );
@@ -3280,7 +3617,7 @@ async function handlePanel(res, body, req) {
         const limit = parseLimit(body.limit, 25, 100);
         let url = `https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=${limit}`;
         if (body.before) url += `&before=${body.before}`;
-        const log = await discordFetch3(url, { headers });
+        const log = await discordFetch2(url, { headers });
         return res.json({ entries: log.audit_log_entries || [], users: log.users || [], roles: log.roles || [], webhooks: log.webhooks || [], integrations: log.integrations || [] });
       } catch (e) {
         return res.status(500).json({ error: e.message || "Failed to fetch audit log" });
@@ -3288,7 +3625,7 @@ async function handlePanel(res, body, req) {
     }
     if (body.action === "invites") {
       try {
-        const invites = await discordFetch3(
+        const invites = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/invites`,
           { headers }
         );
@@ -3300,7 +3637,7 @@ async function handlePanel(res, body, req) {
     if (body.action === "delete_invite") {
       if (!body.inviteCode) return res.status(400).json({ error: "No invite code" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/invites/${encodeURIComponent(body.inviteCode)}`,
           { method: "DELETE", headers }
         );
@@ -3313,7 +3650,7 @@ async function handlePanel(res, body, req) {
     if (body.action === "create_invite") {
       if (!body.channelId) return res.status(400).json({ error: "No channel specified" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/channels/${body.channelId}/invites`,
           {
             method: "POST",
@@ -3332,7 +3669,7 @@ async function handlePanel(res, body, req) {
     }
     if (body.action === "emojis") {
       try {
-        const emojis = await discordFetch3(
+        const emojis = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/emojis`,
           { headers }
         );
@@ -3348,7 +3685,7 @@ async function handlePanel(res, body, req) {
         const chBody = { name: chName, type: parseInt(String(body.type), 10) || 0 };
         if (body.topic) chBody.topic = String(body.topic).slice(0, 1024);
         if (body.categoryId && isValidSnowflake(body.categoryId)) chBody.parent_id = body.categoryId;
-        const ch = await discordFetch3(
+        const ch = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/channels`,
           { method: "POST", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(chBody) }
         );
@@ -3360,7 +3697,7 @@ async function handlePanel(res, body, req) {
     if (body.action === "delete_channel") {
       if (!isValidSnowflake(body.channelId)) return res.status(400).json({ error: "Invalid channel ID" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/channels/${body.channelId}`,
           { method: "DELETE", headers }
         );
@@ -3380,7 +3717,7 @@ async function handlePanel(res, body, req) {
       if (body.user_limit !== void 0) patchBody.user_limit = Math.min(Math.max(parseInt(body.user_limit, 10) || 0, 0), 99);
       if (body.parent_id !== void 0) patchBody.parent_id = body.parent_id && isValidSnowflake(body.parent_id) ? body.parent_id : null;
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/channels/${body.channelId}`,
           { method: "PATCH", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(patchBody) }
         );
@@ -3393,7 +3730,7 @@ async function handlePanel(res, body, req) {
       if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
       if (!isValidSnowflake(body.roleId)) return res.status(400).json({ error: "Invalid role ID" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/members/${body.userId}/roles/${body.roleId}`,
           { method: "PUT", headers }
         );
@@ -3406,7 +3743,7 @@ async function handlePanel(res, body, req) {
       if (!isValidSnowflake(body.userId)) return res.status(400).json({ error: "Invalid user ID" });
       if (!isValidSnowflake(body.roleId)) return res.status(400).json({ error: "Invalid role ID" });
       try {
-        await discordFetch3(
+        await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/members/${body.userId}/roles/${body.roleId}`,
           { method: "DELETE", headers }
         );
@@ -3426,7 +3763,7 @@ async function handlePanel(res, body, req) {
           patchBody.icon = body.icon;
         }
         if (!Object.keys(patchBody).length) return res.status(400).json({ error: "Nothing to update" });
-        const guild = await discordFetch3(
+        const guild = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}`,
           { method: "PATCH", headers: { ...headers, "Content-Type": "application/json" }, body: JSON.stringify(patchBody) }
         );
@@ -3437,7 +3774,7 @@ async function handlePanel(res, body, req) {
     }
     if (body.action === "guild_activity") {
       try {
-        const members = await discordFetch3(
+        const members = await discordFetch2(
           `https://discord.com/api/v10/guilds/${guildId}/members?limit=1000&sort=joined_at&desc=true`,
           { headers }
         ).catch(() => []);
@@ -3454,13 +3791,13 @@ async function handlePanel(res, body, req) {
         }));
         let bans = [];
         try {
-          const banList = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=100`, { headers });
+          const banList = await discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/bans?limit=100`, { headers });
           bans = Array.isArray(banList) ? banList.slice(0, 20) : [];
         } catch {
         }
         let kicks = [];
         try {
-          const auditLog = await discordFetch3(`https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=100&action_type=1`, { headers });
+          const auditLog = await discordFetch2(`https://discord.com/api/v10/guilds/${guildId}/audit-logs?limit=100&action_type=1`, { headers });
           if (auditLog && auditLog.audit_log_entries) {
             kicks = auditLog.audit_log_entries.slice(0, 20).map((entry) => ({
               user: auditLog.users?.find((u) => u.id === entry.user_id) || { id: entry.user_id, username: "Unknown" },

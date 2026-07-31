@@ -2,51 +2,21 @@ import {
   ApplicationCommandOptionType,
   MessageFlags,
 } from "discord-api-types/v10";
+import { discordFetch, discordHeaders } from "../utils/discordFetch";
 import type {
   CommandData,
   CommandExecuteResult,
   SimplifiedInteraction,
 } from "../utils/types";
 
-async function discordFetch(url: string, opts: any = {}): Promise<any> {
-  const u = new URL(url);
-  const mod = u.protocol === "https:" ? await import("https") : await import("http");
-  return new Promise((resolve, reject) => {
-    const req = mod.request(u, {
-      method: opts.method || "GET",
-      headers: { "Content-Type": "application/json", ...opts.headers },
-    }, (res: any) => {
-      let body = "";
-      res.on("data", (chunk: any) => body += chunk);
-      res.on("end", () => {
-        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
-          try { resolve(JSON.parse(body)); } catch { resolve(body); }
-        } else {
-          let msg = `HTTP ${res.statusCode}`;
-          try { const d = JSON.parse(body); msg = d.message || msg; } catch {}
-          const err = new Error(msg) as any;
-          err.status = res.statusCode;
-          reject(err);
-        }
-      });
-    });
-    req.on("error", reject);
-    if (opts.body) {
-      if (typeof opts.body === "string") req.write(opts.body);
-      else req.write(JSON.stringify(opts.body));
-    }
-    req.end();
-  });
-}
-
 export default {
   data: {
     name: "banner",
-    description: "Shows a user's banner",
+    description: "Bir kullanıcının banner'ını gösterir",
     options: [
       {
         name: "user",
-        description: "The user you want to see the banner of",
+        description: "Banner'ını görmek istediğin kullanıcı",
         type: ApplicationCommandOptionType.User,
         required: true,
       },
@@ -61,35 +31,40 @@ export default {
 
     if (!userId) {
       return {
-        content: "You must specify a user.",
+        content: "Bir kullanıcı belirtmelisin.",
         flags: MessageFlags.Ephemeral,
       };
     }
 
-    const user = await discordFetch(
-      `https://discord.com/api/v10/users/${userId}`,
-      {
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        },
-      },
-    );
+    let user: any;
+    try {
+      user = await discordFetch(
+        `https://discord.com/api/v10/users/${userId}`,
+        { headers: discordHeaders },
+      );
+    } catch (e: any) {
+      return {
+        content: e.status === 404 ? "Kullanıcı bulunamadı." : `Banner alınamadı: ${e.message || e}`,
+        flags: MessageFlags.Ephemeral,
+      };
+    }
 
     if (!user.banner) {
+      const displayName = user.global_name || user.username;
       return {
-        content: "This user doesn't have a banner.",
+        content: `**@${displayName}**'in bir banner'ı yok.`,
         flags: MessageFlags.Ephemeral,
       };
     }
 
-    const isAnimated = user.banner.startsWith("a_");
-    const ext = isAnimated ? "gif" : "png";
+    const ext = user.banner.startsWith("a_") ? "gif" : "png";
     const bannerUrl = `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${ext}?size=1024`;
 
     return {
       embeds: [
         {
-          color: 0xC9A0DC,
+          color: user.accent_color || 0xC9A0DC,
+          title: `${user.global_name || user.username} banner'ı`,
           image: { url: bannerUrl },
         },
       ],

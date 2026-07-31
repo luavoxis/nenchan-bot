@@ -11,23 +11,20 @@ import type {
   SimplifiedInteraction,
 } from "../utils/types";
 
-// Here you define your command data
-// Discraft will handle the registration and interactions with the API
-
 export default {
   data: {
-    name: "chat", // The name of the command
-    description: "Chat with Gemini AI", // The description of the command
+    name: "chat",
+    description: "Gemini AI ile sohbet et",
     options: [
       {
-        name: "prompt", // The name of the prompt option
-        description: "The prompt for the AI", // The description of the prompt option
+        name: "prompt",
+        description: "AI'ya soracağın şey",
         type: ApplicationCommandOptionType.String,
         required: true,
       },
       {
-        name: "image", // The name of the image option
-        description: "Optional image to include in the prompt", // The description of the image option
+        name: "image",
+        description: "Prompt'a eklenecek görsel (opsiyonel)",
         type: ApplicationCommandOptionType.Attachment,
         required: false,
       },
@@ -36,91 +33,75 @@ export default {
   async execute(data: {
     interaction: SimplifiedInteraction;
   }): CommandExecuteResult {
-    // Initialize the Google Generative AI client
-    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
-    // Get the generative model instance
+    const apiKey = process.env.GOOGLE_AI_API_KEY;
+    if (!apiKey) {
+      return {
+        content: "Bu komut şu anda ayarlanmamış (GOOGLE_AI_API_KEY eksik). Sunucu sahibiyle iletişime geç.",
+        flags: MessageFlags.Ephemeral,
+      };
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: process.env.GOOGLE_AI_MODEL || "gemini-1.5-flash",
     });
 
-    const interaction = data.interaction; // Get the interaction data
+    const interaction = data.interaction;
 
-    // Check if the interaction is a chat input command
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
-        content:
-          "This command can only be used as a chat input (slash) command.",
-        flags: MessageFlags.Ephemeral, // Make the response visible only to the user
+        content: "Bu komut sadece slash (chat input) komutu olarak kullanılabilir.",
+        flags: MessageFlags.Ephemeral,
       };
     }
 
-    // Cast the interaction to the correct type
-    const chatInteraction = interaction;
-
-    // Find the 'prompt' option from the interaction
-    const promptOption = chatInteraction.data.options?.find(
+    const promptOption = interaction.data.options?.find(
       (option) => option.name === "prompt",
     ) as (APIApplicationCommandOption & { value: string }) | undefined;
-    // Find the 'image' option from the interaction
-    const imageOption = chatInteraction.data.options?.find(
+    const imageOption = interaction.data.options?.find(
       (option) => option.name === "image",
     ) as (APIApplicationCommandOption & { value: string }) | undefined;
-    const prompt = promptOption?.value || ""; // Get the value of the prompt option
+    const prompt = promptOption?.value || "";
     const imageAttachment =
-      chatInteraction.data.resolved?.attachments?.[imageOption?.value || ""]; // Get the image attachment details from the resolved data
+      interaction.data.resolved?.attachments?.[imageOption?.value || ""];
 
-    // Check if the prompt exceeds the maximum length
     if (prompt.length > 2000) {
       return {
-        content: "Prompt must be less than 2000 characters.",
+        content: "Prompt 2000 karakterden kısa olmalı.",
         flags: MessageFlags.Ephemeral,
       };
     }
 
     try {
-      // Prepare the parts for the AI model, starting with the prompt
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let parts: any[] = [prompt];
-      // If an image attachment exists, process it
       if (imageAttachment) {
-        // Fetch the image data from the URL
         const imageBuffer = await (
           await fetch(imageAttachment.url)
         ).arrayBuffer();
-        // Convert the image buffer to base64
-        const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-        // Format the image data for the AI model
-        const image = {
-          inlineData: {
-            data: imageBase64, // The base64 encoded image data
-            mimeType: imageAttachment.content_type, // The MIME type of the image
+        parts = [
+          prompt,
+          {
+            inlineData: {
+              data: Buffer.from(imageBuffer).toString("base64"),
+              mimeType: imageAttachment.content_type,
+            },
           },
-        };
-        // Include the image data along with the prompt
-        parts = [prompt, image];
+        ];
       }
 
-      // Generate content using the AI model
       const result = await model.generateContent(parts);
-      // Extract the text response from the result
       const response = result.response.text();
 
-      const truncatedResponse =
+      const truncated =
         response.length > 1900
-          ? response.slice(0, 1900) +
-            "\n...[truncated to keep below 2000 characters]"
+          ? response.slice(0, 1900) + "\n...[2000 karakter sınırı için kısaltıldı]"
           : response;
 
-      // Return the AI's response
-      return {
-        content: truncatedResponse,
-      };
+      return { content: truncated };
     } catch (error) {
-      // Log any errors that occur during the AI chat process
       console.error("Error during AI chat:", error);
-      // Return an error message to the user
       return {
-        content: "An error occurred while processing your request.",
+        content: "İstek işlenirken bir hata oluştu.",
         flags: MessageFlags.Ephemeral,
       };
     }
