@@ -936,8 +936,14 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
 .invite-members{color:#5a5260}
 .invite-del{padding:4px 10px;font-size:9px;border:1px solid #d45555;color:#d45555;background:transparent;border-radius:4px;cursor:pointer;font-family:'Space Grotesk',monospace;transition:all .15s;flex-shrink:0}
 .invite-del:hover{background:#d45555;color:#fff}
-.invite-temp-label{color:#5a5260;font-size:10px;display:flex;align-items:center;gap:4px;white-space:nowrap;cursor:pointer}
-.invite-temp-label input{cursor:pointer}
+.invite-temp-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;position:relative;height:30px;padding:0 2px}
+.invite-temp-toggle input{display:none}
+.invite-temp-toggle .toggle-track{width:30px;height:16px;background:#1c2129;border-radius:8px;position:relative;transition:background .2s;flex-shrink:0;border:1px solid #2e3440;box-shadow:inset 0 1px 2px rgba(0,0,0,.4)}
+.invite-temp-toggle .toggle-thumb{width:12px;height:12px;background:#5a5260;border-radius:50%;position:absolute;top:1px;left:1px;transition:left .2s,background .2s}
+.invite-temp-toggle input:checked + .toggle-track{background:#b48899;border-color:#b48899}
+.invite-temp-toggle input:checked + .toggle-track .toggle-thumb{left:15px;background:#13161b}
+.invite-temp-toggle .toggle-label{color:#5a5260;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;transition:color .2s}
+.invite-temp-toggle:hover .toggle-label{color:#e0dce4}
 .emoji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:4px;max-height:300px;overflow-y:auto;padding:4px}
 .emoji-grid::-webkit-scrollbar{width:4px}
 .emoji-grid::-webkit-scrollbar-thumb{background:#252a32;border-radius:2px}
@@ -1093,7 +1099,11 @@ th{color:#6d6572;font-size:10px;text-transform:uppercase;font-weight:600}
     <option value="604800">7 days</option>
     <option value="0">never</option>
   </select>
-  <label class="invite-temp-label"><input type="checkbox" id="inviteTemporary"/> temp</label>
+  <label class="invite-temp-toggle" title="temporary members are pruned if they leave &amp; rejoin">
+    <input type="checkbox" id="inviteTemporary"/>
+    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+    <span class="toggle-label">temp</span>
+  </label>
   <button onclick="createInvite()">create</button>
 </div>
 <div id="inviteList"></div>
