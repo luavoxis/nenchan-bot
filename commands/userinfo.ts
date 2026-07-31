@@ -34,7 +34,6 @@ function avatarUrl(user: any): string {
 }
 
 const ACCENT = 0xC9A0DC;
-const separator = () => ({ name: "\u200b", value: "\u200b", inline: false });
 
 function getBadges(user: any): string[] {
   const flags = user.public_flags ?? 0;
@@ -114,7 +113,6 @@ export default {
     });
 
     if (badges.length) {
-      fields.push(separator());
       fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
 
@@ -123,8 +121,6 @@ export default {
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
         { headers: discordHeaders },
       );
-
-      fields.push(separator());
 
       fields.push({ name: "Nickname", value: member.nick || "None", inline: true });
       fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
@@ -151,7 +147,6 @@ export default {
       fields.push({ name: "Roles", value: roleSummary, inline: false });
     } catch (e: any) {
       if (e.status !== 404) {
-        fields.push(separator());
         fields.push({
           name: "Note",
           value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
@@ -167,8 +162,6 @@ export default {
           author: { name: `@${user.username}`, icon_url: avatarUrl(user) },
           thumbnail: { url: avatarUrl(user) },
           fields,
-          footer: { text: `User ID: ${user.id}` },
-          timestamp: new Date().toISOString(),
         },
       ],
     };

@@ -78,7 +78,6 @@ function avatarUrl(user) {
   return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${ext}?size=1024`;
 }
 var ACCENT = 13213916;
-var separator = () => ({ name: "\u200B", value: "\u200B", inline: false });
 function getBadges(user) {
   const flags = user.public_flags ?? 0;
   const flagMap = [
@@ -146,7 +145,6 @@ var userinfo_default = {
       inline: true
     });
     if (badges.length) {
-      fields.push(separator());
       fields.push({ name: "Badges", value: badges.join(", "), inline: false });
     }
     try {
@@ -154,7 +152,6 @@ var userinfo_default = {
         `https://discord.com/api/v10/guilds/${interaction.guild_id}/members/${targetId}`,
         { headers: discordHeaders }
       );
-      fields.push(separator());
       fields.push({ name: "Nickname", value: member.nick || "None", inline: true });
       fields.push({ name: "Joined Server", value: formatDate(member.joined_at), inline: true });
       const allRoles = await discordFetch(
@@ -172,7 +169,6 @@ var userinfo_default = {
       fields.push({ name: "Roles", value: roleSummary, inline: false });
     } catch (e) {
       if (e.status !== 404) {
-        fields.push(separator());
         fields.push({
           name: "Note",
           value: "*Could not fetch server member data - make sure the bot has the **Server Members Intent** enabled.*",
@@ -186,9 +182,7 @@ var userinfo_default = {
           color,
           author: { name: `@${user.username}`, icon_url: avatarUrl(user) },
           thumbnail: { url: avatarUrl(user) },
-          fields,
-          footer: { text: `User ID: ${user.id}` },
-          timestamp: (/* @__PURE__ */ new Date()).toISOString()
+          fields
         }
       ]
     };
